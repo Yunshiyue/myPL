@@ -85,8 +85,8 @@ build CMakeFiles/myPL.dir/ClassDeclaration.cpp.o: CXX_COMPILER__myPL_Debug /home
   OBJECT_DIR = CMakeFiles/myPL.dir
   OBJECT_FILE_DIR = CMakeFiles/myPL.dir
 
-build CMakeFiles/myPL.dir/CommenStatement.cpp.o: CXX_COMPILER__myPL_Debug /home/qqy/data/cpp/myPL/CommenStatement.cpp || cmake_object_order_depends_target_myPL
-  DEP_FILE = CMakeFiles/myPL.dir/CommenStatement.cpp.o.d
+build CMakeFiles/myPL.dir/CommonStatement.cpp.o: CXX_COMPILER__myPL_Debug /home/qqy/data/cpp/myPL/CommonStatement.cpp || cmake_object_order_depends_target_myPL
+  DEP_FILE = CMakeFiles/myPL.dir/CommonStatement.cpp.o.d
   FLAGS = -g -std=gnu++17
   OBJECT_DIR = CMakeFiles/myPL.dir
   OBJECT_FILE_DIR = CMakeFiles/myPL.dir
@@ -99,7 +99,7 @@ build CMakeFiles/myPL.dir/CommenStatement.cpp.o: CXX_COMPILER__myPL_Debug /home/
 #############################################
 # Link the executable myPL
 
-build myPL: CXX_EXECUTABLE_LINKER__myPL_Debug CMakeFiles/myPL.dir/main.cpp.o CMakeFiles/myPL.dir/AstNode.cpp.o CMakeFiles/myPL.dir/Statement.cpp.o CMakeFiles/myPL.dir/Expression.cpp.o CMakeFiles/myPL.dir/FunctionDeclaration.cpp.o CMakeFiles/myPL.dir/ClassDeclaration.cpp.o CMakeFiles/myPL.dir/CommenStatement.cpp.o
+build myPL: CXX_EXECUTABLE_LINKER__myPL_Debug CMakeFiles/myPL.dir/main.cpp.o CMakeFiles/myPL.dir/AstNode.cpp.o CMakeFiles/myPL.dir/Statement.cpp.o CMakeFiles/myPL.dir/Expression.cpp.o CMakeFiles/myPL.dir/FunctionDeclaration.cpp.o CMakeFiles/myPL.dir/ClassDeclaration.cpp.o CMakeFiles/myPL.dir/CommonStatement.cpp.o
   FLAGS = -g
   OBJECT_DIR = CMakeFiles/myPL.dir
   POST_BUILD = :

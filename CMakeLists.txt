@@ -28,14 +28,9 @@ add_executable(myPL
 #${FLEX_Lexer_OUTPUTS} 
 main.cpp
         AstNode.cpp
-        AstNode.h
         Statement.cpp
-        Statement.h
         Expression.cpp
-        Expression.h
         FunctionDeclaration.cpp
-        FunctionDeclaration.h
         ClassDeclaration.cpp
-        ClassDeclaration.h
         CommonStatement.cpp
-        CommonStatement.h)
+        )
