@@ -1,4 +1,6 @@
-/home/qqy/data/clion/clion-2022.2.1/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/home/qqy/data/clion/clion-2022.2.1/bin/ninja/linux/ninja -G Ninja -S /home/qqy/data/cpp/myPL -B /home/qqy/data/cpp/myPL/cmake-build-debug
+"F:\clion\CLion 2022.2.1\bin\cmake\win\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - MinGW Makefiles" -S F:\1.cpp\myPL -B F:\1.cpp\myPL\cmake-build-debug
+-- Could NOT find BISON (missing: BISON_EXECUTABLE) 
+-- Could NOT find FLEX (missing: FLEX_EXECUTABLE) 
 -- Configuring done
 -- Generating done
--- Build files have been written to: /home/qqy/data/cpp/myPL/cmake-build-debug
+-- Build files have been written to: F:/1.cpp/myPL/cmake-build-debug

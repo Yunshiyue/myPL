@@ -7,10 +7,16 @@
 
 #include <vector>
 #include <memory>
+#include <string>
 
-using StatementList = std::vector<class Statement*>;
-using ExpressionList = std::vector<class Expression*>;
-using VariableList = std::vector<class VariableDeclaration*>;
+
+class CommonStatement;
+class Expression;
+class VariableDeclaration;
+
+using StatementList = std::vector<std::shared_ptr<CommonStatement>>;
+using ExpressionList = std::vector<std::shared_ptr<Expression>>;
+using VariableList = std::vector<std::shared_ptr<VariableDeclaration>>;
 
 class AstNode {
 public:

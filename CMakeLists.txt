@@ -33,4 +33,4 @@ main.cpp
         FunctionDeclaration.cpp
         ClassDeclaration.cpp
         CommonStatement.cpp
-        )
+        Literal.cpp Literal.h Type.cpp Type.h)
