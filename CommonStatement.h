@@ -49,11 +49,88 @@ private:
 
 class ForStatement : public CommonStatement {
 public:
+    explicit ForStatement(std::shared_ptr<Block> block) : block(std::move(block)) {}
+protected:
+    std::shared_ptr<Block> block;
+};
+
+class PyLikeForStatement : public ForStatement {
+public:
+    PyLikeForStatement(std::shared_ptr<Identifier> loopVariable, int left, int right, std::shared_ptr<Block> block)
+    : loopVariable(std::move(loopVariable))
+    , left(left)
+    , right(right)
+    , ForStatement(std::move(block)){}
+private:
+    std::shared_ptr<Identifier> loopVariable;
+    int left;
+    int right;
+};
+
+class CLikeForStatement : public ForStatement {
+public:
+    CLikeForStatement(std::shared_ptr<VariableDeclaration> firstExpr1,
+                      std::shared_ptr<RelationalExpression> judgeExpr,
+                      std::shared_ptr<AssignExpression> assignExpr,
+                      std::shared_ptr<Block> block)
+                      : firstExpr1(std::move(firstExpr1))
+                      , judgeExpr(std::move(judgeExpr))
+                      , assignExpr(std::move(assignExpr))
+                      , ForStatement(std::move(block)) {}
+
+    CLikeForStatement(std::shared_ptr<AssignExpression> firstExpr2,
+                      std::shared_ptr<RelationalExpression> judgeExpr,
+                      std::shared_ptr<AssignExpression> assignExpr,
+                      std::shared_ptr<Block> block)
+            : firstExpr2(std::move(firstExpr2))
+            , judgeExpr(std::move(judgeExpr))
+            , assignExpr(std::move(assignExpr))
+            , ForStatement(std::move(block)) {}
+private:
+    std::shared_ptr<VariableDeclaration> firstExpr1 = nullptr;  // 注意：expr1和expr2只能用1个
+    std::shared_ptr<AssignExpression> firstExpr2 = nullptr;
+    std::shared_ptr<RelationalExpression> judgeExpr = nullptr;
+    std::shared_ptr<AssignExpression> assignExpr = nullptr;
+};
+
+class RangeForStatement : public ForStatement {
+public:
+    RangeForStatement(std::shared_ptr<Type> loopVariableType, std::shared_ptr<Identifier> loopVariable,
+                      std::shared_ptr<Identifier> loopRangeId, std::shared_ptr<Block> block)
+                      : loopVariableType(std::move(loopVariableType))
+                      , loopVariable(std::move(loopVariable))
+                      , loopRangeId(std::move(loopRangeId))
+                      , ForStatement(std::move(block)) {}
+private:
+    std::shared_ptr<Type> loopVariableType;
+    std::shared_ptr<Identifier> loopVariable;
+    std::shared_ptr<Identifier> loopRangeId;
 };
 
 class VariableDeclaration : public CommonStatement {
 public:
+    VariableDeclaration(std::shared_ptr<Type> type, std::shared_ptr<Identifier> id)
+    : type(std::move(type))
+    , id(std::move(id)) {}
 
+    VariableDeclaration(std::shared_ptr<Type> type, std::shared_ptr<Identifier> id,
+                        std::shared_ptr<Expression> assignmentExpr)
+                        : type(std::move(type))
+                        , id(std::move(id))
+                        , assignmentExpr(std::move(assignmentExpr)) {}
+
+    VariableDeclaration(std::shared_ptr<Type> type, std::shared_ptr<Identifier> id,
+                        std::shared_ptr<Type> templateType)
+                        : type(std::move(type))
+                        , id(std::move(id))
+                        , templateType(std::move(templateType)) {}
+
+    VariableDeclaration(std::shared_ptr<Type> type, std::shared_ptr<Identifier> id,
+                        std::shared_ptr<Expression> assignmentExpr, std::shared_ptr<Type> templateType)
+                        : type(std::move(type))
+                        , id(std::move(id))
+                        , assignmentExpr(std::move(assignmentExpr))
+                        , templateType(std::move(templateType)) {}
 private:
     std::shared_ptr<Type> type;
     std::shared_ptr<Identifier> id;

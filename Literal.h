@@ -14,28 +14,28 @@ private:
 
 class Character : public Literal {
 public:
-    Character(int value) : value(value) {}
+    explicit Character(int value) : value(value) {}
 private:
     int value;
 };
 
 class Boolean : public Literal {
 public:
-    Boolean(int v) { v >= 1 ? value = 1 : value = 0; }
+    explicit Boolean(int v) { v >= 1 ? value = 1 : value = 0; }
 private:
     int value;
 };
 
 class Double : public Literal {
 public:
-    Double(double value) : value(value) {}
+    explicit Double(double value) : value(value) {}
 private:
     double value;
 };
 
 class Float : public Literal {
 public:
-    Float(float value) : value(value) {}
+    explicit Float(float value) : value(value) {}
 private:
     float value;
 };

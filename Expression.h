@@ -23,8 +23,6 @@ private:
     std::string name;
 };
 
-
-
 class Factor : public Expression {
 public:
     explicit Factor(std::shared_ptr<Expression> exp) : exp(std::move(exp)) {}
@@ -80,7 +78,6 @@ private:
     std::string value;
 };
 
-// TODO 切片另外2种
 class SliceExpression : public Expression {
 public:
     SliceExpression(std::shared_ptr<Identifier> id, int left, int right)
@@ -93,16 +90,24 @@ private:
     int right;
 };
 
-// TODO: array
 class AssignExpression : public Expression {
 public:
+    AssignExpression(std::shared_ptr<Identifier> id, std::shared_ptr<Expression> rhs,
+                     std::shared_ptr<Expression> arrayIndex = nullptr)
+                     : id(std::move(id))
+                     , rhs(std::move(rhs))
+                     , arrayIndex(std::move(arrayIndex)) {}
 private:
     std::shared_ptr<Identifier> id;
     std::shared_ptr<Expression> rhs;
+    std::shared_ptr<Expression> arrayIndex = nullptr; // 只有对数组元素赋值时才使用
 };
 
 class FunctionCall : public Expression {
 public:
+    FunctionCall(std::shared_ptr<Identifier> id, std::shared_ptr<ExpressionList> arguments)
+    : id(std::move(id))
+    , arguments(std::move(arguments)) {}
 private:
     std::shared_ptr<Identifier> id;
     std::shared_ptr<ExpressionList> arguments;
