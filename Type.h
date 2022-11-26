@@ -13,6 +13,7 @@
 enum class TypeName {
     NONE,
     INT,
+    CHAR,
     DOUBLE,
     FLOAT,
     BOOLEAN,
@@ -66,6 +67,13 @@ class BooleanType : public Type {
 public:
     explicit BooleanType(int type) : Type(type) {}
     TypeName getTypeName() override { return TypeName::BOOLEAN; }
+private:
+};
+
+class CharType : public Type {
+public:
+    explicit CharType(int type) : Type(type) {}
+    TypeName getTypeName() override { return TypeName::CHAR; }
 private:
 };
 
