@@ -18,6 +18,15 @@ using StatementList = std::vector<std::shared_ptr<CommonStatement>>;
 using ExpressionList = std::vector<std::shared_ptr<Expression>>;
 using VariableList = std::vector<std::shared_ptr<VariableDeclaration>>;
 
+struct YYLTYPE
+{
+    int         first_line{0};
+    int         first_column{0};
+    int         last_line{0};
+    int         last_column{0};
+    std::string file_name;
+};
+
 class AstNode {
 public:
     virtual ~AstNode() = default;
