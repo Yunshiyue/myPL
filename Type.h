@@ -11,7 +11,9 @@
 #include "Expression.h"
 
 enum class TypeName {
+    NONE,
     INT,
+    CHAR,
     DOUBLE,
     FLOAT,
     BOOLEAN,
@@ -21,59 +23,72 @@ enum class TypeName {
 
 class Type : public AstNode {
 public:
-    Type(int type, std::shared_ptr<Identifier> id) : type(type), id(std::move(id)) {}
-    virtual TypeName getTypeName() = 0;
+    explicit Type(int type) : type(type) {}
+    virtual TypeName getTypeName()  { return TypeName::NONE; };
 protected:
-    int type;
-    std::shared_ptr<Identifier> id;
+    int type;   // 初始化时，传入词法对应的标识符，比如int、double、char对应的ID
 };
 
 class ArrayType : public Type {
 public:
-    ArrayType(int type, std::shared_ptr<Identifier> id, int capacity)
-    : Type(type, std::move(id))
+    // TODO 构造函数内部要根据eleType初始化elementType。词法定义好后可以做。
+    ArrayType(int type, int eleType, int capacity)
+    : Type(type)
     , capacity(capacity) {}
     TypeName getTypeName() override { return TypeName::ARRAY; }
+    TypeName getElementName() { return elementType; }
 private:
+    TypeName elementType;   // 数组存放元素的类型
     int capacity;
 };
 
 class IntType : public Type {
 public:
-    IntType(int type, std::shared_ptr<Identifier> id) : Type(type, std::move(id)) {}
-    TypeName getTypeName() override { return TypeName::ARRAY; }
+    explicit IntType(int type) : Type(type) {}
+    TypeName getTypeName() override { return TypeName::INT; }
 private:
 };
 
 class DoubleType : public Type {
 public:
-    DoubleType(int type, std::shared_ptr<Identifier> id) : Type(type, std::move(id)) {}
+    explicit DoubleType(int type) : Type(type) {}
     TypeName getTypeName() override { return TypeName::DOUBLE; }
 private:
 };
 
 class FloatType : public Type {
 public:
-    FloatType(int type, std::shared_ptr<Identifier> id) : Type(type, std::move(id)) {}
+    explicit FloatType(int type) : Type(type) {}
     TypeName getTypeName() override { return TypeName::FLOAT; }
 private:
 };
 
 class BooleanType : public Type {
 public:
-    BooleanType(int type, std::shared_ptr<Identifier> id) : Type(type, std::move(id)) {}
+    explicit BooleanType(int type) : Type(type) {}
     TypeName getTypeName() override { return TypeName::BOOLEAN; }
+private:
+};
+
+class CharType : public Type {
+public:
+    explicit CharType(int type) : Type(type) {}
+    TypeName getTypeName() override { return TypeName::CHAR; }
 private:
 };
 
 class ClassType : public Type {
 public:
-    ClassType(int type, std::shared_ptr<Identifier> id, std::shared_ptr<Identifier> classId)
-    : Type(type, std::move(id))
-    , classId(std::move(classId)) {}
+    ClassType(int type, std::shared_ptr<Identifier> classId, std::shared_ptr<Type> templateType = nullptr)
+    : Type(type)
+    , classId(std::move(classId))
+    , templateType(std::move(templateType)) {}
     TypeName getTypeName() override { return TypeName::CLASS; }
+    std::shared_ptr<Identifier> getClassId() { return classId; }
+    std::shared_ptr<Type> getTemplateType() { return templateType; }
 private:
     std::shared_ptr<Identifier> classId;
+    std::shared_ptr<Type> templateType = nullptr;   // 模板类类型。非模板类为nullptr
 };
 
 #endif //MYPL_TYPE_H

@@ -27,14 +27,14 @@ public:
 
     // if-elif-else
     IfStatement(std::shared_ptr<CBPair> cbs, std::shared_ptr<std::vector<CBPair>> elifCbs,
-                std::shared_ptr<Block> elseBlock)
+                std::shared_ptr<Block> elseBlock = nullptr)
             : ifCbs(std::move(cbs))
             , elifCbs(std::move(elifCbs))
             , elseBlock(std::move(elseBlock)) {}
 private:
     std::shared_ptr<CBPair> ifCbs;
     std::shared_ptr<std::vector<CBPair>> elifCbs = nullptr;
-    std::shared_ptr<Block> elseBlock;
+    std::shared_ptr<Block> elseBlock = nullptr;
 };
 
 class WhileStatement : public CommonStatement {
@@ -60,7 +60,7 @@ public:
     : loopVariable(std::move(loopVariable))
     , left(left)
     , right(right)
-    , ForStatement(std::move(block)){}
+    , ForStatement(std::move(block)) {}
 private:
     std::shared_ptr<Identifier> loopVariable;
     int left;
@@ -109,55 +109,80 @@ private:
 
 class VariableDeclaration : public CommonStatement {
 public:
-    VariableDeclaration(std::shared_ptr<Type> type, std::shared_ptr<Identifier> id)
+    // 形如：int a;
+    VariableDeclaration(std::shared_ptr<Type> type, std::shared_ptr<Identifier> id, YYLTYPE loc)
     : type(std::move(type))
-    , id(std::move(id)) {}
+    , id(std::move(id))
+    , loc(std::move(loc)) {}
 
+    // 形如：int a = exp;
     VariableDeclaration(std::shared_ptr<Type> type, std::shared_ptr<Identifier> id,
-                        std::shared_ptr<Expression> assignmentExpr)
-                        : type(std::move(type))
-                        , id(std::move(id))
-                        , assignmentExpr(std::move(assignmentExpr)) {}
-
-    VariableDeclaration(std::shared_ptr<Type> type, std::shared_ptr<Identifier> id,
-                        std::shared_ptr<Type> templateType)
-                        : type(std::move(type))
-                        , id(std::move(id))
-                        , templateType(std::move(templateType)) {}
-
-    VariableDeclaration(std::shared_ptr<Type> type, std::shared_ptr<Identifier> id,
-                        std::shared_ptr<Expression> assignmentExpr, std::shared_ptr<Type> templateType)
+                        std::shared_ptr<Expression> assignmentExpr, YYLTYPE loc)
                         : type(std::move(type))
                         , id(std::move(id))
                         , assignmentExpr(std::move(assignmentExpr))
-                        , templateType(std::move(templateType)) {}
+                        , loc(std::move(loc)) {}
+
+    // 形如：A<int> a;
+    VariableDeclaration(std::shared_ptr<Type> type, std::shared_ptr<Identifier> id,
+                        std::shared_ptr<Type> templateType, YYLTYPE loc)
+                        : type(std::move(type))
+                        , id(std::move(id))
+                        , templateType(std::move(templateType))
+                        , loc(std::move(loc)) {}
+
+    // 形如：A<int> a = b;
+    VariableDeclaration(std::shared_ptr<Type> type, std::shared_ptr<Identifier> id,
+                        std::shared_ptr<Expression> assignmentExpr, std::shared_ptr<Type> templateType
+                        , YYLTYPE loc)
+                        : type(std::move(type))
+                        , id(std::move(id))
+                        , assignmentExpr(std::move(assignmentExpr))
+                        , templateType(std::move(templateType))
+                        , loc(std::move(loc)) {}
+
+    YYLTYPE getLocation() { return loc; }
 private:
     std::shared_ptr<Type> type;
     std::shared_ptr<Identifier> id;
     std::shared_ptr<Expression> assignmentExpr = nullptr;
     std::shared_ptr<Type> templateType = nullptr;
+    YYLTYPE loc;
 };
 
 class ReturnStatement : public CommonStatement {
 public:
-    explicit ReturnStatement(std::shared_ptr<Expression> expr = nullptr)
-    : returnExpr(std::move(expr)) {}
+    // 有返回值
+    explicit ReturnStatement(std::shared_ptr<Expression> expr, YYLTYPE loc)
+    : returnExpr(std::move(expr))
+    , loc(std::move(loc)) {}
+
+    // 无返回值
+    explicit ReturnStatement(YYLTYPE loc) : loc(std::move(loc)) {}
+    YYLTYPE getLocation() { return loc; }
 private:
-    std::shared_ptr<Expression> returnExpr;
+    std::shared_ptr<Expression> returnExpr = nullptr;
+    YYLTYPE loc;
 };
 
 class ExpressionStatement : public CommonStatement {
 public:
-    explicit ExpressionStatement(std::shared_ptr<Expression> expr) : expr(std::move(expr)) {}
+    explicit ExpressionStatement(std::shared_ptr<Expression> expr, YYLTYPE loc)
+    : expr(std::move(expr))
+    , loc(std::move(loc)) {}
+    YYLTYPE getLocation() { return loc; }
 private:
     std::shared_ptr<Expression> expr;
+    YYLTYPE loc;
 };
 
 class JumpStatement : public CommonStatement {
 public:
-    explicit JumpStatement(int op) : op(op) {}
+    explicit JumpStatement(int op, YYLTYPE loc) : op(op), loc(std::move(loc)) {}
+    YYLTYPE getLocation() { return loc; }
 private:
     int op;
+    YYLTYPE loc;
 };
 
 #endif //MYPL_COMMONSTATEMENT_H

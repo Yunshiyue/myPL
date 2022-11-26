@@ -1,3 +1,0 @@
-D:/ide/1.cpp/myPL/cmake-build-debug/CMakeFiles/myPL.dir
-D:/ide/1.cpp/myPL/cmake-build-debug/CMakeFiles/edit_cache.dir
-D:/ide/1.cpp/myPL/cmake-build-debug/CMakeFiles/rebuild_cache.dir

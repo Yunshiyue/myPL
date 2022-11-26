@@ -26,11 +26,13 @@ find_package(FLEX)
 add_executable(myPL 
 #${BISON_Parser_OUTPUTS} 
 #${FLEX_Lexer_OUTPUTS} 
-main.cpp
+        main.cpp
         AstNode.cpp
         Statement.cpp
         Expression.cpp
         FunctionDeclaration.cpp
         ClassDeclaration.cpp
         CommonStatement.cpp
-        Literal.cpp Literal.h Type.cpp Type.h)
+        Literal.cpp
+        Type.cpp
+        StringExpression.cpp)
