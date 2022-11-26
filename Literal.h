@@ -26,6 +26,13 @@ private:
     int value;
 };
 
+class Integer : public Literal {
+public:
+    explicit Integer(int v) : value(v) {}
+private:
+    int value;
+};
+
 class Double : public Literal {
 public:
     explicit Double(double value) : value(value) {}
