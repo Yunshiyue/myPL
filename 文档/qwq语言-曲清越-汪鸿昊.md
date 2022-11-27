@@ -1,3 +1,312 @@
+# 1 设计背景和思路
+
+## 1.1 背景
+
+​		随着信息技术的发展，计算机已成为人们学习和生活中不可缺少的一部分。在高等教育中，即使是非计算机专业，学校也往往会在前2学期为学生开设计算机相关的课程。课程内容一般为计算机的通识知识，后来为增加实用性，又出现了越来越多的课程开始教授编程语言，甚至部分非理工科专业也会在大学阶段修读关于编程语言的课程。
+
+​		现阶段，大学课堂上教授的最广泛的语言是C/C++、Java和Python，然而，这些语言都是应用广泛的商业型语言，语法规则、特性往往十分复杂、繁多。受限于课时数、语言的复杂程度等原因，学生并不可能在短短一学期的课程中掌握一门语言的全部内容，尤其对于非计算机专业的大部分学生，可能只能掌握语言的基本用法，无法理解更高级的特性。甚至面对规则、特性十分繁杂的语言，产生“被劝退”的副作用。
+
+​		所以，我们选择设计一门专门用于教学的编程语言，它集成了C++、Java和Python的最核心部分，去除了其中对于普通学生而言不常用的功能特性，让它作为一门教学语言，能达到“麻雀虽小五脏俱全”的效果。
+
+​		在详细阐述我们的语言的设计前，我们先从教学的角度分析C++、Java和Python的特点：
+
++ C++
+  C++是一门多范型语言，既可以支持面向对象编程，也可以像C语言那样进行纯面向过程的编程。C++最大的特点就是灵活性，我们可以用C++实现几乎任何我们想要的东西。但对于新手而言，灵活性更意味着复杂性，众多的特性会让新手无所适从。例如，光是指针这一内容，就足以专门出一本书去讲解了。另外，C++还有众多不便之处，比如，我们无法对数组进行整体赋值，只能对逐个元素进行赋值；想使用多态的性质，就必须将对象声明为指针类型等。
++ Java
+  Java抛弃了C++中一些使人容易犯错的用法，比如指针，从入手难度上看，比C++更加友好。但Java是一门纯面向对象语言，意味着任何事情都是对象，任何方法、变量均需在类里声明和定义。对于新手而言，理解面向对象的编程思想可能并不简单，容易在学习编程的初期产生很多困惑。
++ Python
+  与C++和Java相比，Python的语法精简了很多，在很多操作上，也比C++和Java容易，比如列表可以进行切片操作、有乘方运算符“**”等。但Python作为一门解释型的动态类型语言，也存在一些缺点。比如，性能相对较差，语法混乱（不同版本之间的语法可能不兼容）等。
+
+## 1.2 设计思路
+
+- 对Java和C++中有关类的语法和语义进行精简并结合
+- 加入一些Python中常用且方便的操作
+- 加入一些常用的高级特性，如模板等
+
+## 1.3 语言特性
+
+​		综合C++、Java和Python的特点，我们的语言具有以下特性：
+
++ 是一门多范型语言，既可以支持面向对象编程，也可以支持面向过程编程
++ 抛弃指针。简化多态特性，所有的方法均为动态绑定
++ 数组成为一种类型，可以整体赋值，并支持切片操作
++ 支持常用的便捷操作，如乘方运算符、取整运算符、范围for循环等，并将字符串作为一种基本类型
++ 支持函数模板
+
+# 2 词法和语法描述
+
+## 2.1 词法
+
+### 2.1.1 关键字
+
+&emsp;&emsp;本语言综合C++、Java和Python中的一些词法约束，并去掉了一些了我们不需要的内容。我们的关键字的EBNF如下：
+
+```ebnf
+# 关键字
+keyword ::= 'if' | 'else' | 'elif' | 'while' | 'this' | 'public' | 'private' | 'protected' | 'extends' | 'null' |
+'def' | 'class' | 'return' | 'break' | 'continue' | 'template' | 'typename';
+```
+
+### 2.1.2 基本类型及其字面值
+
+&emsp;&emsp;与C++、Java和Python类似，本语言的基本类型有bool、char、int、float、double。与之不同的是：  
+（1）我们把字符串string类型设置为一个基本类型，而不是像C++和Java一样是一个对象；  
+（2）我们新增数组类型array，方便用户直接对数组进行赋值等一些基本操作。
+
+&emsp;&emsp;基本类型的EBNF如下：
+
+```ebnf
+# 基本类型
+value-type ::= <bool> | <int> | <float> | <double> | <char> | <string> | <array>;
+bool ::= 'bool';
+int ::= 'int';
+float ::= 'float';
+double ::= 'double';
+char ::= 'char';
+string ::= 'string';
+array ::= 'array' '<' <value-type> ',' <integer> '>';
+```
+
+
+### 2.1.3 运算符
+
+&emsp;&emsp;运算符分为算术运算符、逻辑运算符和关系运算符，其中算术运算符又分为加法运算符和乘法运算符。  
+&emsp;&emsp;参考Python，本语言引入了乘方运算符“**”和取整运算符“//“。  
+&emsp;&emsp;EBNF如下：
+
+```ebnf
+# 加法运算符
+addition-operation ::= '+' | '-';
+
+# 乘法运算符
+multiplication-operator ::= '*' | '/' | '%' | '**' | '//';
+
+# 逻辑运算符
+logical-operator ::= '&&' | '||';
+
+# 关系运算符
+relational-operation ::= '>' | '>=' | '<' | '<=' | '==' | '!=';
+```
+
+### 2.1.4 标识符
+
+&emsp;&emsp;关键字以字母或下划线开始，由字母、数字和下划线组成，EBNF如下：
+
+```ebnf
+# 标识符
+identifier ::= [<letter> | '_'] {<letter> | <digit> | '_'};
+digit ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9';
+letter ::= 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' | 'k' | 'l' | 'm' | 
+'n' | 'o' | 'p' | 'q' | 'r' | 's' | 't' | 'u' | 'v' | 'w' | 'x' | 'y' | 'z' | 'A' |
+'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I' | 'J' | 'K' | 'L' | 'M' | 'N' | 
+'O' | 'P' | 'Q' | 'R' | 'S' | 'T' | 'U' | 'V' | 'W' | 'X' | 'Y' | 'Z';
+```
+
+## 2.2 语法
+
+### 2.2.1 程序
+
+&emsp;&emsp;程序由多条语句构成。本语言为多范型语言，支持面向对象和面向过程编程，所以可在类外部定义变量、函数等。EBNF如下：
+
+```ebnf
+# 程序
+program ::= <statement>+;
+statement ::= <function-declaration> | <class-declaration> | <variable-declaration> | <common-statement>;
+```
+
+### 2.2.2 函数声明
+
+&emsp;&emsp;由于本语言支持面向对象编程，变量的类型可以为类类型，所以类型由基础类型和类类型构成，EBNF如下：
+
+```ebnf
+type ::= <value-type> | <identifier>;
+```
+
+&emsp;&emsp;函数由函数头和函数体构成。本语言支持函数模板，可在函数头开头使用“template”关键字声明模板。返回类型尾置，如果不需要返回值，则无需写返回类型。函数体由基本语句构成。EBNF如下：
+
+```ebnf
+# 函数声明（注意模板）
+function-declaration ::= <function-head><function-body>;
+function-head ::= ['template' '<' 'typename' <identifier> '>'] 'def' <identifier> '(' <foraml-parameter-list> ')' ['->' <type>];
+function-body ::= '{' <statement-list> '}';
+foraml-parameter-list ::= <type> <identifier> {','<type> <identifier>} | null;
+statement-list ::= <common-statement>*;
+```
+
+### 2.2.3 类声明
+
+&emsp;&emsp;类声明由类头和类体构成。本语言支持类模板，可在类头的初始位置使用“template”关键字声明模板。为使语言容易理解且规避多继承带来的问题，本语言只支持单继承，可在类头中使用“extends”表明继承的父类。    
+&emsp;&emsp;本语言参考了C++和Java的面向对象机制，支持继承，在类体中可以用访问限制控制符“public”、“private”和“protected”声明块。  
+&emsp;&emsp;EBNF如下：
+
+```ebnf
+# 类声明（注意模板）
+class-declaration ::= <class-head> <class-body>;
+class-head ::= ['template' '<' 'typename' <identifier> '>'] 'class' <identifier> ['extends' <identifier>];
+class-body ::= '{' {public-block} {protected-block} {private-block} '}' ';';
+public-block ::= 'public:' <class-statement-list>;
+protected-block ::= 'protected:' <class-statement-list>;
+private-block ::= 'private:' <class-statement-list>;
+class-statement-list ::= {<function-declaration> | <variable-declaration>};
+```
+
+### 2.2.4 变量声明
+
+&emsp;&emsp;变量声明时，可以选择是否赋予初值。  
+&emsp;&emsp;在声明类类型时，本语言参考了Java的做法，所有类类型均动态分配。但Java中没声明一个对象，就要使用“new”关键字，比较繁琐，因此本语言简化了类类型对象的声明，如同C++中的直接构造那样，在标识符后面附加参数列表完成构造。  
+&emsp;&emsp;由于本语言支持类模板，在定义模板类的对象时，需在类型名后面使用“<>”表明模板类型。  
+&emsp;&emsp;EBNF如下：
+
+```ebnf
+# 变量声明
+variable-declaration ::= <type>['<' <type> '>'] <identifier> ';'|
+                         <type>['<' <type> '>'] <identifier> '=' <expression> ';' |
+                         <type>['<' <type> '>'] <identifier> '=' <identifier> ';' |
+                         <type>['<' <type> '>'] <identifier> '(' <actual-parameter-list> ')' ';';
+```
+
+### 2.2.5 语句
+
+&emsp;&emsp;普通语句分为if语句、while语句、for语句、变量声明、返回语句、表达式语句和jump语句。EBNF如下：
+
+```ebnf
+# 普通语句
+common-statement ::= <if-statement> | <while-statement> | <for-statement> | <variable-declaration> | ;
+                     <return-statement> | <expression-statement> | <jump-statement>;
+```
+
+#### 2.2.5.1 if语句
+
+&emsp;&emsp;在if语句中，本语言参考Python语言的elif关键字，不再需要else if表明分支。EBNF如下：
+
+```ebnf
+# if语句
+if-statement ::= 'if' '(' <relation-expression> ')' '{' <statement-list> '}'
+                {'elif' '(' <relation-expression> ')' '{' <statement-list> '}'} {'else' '{' <statement-list> '}'};
+```
+
+#### 2.2.5.2 while语句
+
+&emsp;&emsp;jump语句一般用于循环控制，本语言支持使用“break”和“continue”控制循环。EBNF如下：
+
+```ebnf
+# jump语句
+jump-statement ::= 'break' ';' | 'continue' ';';
+
+# while语句
+while-statement ::= 'while' '(' <relation-expression> ')' '{' <statement-list>  '}';
+```
+
+#### 2.2.5.3 for语句
+
+&emsp;&emsp;本语言参考C++、Java和Python中的for语句，丰富了for语句的语法。for语句支持：  
+（1）像Python那样，使用“in”表示循环控制变量的范围，区间为左闭右开；  
+（2）像C++和Java那样普通的for循环；  
+（3）范围for循环。  
+&emsp;&emsp;EBNF如下：
+
+```ebnf
+for-statement ::= 'for' <identifier> 'in' '(' <expression> ',' <expression> ')' '{' <statement-list> '}' |
+                  'for' '(' [<variable-declaration> | <assign-expression>]';' [<relation-expression>] ';' [<assign-expression>]')' 
+                  '{' <statement-list> '}' |
+                  'for' '(' <type> <identifier> 'in' <identifier>')' '{' <statement-list> '}';
+```
+
+#### 2.2.5.4 返回语句
+
+&emsp;&emsp;返回语句支持返回一个表达式或者不返回值，EBNF如下：
+
+```ebnf
+# 返回语句
+return-statement ::= 'return' [<expression>] ';';
+```
+
+#### 2.2.5.5 表达式语句
+
+&emsp;&emsp;每个表达式均可构成一条语句，EBNF如下：
+
+```ebnf
+# 表达式语句
+expression-statement ::= <expression> ';';
+```
+
+### 2.2.6 表达式
+
+&emsp;&emsp;表达式的类型分为逻辑表达式、算术表达式、字符串表达式、切片表达式和赋值表达式，EBNF如下：
+
+```ebnf
+# 表达式
+expression ::= <logical-expression> | <arithmetic-expression> | <string-expression> | 
+                <slice-expression> | <assign-expression>;
+```
+
+### 2.2.6.1 赋值表达式
+
+&emsp;&emsp;赋值表达式使用“=”对变量进行赋值，本语言的数组为基础类型，所以既可以对数组中的元素进行单独赋值，也可以对数组进行整体赋值。EBNF如下：
+
+```ebnf
+# 赋值表达式
+assign-expression ::= <identifier> {'[' <expression> ']'} '=' <expression>;
+```
+
+### 2.2.6.2 字符串表达式
+
+&emsp;&emsp;本语言将字符串作为一种基本类型，并为string类型内置了一些基本操作：  
+（1）使用substr返回子字符串；
+（2）使用reverse倒置字符串；  
+（3）使用title将字符串中每个单词的首字母大写；  
+（4）使用uppercase将字符串中的所有字母大写；  
+（5）使用lowercase将字符串中的所有字母小写。  
+&emsp;&emsp;EBNF如下：
+
+```ebnf
+# 字符串表达式
+string-expression ::= <string-literal> | <identifier> | <string-operation> | <function-expression>;
+string-operation ::= <string-expression> '+' <string-expression> |
+                    <string-expression> '.' 'substr' '(' <expression> ',' <expression> ')' |
+                    <string-expression> '.' 'reverse' |
+                    <string-expression> '.' 'title' |
+                    <string-expression> '.' 'uppercase' |
+                    <string-expression> '.' 'lowercase';
+```
+
+### 2.2.6.3 切片表达式
+
+&emsp;&emsp;本语言参考Python语言，引入切片机制，可以使用方括号和冒号的搭配返回一个新的数组，新数组的元素为原数组指定区间内的元素。EBNF如下：
+
+```ebnf
+# 切片表达式，返回一个数组
+slice-expression ::= <identifier> '[' [<expression>] ':' [<expression>] ']';
+```
+
+### 2.2.6.4 算术、逻辑和关系表达式
+
+&emsp;&emsp;本语言与运算有关的表达式包括算术表达式、逻辑表达式和关系表达式，EBNF如下：
+
+```ebnf
+# 算术表达式
+arithmetic-expression ::= ['+' | '-'] <item> { <addition-operator> <item> };
+addition-operation ::= '+' | '-';
+
+# 逻辑表达式（包括逻辑运算和关系运算）
+logical-expression ::= <factor> { <logical-operator> <factor>};
+logical-operator ::= '&&' | '||';
+
+# 关系表达式
+relational-expression ::= <arithmetic-expression> <relational-operator> <arithmetic-expression>;
+relational-operation ::= '>' | '>=' | '<' | '<=' | '==' | '!=';
+
+# 项
+item ::= <factor> { <multiplication-operator> <factor> };
+multiplication-operator ::= '*' | '/' | '%' | '**' | '//';
+
+# 因子（标识符、数组、括号表达式、字面值常量、函数表达式）
+factor ::= <identifier> | <identifier> { '[' <expression> ']' } | '(' <expression> ')' | 
+            <literal> | <function-expression> | <relational-expression>;
+```
+
+
+
 # 3 典型语言机制的语义描述
 
 ## 3.1 存储域
@@ -582,3 +891,149 @@ class-statement-list ::= {<function-declaration> | <variable-declaration>}
 
 ```java
 ```
+
+# 4 词法分析设计
+
+## 4.1 yylval类型定义（qwq.yy）
+
+```c++
+%union {
+    // TODO: 根据定义的节点class完善union
+    long long integer;
+    double real;
+    int boolean;
+    char character;
+    std::string *string; // 如果是string就是字符串的内容，如果是identifier就是标识符的名字
+    int token;
+}
+```
+
+## 4.2 token定义
+
+| 终结符、非终结符                   | 对应token            |
+| ---------------------------------- | -------------------- |
+| ''' . '''                          | TCHAR                |
+| '"' \<char>\* '"'                  | TSTRING、TIDENTIFIER |
+| 'true'\|'false'                    | TBOOL                |
+| ['+'\|'-'] \<digit>+               | TINTEGER             |
+| ['+'\|'-'] \<digit>+ '.' \<digit>+ | TREAL                |
+| '\*\*'                             | TPOWER               |
+| '//'                               | TEDIV                |
+| '++'                               | TSADD                |
+| '--'                               | TSSUB                |
+| '\|\|'                             | TOR                  |
+| '&&'                               | TAND                 |
+| '=='                               | TEQ                  |
+| '!='                               | TNE                  |
+| '>='                               | TGE                  |
+| '<='                               | TLE                  |
+| '+'                                | TADD                 |
+| '-'                                | TSUB                 |
+| '\*'                               | TMUL                 |
+| '/'                                | TDIV                 |
+| '%'                                | TMOD                 |
+| '!'                                | TNOT                 |
+| '>'                                | TGT                  |
+| '<'                                | TLT                  |
+| 'if'                               | TIF                  |
+| 'else'                             | TELSE                |
+| 'elif'                             | TELIF                |
+| 'for'                              | TFOR                 |
+| 'while'                            | TWHILE               |
+| 'this'                             | TTHIS                |
+| 'public'                           | TPUBLIC              |
+| 'private'                          | TPRIVATE             |
+| 'protected'                        | TPROTECTED           |
+| 'extends'                          | TEXTEND              |
+| 'def'                              | TDEF                 |
+| 'class'                            | TCLASS               |
+| 'return'                           | TRETURN              |
+| 'break'                            | TBREAK               |
+| 'continue'                         | TCONTINUE            |
+| 'int'                              | TINTTK               |
+| 'bool'                             | TBOOLTK              |
+| 'double'                           | TDOUBLETK            |
+| 'char'                             | TCHARTK              |
+| 'string'                           | TSTRTK               |
+| 'array'                            | TARRTK               |
+| 'template'                         | TTEMP                |
+| 'typename'                         | TTYNAME              |
+| 'substr'                           | TSUBS                |
+| 'reverse'                          | TREVS                |
+| 'title'                            | TTITLES              |
+| 'uppercase'                        | TUPS                 |
+| 'lowercase'                        | TLOWS                |
+
++ 赋值符号=、各种括号、.、,、;没有对应的token
+
+# 5 语法分析设计
+
+
+
+## 5.1 终结符定义
+
+```C++
+%token <integer>    TINTEGER
+%token <real>       TREAL
+%token <boolean>    TBOOL
+%token <character>  TCHAR
+%token <string>     TSTRING TIDENTIFIER
+// 算数运算符
+%token <token>      TPOWER TEDIV TSADD TSSUB TADD TSUB TMUL TDIV TMOD
+// 逻辑运算符
+%token <token>      TAND TOR TNOT
+// 比较运算符
+%token <token>      TEQ TNE TGE TLE TGT TLT
+// 关键字
+// 条件语句
+%token <token>      TIF TELSE TELIF
+// 循环语句
+%token <token>      TFOR TWHILE
+// 类
+%token <token>      TTHIS TPUBLIC TPRIVATE TPROTECTED TEXTEND TCLASS
+// 函数
+%token <token>      TDEF TRETURN
+// 跳出语句
+%token <token>      TCONTINUE TBREAK
+// 声明语句
+%token <token>      TINTTK TBOOLTK TDOUBLETK TCHARTK TSTRTK TARRTK
+// 模板
+%token <token>      TTEMP TTYNAME
+// 字符串操作
+%token <token>      TSUBS TREVS TTITLES TUPS TLOWS
+```
+
+## 5.2 非终结符定义
+
+
+
+## 5.3 优先级以及结合性
+
+```C++
+%right '='
+%left TAND TOR
+%nonassoc TNOT
+%left TADD TSUB
+%left TMUL TDIV TEDIV TMOD
+%left TPOWER
+%nonassoc TSADD TSSUB
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
