@@ -7,46 +7,46 @@
 
 #include "Expression.h"
 
-class Literal : public Expression {
-public:
-private:
-};
+namespace qwq {
 
-class Character : public Literal {
-public:
-    explicit Character(int value) : value(value) {}
-private:
-    int value;
-};
+    class Literal : public Expression {
+    public:
+    private:
+    };
 
-class Boolean : public Literal {
-public:
-    explicit Boolean(int v) { v >= 1 ? value = 1 : value = 0; }
-private:
-    int value;
-};
+    class Character : public Literal {
+    public:
+        explicit Character(int value) : value(value) {}
 
-class Integer : public Literal {
-public:
-    explicit Integer(int v) : value(v) {}
-private:
-    int value;
-};
+    private:
+        int value;
+    };
 
-class Double : public Literal {
-public:
-    explicit Double(double value) : value(value) {}
-private:
-    double value;
-};
+    class Boolean : public Literal {
+    public:
+        explicit Boolean(int v) { v >= 1 ? value = 1 : value = 0; }
 
-class Float : public Literal {
-public:
-    explicit Float(float value) : value(value) {}
-private:
-    float value;
-};
+    private:
+        int value;
+    };
 
+    class Integer : public Literal {
+    public:
+        explicit Integer(int v) : value(v) {}
+
+    private:
+        int value;
+    };
+
+    class Double : public Literal {
+    public:
+        explicit Double(double value) : value(value) {}
+
+    private:
+        double value;
+    };
 
 
+
+}
 #endif //MYPL_LITERAL_H

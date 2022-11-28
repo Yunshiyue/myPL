@@ -9,187 +9,177 @@
 
 #include "AstNode.h"
 
-class Type;
-
-class Expression : public AstNode {
-public:
-};
-
-class Identifier : public Expression {
-public:
-    explicit Identifier(std::string name, YYLTYPE loc) : name(std::move(name)), loc(std::move(loc)) {}
-    Identifier(const Identifier& id) : name(id.name), loc(id.loc) {}
-    YYLTYPE getLocation() { return loc; }
-private:
-    std::string name;
-    YYLTYPE loc;
-};
-
-class ArrayAccess : public Expression {
-public:
-    // 一维数组
-    ArrayAccess(std::shared_ptr<Identifier> id, int index, YYLTYPE loc)
-    : id(std::move(id))
-    , index(index)
-    , loc(std::move(loc)) {}
-
-    // 多维数组
-    ArrayAccess(std::shared_ptr<ArrayAccess> arrayAccess, int index, YYLTYPE loc)
-    : arrayExpr(std::move(arrayAccess))
-    , index(index)
-    , loc(std::move(loc)) {}
-
-    YYLTYPE getLocation() { return loc; }
-private:
-    std::shared_ptr<Identifier> id = nullptr;
-    std::shared_ptr<ArrayAccess> arrayExpr = nullptr;
-    int index;
-    YYLTYPE loc;
-};
-
-class Factor : public Expression {
-public:
-    explicit Factor(std::shared_ptr<Expression> exp) : exp(std::move(exp)) {}
-private:
-    std::shared_ptr<Expression> exp;
-};
-
-class Item : public Expression {
-public:
-    explicit Item(std::shared_ptr<Factor> lhs,
-                  std::shared_ptr<Factor> rhs = nullptr,
-                  int op = -1)
-                 : lhs(std::move(lhs))
-                 , op(op)
-                 , rhs(std::move(rhs)) {}
-
-private:
-    std::shared_ptr<Factor> lhs;
-    std::shared_ptr<Factor> rhs;
-    int op;
-};
-
-class ArithmeticExpression : public Expression {
-public:
-    // 形如：a op b
-    explicit ArithmeticExpression(std::shared_ptr<Item> lhs, std::shared_ptr<Item> rhs,
-                         int op, YYLTYPE loc)
-                         : lhs(std::move(lhs))
-                         , rhs(std::move(rhs))
-                         , op(op)
-                         , loc(std::move(loc)) {}
-
-    // 形如：a
-    explicit ArithmeticExpression(std::shared_ptr<Item> lhs, YYLTYPE loc)
-            : lhs(std::move(lhs))
-            , loc(std::move(loc)) {}
-
-    YYLTYPE getLocation() { return loc; }
-private:
-    std::shared_ptr<Item> lhs = nullptr;
-    std::shared_ptr<Item> rhs = nullptr;
-    int op = -1;
-    YYLTYPE loc;
-};
-
-class LogicalExpression : public Expression {
-public:
-    // 形如：a op b
-    explicit LogicalExpression(std::shared_ptr<Factor> lhs, std::shared_ptr<Factor> rhs,
-                      int op, YYLTYPE loc)
-                      : lhs(std::move(lhs))
-                      , rhs(std::move(rhs))
-                      , op(op)
-                      , loc(std::move(loc)) {}
-
-    // 形如：a
-    explicit LogicalExpression(std::shared_ptr<Factor> lhs, YYLTYPE loc)
-            : lhs(std::move(lhs))
-            , loc(std::move(loc)) {}
-
-    YYLTYPE getLocation() { return loc; }
-private:
-    std::shared_ptr<Factor> lhs = nullptr;
-    std::shared_ptr<Factor> rhs = nullptr;
-    int op = -1;
-    YYLTYPE loc;
-};
+namespace qwq {
 
 
-class SliceExpression : public Expression {
-public:
-    SliceExpression(std::shared_ptr<Identifier> id, int left, int right, YYLTYPE loc)
-    : id(std::move(id))
-    , left(left)
-    , right(right)
-    , loc(std::move(loc)) {}
-    YYLTYPE getLocation() { return loc; }
-private:
-    std::shared_ptr<Identifier> id;
-    int left;
-    int right;
-    YYLTYPE loc;
-};
+    class Type;
 
-class AssignExpression : public Expression {
-public:
-    // 给标识符赋值
-    AssignExpression(std::shared_ptr<Identifier> id, std::shared_ptr<Expression> rhs, YYLTYPE loc)
-                     : id(std::move(id))
-                     , rhs(std::move(rhs))
-                     , loc(std::move(loc)) {}
+    class Expression : public AstNode {
+    public:
+    };
 
-    // 给数组赋值
-    AssignExpression(std::shared_ptr<ArrayAccess> arrayAccess, std::shared_ptr<Expression> rhs, YYLTYPE loc)
-            : arrayExpr(std::move(arrayAccess))
-            , rhs(std::move(rhs))
-            , loc(std::move(loc)) {}
-    YYLTYPE getLocation() { return loc; }
-private:
-    std::shared_ptr<Identifier> id = nullptr;
-    std::shared_ptr<Expression> rhs = nullptr;
-    std::shared_ptr<ArrayAccess> arrayExpr = nullptr; // 只有对数组元素赋值时才使用
-    YYLTYPE loc;
-};
+    class Identifier : public Expression {
+    public:
+        explicit Identifier(std::string name, YYLTYPE loc) : name(std::move(name)), loc(std::move(loc)) {}
 
-class FunctionCall : public Expression {
-public:
-    FunctionCall(std::shared_ptr<Identifier> id, std::shared_ptr<ExpressionList> arguments, YYLTYPE loc)
-    : id(std::move(id))
-    , arguments(std::move(arguments))
-    , loc(std::move(loc)) {}
-    YYLTYPE getLocation() { return loc; }
-private:
-    std::shared_ptr<Identifier> id;
-    std::shared_ptr<ExpressionList> arguments;
-    YYLTYPE loc;
-};
+        Identifier(const Identifier &id) : name(id.name), loc(id.loc) {}
 
-class RelationalExpression : public Expression {
-public:
-    // 形如：a op b
-    explicit RelationalExpression(std::shared_ptr<ArithmeticExpression> lhs,
-                         std::shared_ptr<ArithmeticExpression> rhs, int op, YYLTYPE loc)
-                         : lhs(std::move(lhs))
-                         , rhs(std::move(rhs))
-                         , op(op)
-                         , loc(std::move(loc)) {}
+        YYLTYPE getLocation() { return loc; }
 
-    // 形如：a
-    explicit RelationalExpression(std::shared_ptr<ArithmeticExpression> lhs, YYLTYPE loc)
-            : lhs(std::move(lhs))
-            , loc(std::move(loc)) {}
-private:
-    std::shared_ptr<ArithmeticExpression> lhs;
-    std::shared_ptr<ArithmeticExpression> rhs = nullptr;
-    int op = -1;
-    YYLTYPE loc;
-};
+    private:
+        std::string name;
+        YYLTYPE loc;
+    };
 
-class Block : Expression {
-public:
-    StatementList statementLists;
-};
+    class ArrayAccess : public Expression {
+    public:
+        // 一维数组
+        ArrayAccess(std::shared_ptr<Identifier> id, int index, YYLTYPE loc)
+                : id(std::move(id)), index(index), loc(std::move(loc)) {}
+
+        // 多维数组
+        ArrayAccess(std::shared_ptr<ArrayAccess> arrayAccess, int index, YYLTYPE loc)
+                : arrayExpr(std::move(arrayAccess)), index(index), loc(std::move(loc)) {}
+
+        YYLTYPE getLocation() { return loc; }
+
+    private:
+        std::shared_ptr<Identifier> id = nullptr;
+        std::shared_ptr<ArrayAccess> arrayExpr = nullptr;
+        int index;
+        YYLTYPE loc;
+    };
+
+    class Factor : public Expression {
+    public:
+        explicit Factor(std::shared_ptr<Expression> exp) : exp(std::move(exp)) {}
+
+    private:
+        std::shared_ptr<Expression> exp;
+    };
+
+    class Item : public Expression {
+    public:
+        explicit Item(std::shared_ptr<Factor> lhs,
+                      std::shared_ptr<Factor> rhs = nullptr,
+                      int op = -1)
+                : lhs(std::move(lhs)), op(op), rhs(std::move(rhs)) {}
+
+    private:
+        std::shared_ptr<Factor> lhs;
+        std::shared_ptr<Factor> rhs;
+        int op;
+    };
+
+    class ArithmeticExpression : public Expression {
+    public:
+        // 形如：a op b
+        explicit ArithmeticExpression(std::shared_ptr<Item> lhs, std::shared_ptr<Item> rhs,
+                                      int op, YYLTYPE loc)
+                : lhs(std::move(lhs)), rhs(std::move(rhs)), op(op), loc(std::move(loc)) {}
+
+        // 形如：a
+        explicit ArithmeticExpression(std::shared_ptr<Item> lhs, YYLTYPE loc)
+                : lhs(std::move(lhs)), loc(std::move(loc)) {}
+
+        YYLTYPE getLocation() { return loc; }
+
+    private:
+        std::shared_ptr<Item> lhs = nullptr;
+        std::shared_ptr<Item> rhs = nullptr;
+        int op = -1;
+        YYLTYPE loc;
+    };
+
+    class LogicalExpression : public Expression {
+    public:
+        // 形如：a op b
+        explicit LogicalExpression(std::shared_ptr<Factor> lhs, std::shared_ptr<Factor> rhs,
+                                   int op, YYLTYPE loc)
+                : lhs(std::move(lhs)), rhs(std::move(rhs)), op(op), loc(std::move(loc)) {}
+
+        // 形如：a
+        explicit LogicalExpression(std::shared_ptr<Factor> lhs, YYLTYPE loc)
+                : lhs(std::move(lhs)), loc(std::move(loc)) {}
+
+        YYLTYPE getLocation() { return loc; }
+
+    private:
+        std::shared_ptr<Factor> lhs = nullptr;
+        std::shared_ptr<Factor> rhs = nullptr;
+        int op = -1;
+        YYLTYPE loc;
+    };
 
 
+    class SliceExpression : public Expression {
+    public:
+        SliceExpression(std::shared_ptr<Identifier> id, int left, int right, YYLTYPE loc)
+                : id(std::move(id)), left(left), right(right), loc(std::move(loc)) {}
+
+        YYLTYPE getLocation() { return loc; }
+
+    private:
+        std::shared_ptr<Identifier> id;
+        int left;
+        int right;
+        YYLTYPE loc;
+    };
+
+    class AssignExpression : public Expression {
+    public:
+        // 给标识符赋值
+        AssignExpression(std::shared_ptr<Identifier> id, std::shared_ptr<Expression> rhs, YYLTYPE loc)
+                : id(std::move(id)), rhs(std::move(rhs)), loc(std::move(loc)) {}
+
+        // 给数组赋值
+        AssignExpression(std::shared_ptr<ArrayAccess> arrayAccess, std::shared_ptr<Expression> rhs, YYLTYPE loc)
+                : arrayExpr(std::move(arrayAccess)), rhs(std::move(rhs)), loc(std::move(loc)) {}
+
+        YYLTYPE getLocation() { return loc; }
+
+    private:
+        std::shared_ptr<Identifier> id = nullptr;
+        std::shared_ptr<Expression> rhs = nullptr;
+        std::shared_ptr<ArrayAccess> arrayExpr = nullptr; // 只有对数组元素赋值时才使用
+        YYLTYPE loc;
+    };
+
+    class FunctionCall : public Expression {
+    public:
+        FunctionCall(std::shared_ptr<Identifier> id, std::shared_ptr<ExpressionList> arguments, YYLTYPE loc)
+                : id(std::move(id)), arguments(std::move(arguments)), loc(std::move(loc)) {}
+
+        YYLTYPE getLocation() { return loc; }
+
+    private:
+        std::shared_ptr<Identifier> id;
+        std::shared_ptr<ExpressionList> arguments;
+        YYLTYPE loc;
+    };
+
+    class RelationalExpression : public Expression {
+    public:
+        // 形如：a op b
+        explicit RelationalExpression(std::shared_ptr<ArithmeticExpression> lhs,
+                                      std::shared_ptr<ArithmeticExpression> rhs, int op, YYLTYPE loc)
+                : lhs(std::move(lhs)), rhs(std::move(rhs)), op(op), loc(std::move(loc)) {}
+
+        // 形如：a
+        explicit RelationalExpression(std::shared_ptr<ArithmeticExpression> lhs, YYLTYPE loc)
+                : lhs(std::move(lhs)), loc(std::move(loc)) {}
+
+    private:
+        std::shared_ptr<ArithmeticExpression> lhs;
+        std::shared_ptr<ArithmeticExpression> rhs = nullptr;
+        int op = -1;
+        YYLTYPE loc;
+    };
+
+    class Block : Expression {
+    public:
+        StatementList statementLists;
+    };
+
+}
 #endif //MYPL_EXPRESSION_H

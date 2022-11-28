@@ -7,9 +7,12 @@
 
 #include "AstNode.h"
 
-class Statement : public AstNode{
-public:
-};
+namespace qwq {
 
+    class Statement : public AstNode {
+    public:
+    };
+
+}
 
 #endif //MYPL_STATEMENT_H
