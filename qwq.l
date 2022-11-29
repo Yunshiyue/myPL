@@ -77,6 +77,7 @@ identifier  [{letter}_]?[{letter}{digit}_]+
 "return"        return SAVE_TOKEN(TRETURN);
 "break"         return SAVE_TOKEN(TBREAK);
 "continue"      return SAVE_TOKEN(TCONTINUE);
+"in"            return SAVE_TOKEN(TIN);
  // 类型关键字
 "int"           return SAVE_TOKEN(TINTTK);
 "bool"          return SAVE_TOKEN(TBOOLTK);

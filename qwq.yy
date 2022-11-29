@@ -74,7 +74,7 @@ ${
 // 条件语句
 %token <token>      TIF TELSE TELIF
 // 循环语句
-%token <token>      TFOR TWHILE
+%token <token>      TFOR TWHILE TIN
 // 类
 %token <token>      TTHIS TPUBLIC TPRIVATE TPROTECTED TEXTEND TCLASS
 // 函数
@@ -104,13 +104,12 @@ ${
 %%
 // TODO: 完成语法
 //程序
-program : program stmt {}
-        | stmt {}
+program : program stmt
+        | stmt
         ;
 
 //语句
 stmt  : func-decl
-      | var-decl
       | class-decl
       | common-stmt
       ;
@@ -119,37 +118,34 @@ type  : val-type
       | ident //只能是class类型的
       ;
 
-ident : TIDENTIFIER
-      ;
-
 //模板
 //template  : TTEMP '<' TTYNAME ident '>'
 //          ;
 //以下是statement的4部分
 //函数声明
-func-decl : func-head func-body
+func-decl : func-head block
           ;
 
 func-head : TDEF ident '(' fp-list ')'
           | TTEMP '<' TTYNAME ident '>' TDEF ident '(' fp-list ')'
           ; //bug?
 
-func-body : '{' stmt-list '}'
-          ;
-
 fp-list : %empty
-        | type ident
-        | fp-list ',' type ident
+        | var-decl
+        | fp-list ',' var-decl
         ;
 
 stmt-list : %empty
-          | stmt
-          | stmt-list stmt
+          | common-stmt
+          | stmt-list common-stmt
           ; //这里可能有bug，书上写了
 
+block : '{' stmt-list '}'
+      ;
+
 //类声明
-class-decl  : class-head class-body
-            ;
+class-decl  : class-head block
+            ; //应该只有var和func的声明
 
 class-head  : TCLASS ident 
             | TTEMP '<' TTYNAME ident '>' TCLASS ident
@@ -157,33 +153,185 @@ class-head  : TCLASS ident
             | TTEMP '<' TTYNAME ident '>' TCLASS ident TEXTEND ident
             ; //有点复杂，bug?
 
-class-body  : block
-            ; //应该只有var和func的声明
+//变量声明
+var-decl  : type '<' type '>' ident
+          | type ident
+          ;
+
+var-decl-assign : type ident '=' expr
+                | type '<' type '>' ident '=' expr
+                | type ident '(' ap-list ')'
+                | type '<' type '>' ident '(' ap-list ')'
+                ;
+
+var-decl-stmt : var-decl ';'
+              | var-decl-assign ';'
+              ;
 
 //普通语句
 common-stmt : if-stmt
             | while-stmt
             | for-stmt
-            | var-decl
+            | var-decl-stmt
             | return-stmt
             | expr-stmt
             | jump-stmt
             ;
+//以下是普通语句
+//if语句
+if-stmt : TIF '(' relation-expr ')' block
+        | TIF '(' relation-expr ')' block TELSE '(' relation-expr ')' block
+        ; 
 
-if-stmt : TIF '(' relation-stmt ')' block
-        | TIF '(' relation-stmt ')' block TELIF '(' relation-stmt ')' block TELSE '(' relation-stmt ')' block
-        | TIF '(' relation-stmt ')' block TELSE '(' relation-stmt ')' block
-        ; // elif 后面必须跟else
-
-while-stmt  : TWHILE '(' relation-stmt ')' block
+//while语句
+while-stmt  : TWHILE '(' relation-expr ')' block
             ;
+
+//jump语句
 jump-stmt : TBREAK ';'
           | TCONTINUE ';'
           ;
 
 // TODO:for循环
+// for 语句
+for-stmt  : c-like-for 
+          | py-like-for
+          | range-for
+          ;
+c-like-for  : TFOR '(' var-decl ';' relation-expr ';' assign-expr ')' block
+            | TFOR '(' assign-expr ';' relation-expr ';' assign-expr ')' block
+            ;
 
+py-like-for : TFOR ident TIN '(' expr ',' expr ')' block
+            ;
+
+range-for : TFOR '(' var-decl TIN ident ')' block
+            ;
+
+//返回语句
 return-stmt : TRETURN ';'
-            : TRETURN expr-stmt ';'
+            | TRETURN expr-stmt ';'
+            ;
 
+//表达式
+expr  : logical-expr
+      | arithmetic-expr
+      | str-expr
+      | slice-expr
+      | assign-expr
+      ;
+
+//表达式语句
+expr-stmt : expr ';'
+          ;
+
+//赋值表达式
+assign-expr : ident '=' expr
+            | arr-access '=' expr
+            ;
+
+//函数表达式
+func-expr : ident '.' ident '(' ap-list ')'
+          ;
+
+ap-list : %empty
+        | expr
+        | ap-list expr
+        ;
+
+//字符串表达式
+str-expr  : TSTRING
+          | ident
+          | str-operation
+          | func-expr
+          ;
+
+str-operation : str-expr TADD str-expr
+              | str-expr '.' TSUBS '(' expr ',' expr ')'
+              | str-expr '.' TREVS
+              | str-expr '.' TTITLES
+              | str-expr '.' TUPS
+              | str-expr '.' TLOWS
+              ;
+
+//切片表达式
+slice-expr  : ident '[' expr ':' expr ']'
+            ;
+
+//算术表达式
+arithmetic-expr : item
+                | arithmetic-expr addition-opt item
+                ;
+
+addition-opt  : TADD
+              | TSUB
+              ;
+
+//逻辑表达式
+logical-expr  : factor
+              | logical-expr logical-opt factor
+              ;
+
+logical-opt : TAND
+            | TOR
+            ;
+
+//关系表达式
+relation-expr : arithmetic-expr relation-opt arithmetic-expr
+              ;
+
+relation-opt  : TGT
+              | TGE
+              | TLT
+              | TLE
+              | TEQ
+              | TNE
+              ;
+
+//项
+item  : factor
+      | item multi-opt factor
+      ;
+
+multi-opt : TMUL
+          | TDIV
+          | TMOD
+          | TPOWER
+          | TEDIV
+          ;
+
+//因子
+factor  : ident
+        | arr-access
+        | '(' expr ')'
+        | literal
+        | func-expr
+        | relation-expr
+        ;
+
+//数组访问
+arr-access  : ident '[' expr ']'
+            | arr-access '[' expr ']'
+            ;
+
+//基本类型
+val-type  : TBOOLTK
+          | TINTTK
+          | TDOUBLETK
+          | TCHARTK
+          | TSTRTK
+          | TARRTK
+          ;
+
+//标识符
+ident : TIDENTIFIER
+      ;
+
+//字面值
+literal : TCHAR
+        | TSTRING
+        | TBOOL
+        | TINTEGER
+        | TREAL
+        ;
 %%
