@@ -1,56 +1,63 @@
 # 程序
 program ::= <statement>+;
-statement ::= <function-declaration> | <class-declaration> | <variable-declaration> | <common-statement>;
+statement ::= <function-declaration> | <class-declaration> | <common-statement>;
 
 type ::= <value-type> | <identifier>;
 # 以下是statement的4部分
 # 函数声明（注意模板）
-function-declaration ::= <function-head><function-body>;
+function-declaration ::= <function-head><block>;
 function-head ::= ['template' '<' 'typename' <identifier> '>'] 'def' <identifier> '(' <foraml-parameter-list> ')' ['->' <type>];
-function-body ::= '{' <statement-list> '}';
-foraml-parameter-list ::= <type> <identifier> {','<type> <identifier>} | null;
+(* function-body ::= '{' <statement-list> '}'; *)
+(* foraml-parameter-list ::= <type> <identifier> {','<type> <identifier>} | null; *)
+foraml-parameter-list ::= <variable-declaration> {','<variable-declaration>} | null;
+
 
 # 语句列表和块
 statement-list ::= <common-statement>*;
 block ::= '{' <statement-list> '}';
 
 # 类声明（注意模板）
-class-declaration ::= <class-head> <class-body>;
+class-declaration ::= <class-head> <block>;
 class-head ::= ['template' '<' 'typename' <identifier> '>'] 'class' <identifier> ['extends' <identifier>];
-class-body ::= '{' {public-block} {protected-block} {private-block} '}' ';';
-public-block ::= 'public:' <class-statement-list>;
+(* class-body ::= '{' {public-block} {protected-block} {private-block} '}' ';'; *)
+(* public-block ::= 'public:' <class-statement-list>;
 protected-block ::= 'protected:' <class-statement-list>;
-private-block ::= 'private:' <class-statement-list>;
-class-statement-list ::= {<function-declaration> | <variable-declaration>};
+private-block ::= 'private:' <class-statement-list>; *)
+(* class-statement-list ::= {<function-declaration> | <variable-declaration>}; *)
 
 # 变量声明
-variable-declaration ::= <type>['<' <type> '>'] <identifier> ';'|
-                         <type>['<' <type> '>'] <identifier> '=' <expression> ';' |
+variable-declaration ::= <type>['<' <type> '>'] <identifier> ;
+                         (* <type>['<' <type> '>'] <identifier> '=' <expression> ';' |
                          <type>['<' <type> '>'] <identifier> '=' <identifier> ';' |
-                         <type>['<' <type> '>'] <identifier> '(' <actual-parameter-list> ')' ';';
-
+                         <type>['<' <type> '>'] <identifier> '(' <actual-parameter-list> ')' ';'; *)
+variable-declaration-statement ::= <variable-declaration> ';' | <variable-declaration-assign> ';';
+variable-declaration-assign ::= <type>['<' <type> '>'] <identifier> '=' <expression> |
+                                <type>['<' <type> '>'] <identifier> '(' <actual-parameter-list> ')';
 
 # 普通语句
-common-statement ::= <if-statement> | <while-statement> | <for-statement> | <variable-declaration> |
+common-statement ::= <if-statement> | <while-statement> | <for-statement> | <variable-declaration-statement> |
                      <return-statement> | <expression-statement> | <jump-statement>;
 
 # 以下是普通语句
 # if语句
-if-statement ::= 'if' '(' <relation-expression> ')' <block>
-                {'elif' '(' <relation-expression> ')' <block>} {'else' <block>};
+if-statement ::= 'if' '(' <relation-expression> ')' <block> ['else' <block>];
+                (* {'elif' '(' <relation-expression> ')' <block>}  *)
+                
 
 # while语句
 while-statement ::= 'while' '(' <relation-expression> ')' <block>;
 jump-statement ::= 'break' ';' | 'continue' ';';
 
 # for语句（类似python的循环（限制左闭右开）、C++的循环、范围循环）
-for-statement ::= 'for' <identifier> 'in' '(' <expression> ',' <expression> ')' <block> |
-                  'for' '(' [<variable-declaration> | <assign-expression>]';' [<relation-expression>] ';' [<assign-expression>]')' 
-                  <block> |
-                  'for' '(' <type> <identifier> 'in' <identifier>')' <block>;
+for-statement ::=  <c-like-for> | <py-like-for> | <range-for>;
 
+c-like ::= 'for' '(' [<variable-declaration> | <assign-expression>]';' [<relation-expression>] ';' [<assign-expression>]')' 
+                  <block>;
 
+# 这里identifier可能有问题
+py-like ::= 'for' <identifier> 'in' '(' <expression> ',' <expression> ')' <block>;
 
+range-for ::= 'for' '(' <variable-declaration> 'in' <identifier>')' <block>;
 
 # 返回语句
 return-statement ::= 'return' [<expression>] ';';
@@ -67,7 +74,7 @@ assign-expression ::= <identifier> '=' <expression> |
                         <array-access> '=' <expression>;
 
 # 函数表达式（即函数调用）
-function-expression ::= [<identifier> | 'this' '.'] <identifier> '(' <actual-parameter-list> ')';
+function-expression ::= [<identifier> '.'] <identifier> '(' <actual-parameter-list> ')';
 acturl-parameter-list ::= <expression> {',' <expression> } | null;
 
 

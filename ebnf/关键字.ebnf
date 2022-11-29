@@ -1,6 +1,6 @@
 # 关键字
 keyword ::= 'if' | 'else' | 'elif' | 'while' | 'this' | 'public' | 'private' | 'protected' | 'extends' | 'null' |
-'def' | 'class' | 'return' | 'break' | 'continue' | 'template' | 'typename' | 'for';
+'def' | 'class' | 'return' | 'break' | 'continue' | 'template' | 'typename' | 'for' | 'in';
 
 # 基本类型
 value-type ::= <bool> | <int> | <float> | <double> | <char> | <string> | <array>;

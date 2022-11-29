@@ -34,6 +34,7 @@ namespace qwq {
         std::shared_ptr<Block> protectedBlock = nullptr;
         std::shared_ptr<Block> privateBlock = nullptr;
         std::shared_ptr<Identifier> templateId = nullptr;
+        std::shared_ptr<Identifier> extendClassId = nullptr;
     };
 
 }
