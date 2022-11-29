@@ -50,6 +50,10 @@ ${
     qwq::Literal *literal;
     qwq::Statement *stmt;
     qwq::StringExpression *sExpr;
+    qwq::Block *block;
+    qwq::VariableList *varList;
+    qwq::StatementList *stmtList;
+    qwq::ExpressionList *exprList;
     long long integer;
     double real;
     int boolean;
@@ -104,18 +108,18 @@ ${
 %%
 // TODO: 完成语法
 //程序
-program : program stmt
-        | stmt
+program : program stmt {}
+        | stmt { $$ = $1;}
         ;
 
 //语句
-stmt  : func-decl
-      | class-decl
-      | common-stmt
+stmt  : func-decl { $$ = $1; }
+      | class-decl { $$ = $1; }
+      | common-stmt { $$ = $1; }
       ;
 
-type  : val-type
-      | ident //只能是class类型的
+type  : val-type { $$ = $1; }
+      | ident { $$ = $1; } //只能是class类型的
       ;
 
 //模板
@@ -123,39 +127,42 @@ type  : val-type
 //          ;
 //以下是statement的4部分
 //函数声明
-func-decl : func-head block
+func-decl : func-head block { $$ = new FunctionDeclaration(std::shared_ptr<FunctionHead>($1), 
+                                                            std::shared_ptr<Block>($2)); }
           ;
 
-func-head : TDEF ident '(' fp-list ')'
-          | TTEMP '<' TTYNAME ident '>' TDEF ident '(' fp-list ')'
+func-head : TDEF ident '(' fp-list ')' { $$ = new FunctionHead(std::shared_ptr<Identifier>($2), std::shared_ptr<VariableList>($4), nullptr); }
+          | TTEMP '<' TTYNAME ident '>' TDEF ident '(' fp-list ')' { $$ = new FunctionHead(std::shared_ptr<Identifier>($7), std::shared_ptr<VariableList>($9), nullptr, std::shared_ptr<Identifier>($4)); }
+          | TDEF ident '(' fp-list ')' '->' type { $$ = new FunctionHead(std::shared_ptr<Identifier>($2), std::shared_ptr<VariableList>($4), std::shared_ptr<Type>($7)); }
+          | TTEMP '<' TTYNAME ident '>' TDEF ident '(' fp-list ')' '->' type { $$ = new FunctionHead(std::shared_ptr<Identifier>($7), std::shared_ptr<VariableList>($9), std::shared_ptr<Type>($12), std::shared_ptr<Identifier>($4)); }
           ; //bug?
 
-fp-list : %empty
-        | var-decl
-        | fp-list ',' var-decl
+fp-list : %empty { $$ = new VariableList(); }
+        | var-decl { $$ = new VariableList(); $$->push_back(std::shared_ptr<VariableDeclaration>($1)); }
+        | fp-list ',' var-decl { $1->push_back(std::shared_ptr<VariableDeclaration>($3)); }
         ;
 
-stmt-list : %empty
-          | common-stmt
-          | stmt-list common-stmt
+stmt-list : %empty { $$ = new StatementList(); }
+          | common-stmt { $$ = new StatementList(); $$->push_back(std::shared_ptr<CommonStatement>($1)); }
+          | stmt-list common-stmt { $$->push_back(std::shared_ptr<CommonStatement>($2)); }
           ; //这里可能有bug，书上写了
 
-block : '{' stmt-list '}'
+block : '{' stmt-list '}' { $$ = new Block(std::shared_ptr<StatementList>($1)); }
       ;
 
 //类声明
-class-decl  : class-head block
+class-decl  : class-head block { $$ = new ClassDeclaration(std::shared_ptr<ClassHead>($1), std::shared_ptr<Block>($2)); }
             ; //应该只有var和func的声明
 
-class-head  : TCLASS ident 
-            | TTEMP '<' TTYNAME ident '>' TCLASS ident
-            | TCLASS ident TEXTEND ident
-            | TTEMP '<' TTYNAME ident '>' TCLASS ident TEXTEND ident
+class-head  : TCLASS ident { $$ = new ClassHead(std::shared_ptr<Identifier>($2), nullptr, nullptr); }
+            | TTEMP '<' TTYNAME ident '>' TCLASS ident { $$ = new ClassHead(std::shared_ptr<Identifier>($7), std::shared_ptr<Identifier>($4), nullptr); }
+            | TCLASS ident TEXTEND ident { $$ = new ClassHead(std::shared_ptr<Identifier>($2), nullptr, std::shared_ptr<Identifier>($4)); }
+            | TTEMP '<' TTYNAME ident '>' TCLASS ident TEXTEND ident { $$ = new ClassHead(std::shared_ptr<Identifier>($7), std::shared_ptr<Identifier>($4), std::shared_ptr<Identifier>($9)); }
             ; //有点复杂，bug?
 
 //变量声明
-var-decl  : type '<' type '>' ident
-          | type ident
+var-decl  : type '<' type '>' ident { $$ = new VariableDeclaration(std::shared_ptr<Type>($1), std::shared_ptr<Type>($3), std::shared_ptr<Identifier>($5), @$); }
+          | type ident { $$ = new VariableDeclaration(std::shared_ptr<Type>($1), std::shared_ptr<Type>($2)); }
           ;
 
 var-decl-assign : type ident '=' expr

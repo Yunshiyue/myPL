@@ -13,29 +13,36 @@
 
 namespace qwq {
 
-    class FunctionDeclaration : public Statement {
-    public:
-        FunctionDeclaration(std::shared_ptr<Type> returnType, std::shared_ptr<Identifier> id,
-                            std::shared_ptr<VariableList> arguments, std::shared_ptr<Block> block,
-                            std::shared_ptr<Type> templateType = nullptr)
-                : returnType(std::move(returnType)), id(std::move(id)), arguments(std::move(arguments)),
-                  block(std::move(block)), templateType(std::move(templateType)) {}
+    class FunctionHead : public AstNode {
+        FunctionHead(std::shared_ptr<Identifier> id, std::shared_ptr<VariableList> arguments,
+                     std::shared_ptr<Type> returnType, std::shared_ptr<Type> templateType = nullptr)
+                : returnType(std::move(returnType)), id(std::move(id)), arguments(std::move(arguments))
+                , templateType(std::move(templateType)) {}
 
-        FunctionDeclaration(std::shared_ptr<Identifier> id,
-                            std::shared_ptr<VariableList> arguments, std::shared_ptr<Block> block,
-                            std::shared_ptr<Type> templateType = nullptr)
-                : id(std::move(id)), arguments(std::move(arguments)), block(std::move(block)),
-                  templateType(std::move(templateType)) {}
-
+        FunctionHead(std::shared_ptr<Identifier> id, std::shared_ptr<VariableList> arguments,
+                     std::shared_ptr<Type> templateType = nullptr)
+                : id(std::move(id)), arguments(std::move(arguments))
+                , templateType(std::move(templateType)) {}
     private:
-        friend class ClassDeclaration;
-
         std::shared_ptr<Type> returnType = nullptr;
         std::shared_ptr<Identifier> id;
         std::shared_ptr<VariableList> arguments = nullptr;
-        std::shared_ptr<Block> block;
         std::shared_ptr<Type> templateType = nullptr;
     };
+
+    class FunctionDeclaration : public Statement {
+    public:
+        FunctionDeclaration(std::shared_ptr<FunctionHead> functionHead, std::shared_ptr<Block> block)
+        : functionHead(std::move(functionHead))
+        , block(std::move(block)) {}
+
+    private:
+        friend class ClassDeclaration;
+        std::shared_ptr<FunctionHead> functionHead;
+        std::shared_ptr<Block> block;
+    };
+
+
 
 }
 #endif //MYPL_FUNCTIONDECLARATION_H

@@ -12,30 +12,34 @@
 
 namespace qwq {
 
-
-    class ClassDeclaration : public Statement {
+    class ClassHead : public Statement {
     public:
-        // 非模板类
-        ClassDeclaration(std::shared_ptr<Identifier> id, std::shared_ptr<Block> publicBlock,
-                         std::shared_ptr<Block> protectedBlock, std::shared_ptr<Block> privateBlock)
-                : id(std::move(id)), publicBlock(std::move(publicBlock)), protectedBlock(std::move(protectedBlock)),
-                  privateBlock(std::move(privateBlock)) {}
-
-        // 模板类
-        ClassDeclaration(std::shared_ptr<Identifier> id, std::shared_ptr<Block> publicBlock,
-                         std::shared_ptr<Block> protectedBlock, std::shared_ptr<Block> privateBlock,
-                         std::shared_ptr<Identifier> templateId)
-                : id(std::move(id)), publicBlock(std::move(publicBlock)), protectedBlock(std::move(protectedBlock)),
-                  privateBlock(std::move(privateBlock)), templateId(std::move(templateId)) {}
+        ClassHead(std::shared_ptr<Identifier> id, std::shared_ptr<Identifier> templateId,
+                  std::shared_ptr<Identifier> extendClassId)
+                  : id(std::move(id))
+                  , templateId(std::move(templateId))
+                  , extendClassId(std::move(extendClassId)) {}
 
     private:
         std::shared_ptr<Identifier> id;
-        std::shared_ptr<Block> publicBlock = nullptr;
-        std::shared_ptr<Block> protectedBlock = nullptr;
-        std::shared_ptr<Block> privateBlock = nullptr;
+//        std::shared_ptr<Block> publicBlock = nullptr;
+//        std::shared_ptr<Block> protectedBlock = nullptr;
+//        std::shared_ptr<Block> privateBlock = nullptr;
         std::shared_ptr<Identifier> templateId = nullptr;
         std::shared_ptr<Identifier> extendClassId = nullptr;
     };
+
+    class ClassDeclaration : public AstNode {
+    public:
+        ClassDeclaration(std::shared_ptr<ClassHead> classHead, std::shared_ptr<Block> block)
+        : classHead(std::move(classHead))
+        , block(std::move(block)) {}
+    private:
+        std::shared_ptr<ClassHead> classHead;
+        std::shared_ptr<Block> block;
+    };
+
+
 
 }
 #endif //MYPL_CLASSDECLARATION_H

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 //
 // Created by qqy on 22-11-25.
 //
@@ -109,11 +108,11 @@ namespace qwq {
         VariableDeclaration(std::shared_ptr<Type> type, std::shared_ptr<Identifier> id, YYLTYPE loc)
                 : type(std::move(type)), id(std::move(id)), loc(std::move(loc)) {}
 
-        // 形如：int a = exp;
-        VariableDeclaration(std::shared_ptr<Type> type, std::shared_ptr<Identifier> id,
-                            std::shared_ptr<Expression> assignmentExpr, YYLTYPE loc)
-                : type(std::move(type)), id(std::move(id)), assignmentExpr(std::move(assignmentExpr)),
-                  loc(std::move(loc)) {}
+//        // 形如：int a = exp;
+//        VariableDeclaration(std::shared_ptr<Type> type, std::shared_ptr<Identifier> id,
+//                            std::shared_ptr<Expression> assignmentExpr, YYLTYPE loc)
+//                : type(std::move(type)), id(std::move(id)), assignmentExpr(std::move(assignmentExpr)),
+//                  loc(std::move(loc)) {}
 
         // 形如：A<int> a;
         VariableDeclaration(std::shared_ptr<Type> type, std::shared_ptr<Identifier> id,
@@ -121,11 +120,11 @@ namespace qwq {
                 : type(std::move(type)), id(std::move(id)), templateType(std::move(templateType)),
                   loc(std::move(loc)) {}
 
-        // 形如：A<int> a = b;
-        VariableDeclaration(std::shared_ptr<Type> type, std::shared_ptr<Identifier> id,
-                            std::shared_ptr<Expression> assignmentExpr, std::shared_ptr<Type> templateType, YYLTYPE loc)
-                : type(std::move(type)), id(std::move(id)), assignmentExpr(std::move(assignmentExpr)),
-                  templateType(std::move(templateType)), loc(std::move(loc)) {}
+//        // 形如：A<int> a = b;
+//        VariableDeclaration(std::shared_ptr<Type> type, std::shared_ptr<Identifier> id,
+//                            std::shared_ptr<Expression> assignmentExpr, std::shared_ptr<Type> templateType, YYLTYPE loc)
+//                : type(std::move(type)), id(std::move(id)), assignmentExpr(std::move(assignmentExpr)),
+//                  templateType(std::move(templateType)), loc(std::move(loc)) {}
 
         YYLTYPE getLocation() { return loc; }
 

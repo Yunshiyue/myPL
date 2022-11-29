@@ -34,7 +34,7 @@ namespace qwq {
 
     class ArrayType : public Type {
     public:
-        // TODO 构造函数内部要根据eleType初始化elementType。词法定义好后可以做�?
+        // TODO 构造函数内部要根据eleType初始化elementType。词法定义好后可以做�?
         ArrayType(int type, int eleType, int capacity)
                 : Type(type), capacity(capacity) {}
 
@@ -43,7 +43,7 @@ namespace qwq {
         TypeName getElementName() { return elementType; }
 
     private:
-        TypeName elementType;   // 数组存放元素的类�?
+        TypeName elementType;   // 数组存放元素的类型
         int capacity;
     };
 

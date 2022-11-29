@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 //
 // Created by Qingyue on 2022/11/26.
 //

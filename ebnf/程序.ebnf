@@ -1,10 +1,10 @@
-# ³ÌĞò
+# ç¨‹åº
 program ::= <statement>+;
 statement ::= <function-declaration> | <class-declaration> | <common-statement>;
 
 type ::= <value-type> | <identifier>;
-# ÒÔÏÂÊÇstatementµÄ4²¿·Ö
-# º¯ÊıÉùÃ÷£¨×¢ÒâÄ£°å£©
+# ä»¥ä¸‹æ˜¯statementçš„4éƒ¨åˆ†
+# å‡½æ•°å£°æ˜ï¼ˆæ³¨æ„æ¨¡æ¿ï¼‰
 function-declaration ::= <function-head><block>;
 function-head ::= ['template' '<' 'typename' <identifier> '>'] 'def' <identifier> '(' <foraml-parameter-list> ')' ['->' <type>];
 (* function-body ::= '{' <statement-list> '}'; *)
@@ -12,11 +12,11 @@ function-head ::= ['template' '<' 'typename' <identifier> '>'] 'def' <identifier
 foraml-parameter-list ::= <variable-declaration> {','<variable-declaration>} | null;
 
 
-# Óï¾äÁĞ±íºÍ¿é
+# è¯­å¥åˆ—è¡¨å’Œå—
 statement-list ::= <common-statement>*;
 block ::= '{' <statement-list> '}';
 
-# ÀàÉùÃ÷£¨×¢ÒâÄ£°å£©
+# ç±»å£°æ˜ï¼ˆæ³¨æ„æ¨¡æ¿ï¼‰
 class-declaration ::= <class-head> <block>;
 class-head ::= ['template' '<' 'typename' <identifier> '>'] 'class' <identifier> ['extends' <identifier>];
 (* class-body ::= '{' {public-block} {protected-block} {private-block} '}' ';'; *)
@@ -25,7 +25,7 @@ protected-block ::= 'protected:' <class-statement-list>;
 private-block ::= 'private:' <class-statement-list>; *)
 (* class-statement-list ::= {<function-declaration> | <variable-declaration>}; *)
 
-# ±äÁ¿ÉùÃ÷
+# å˜é‡å£°æ˜
 variable-declaration ::= <type>['<' <type> '>'] <identifier> ;
                          (* <type>['<' <type> '>'] <identifier> '=' <expression> ';' |
                          <type>['<' <type> '>'] <identifier> '=' <identifier> ';' |
@@ -34,51 +34,51 @@ variable-declaration-statement ::= <variable-declaration> ';' | <variable-declar
 variable-declaration-assign ::= <type>['<' <type> '>'] <identifier> '=' <expression> |
                                 <type>['<' <type> '>'] <identifier> '(' <actual-parameter-list> ')';
 
-# ÆÕÍ¨Óï¾ä
+# æ™®é€šè¯­å¥
 common-statement ::= <if-statement> | <while-statement> | <for-statement> | <variable-declaration-statement> |
                      <return-statement> | <expression-statement> | <jump-statement>;
 
-# ÒÔÏÂÊÇÆÕÍ¨Óï¾ä
-# ifÓï¾ä
+# ä»¥ä¸‹æ˜¯æ™®é€šè¯­å¥
+# ifè¯­å¥
 if-statement ::= 'if' '(' <relation-expression> ')' <block> ['else' <block>];
                 (* {'elif' '(' <relation-expression> ')' <block>}  *)
                 
 
-# whileÓï¾ä
+# whileè¯­å¥
 while-statement ::= 'while' '(' <relation-expression> ')' <block>;
 jump-statement ::= 'break' ';' | 'continue' ';';
 
-# forÓï¾ä£¨ÀàËÆpythonµÄÑ­»·£¨ÏŞÖÆ×ó±ÕÓÒ¿ª£©¡¢C++µÄÑ­»·¡¢·¶Î§Ñ­»·£©
+# forè¯­å¥ï¼ˆç±»ä¼¼pythonçš„å¾ªç¯ï¼ˆé™åˆ¶å·¦é—­å³å¼€ï¼‰ã€C++çš„å¾ªç¯ã€èŒƒå›´å¾ªç¯ï¼‰
 for-statement ::=  <c-like-for> | <py-like-for> | <range-for>;
 
 c-like ::= 'for' '(' [<variable-declaration> | <assign-expression>]';' [<relation-expression>] ';' [<assign-expression>]')' 
                   <block>;
 
-# ÕâÀïidentifier¿ÉÄÜÓĞÎÊÌâ
+# è¿™é‡Œidentifierå¯èƒ½æœ‰é—®é¢˜
 py-like ::= 'for' <identifier> 'in' '(' <expression> ',' <expression> ')' <block>;
 
 range-for ::= 'for' '(' <variable-declaration> 'in' <identifier>')' <block>;
 
-# ·µ»ØÓï¾ä
+# è¿”å›è¯­å¥
 return-statement ::= 'return' [<expression>] ';';
 
-# ±í´ïÊ½Óï¾ä
+# è¡¨è¾¾å¼è¯­å¥
 expression-statement ::= <expression> ';';
 
-# ±í´ïÊ½
+# è¡¨è¾¾å¼
 expression ::= <logical-expression> | <arithmetic-expression> | <string-expression> | 
                 <slice-expression> | <assign-expression>;
 
-# ¸³Öµ±í´ïÊ½
+# èµ‹å€¼è¡¨è¾¾å¼
 assign-expression ::= <identifier> '=' <expression> |
                         <array-access> '=' <expression>;
 
-# º¯Êı±í´ïÊ½£¨¼´º¯Êıµ÷ÓÃ£©
+# å‡½æ•°è¡¨è¾¾å¼ï¼ˆå³å‡½æ•°è°ƒç”¨ï¼‰
 function-expression ::= [<identifier> '.'] <identifier> '(' <actual-parameter-list> ')';
 acturl-parameter-list ::= <expression> {',' <expression> } | null;
 
 
-# ×Ö·û´®±í´ïÊ½
+# å­—ç¬¦ä¸²è¡¨è¾¾å¼
 string-expression ::= <string-literal> | <identifier> | <string-operation> | <function-expression>;
 string-operation ::= <string-expression> '+' <string-expression> |
                     <string-expression> '.' 'substr' '(' <expression> ',' <expression> ')' |
@@ -88,29 +88,29 @@ string-operation ::= <string-expression> '+' <string-expression> |
                     <string-expression> '.' 'lowercase';
 
 
-# ÇĞÆ¬±í´ïÊ½£¬·µ»ØÒ»¸öÊı×é
+# åˆ‡ç‰‡è¡¨è¾¾å¼ï¼Œè¿”å›ä¸€ä¸ªæ•°ç»„
 slice-expression ::= <identifier> '[' [<expression>] ':' [<expression>] ']';
 
-# ËãÊõ±í´ïÊ½
+# ç®—æœ¯è¡¨è¾¾å¼
 arithmetic-expression ::= ['+' | '-'] <item> { <addition-operator> <item> };
 addition-operation ::= '+' | '-';
 
-# Âß¼­±í´ïÊ½£¨°üÀ¨Âß¼­ÔËËãºÍ¹ØÏµÔËËã£©
+# é€»è¾‘è¡¨è¾¾å¼ï¼ˆåŒ…æ‹¬é€»è¾‘è¿ç®—å’Œå…³ç³»è¿ç®—ï¼‰
 logical-expression ::= ['!'] <factor> { <logical-operator> <factor>};
 logical-operator ::= '&&' | '||';
 
-# ¹ØÏµ±í´ïÊ½
+# å…³ç³»è¡¨è¾¾å¼
 relational-expression ::= <arithmetic-expression> <relational-operator> <arithmetic-expression>;
 relational-operation ::= '>' | '>=' | '<' | '<=' | '==' | '!=';
 
-# Ïî
+# é¡¹
 item ::= <factor> { <multiplication-operator> <factor> };
 multiplication-operator ::= '*' | '/' | '%' | '**' | '//';
 
-# Òò×Ó£¨±êÊ¶·û¡¢Êı×é¡¢À¨ºÅ±í´ïÊ½¡¢×ÖÃæÖµ³£Á¿¡¢º¯Êı±í´ïÊ½£©
+# å› å­ï¼ˆæ ‡è¯†ç¬¦ã€æ•°ç»„ã€æ‹¬å·è¡¨è¾¾å¼ã€å­—é¢å€¼å¸¸é‡ã€å‡½æ•°è¡¨è¾¾å¼ï¼‰
 factor ::= <identifier> | <array-access> | '(' <expression> ')' | 
             <literal> | <function-expression> | <relational-expression>;
 
-# ĞÂÔö£ºÊı×é·ÃÎÊ
+# æ–°å¢ï¼šæ•°ç»„è®¿é—®
 array-access ::= <identifier> '[' <expression> ']' | array-access '[' <expression> ']';
 

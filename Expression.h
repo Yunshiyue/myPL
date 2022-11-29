@@ -178,7 +178,8 @@ namespace qwq {
 
     class Block : Expression {
     public:
-        StatementList statementLists;
+        std::shared_ptr<StatementList> statementList;
+        explicit Block(std::shared_ptr<StatementList> statementList) : statementList(std::move(statementList)) {}
     };
 
 }
