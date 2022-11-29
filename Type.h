@@ -20,7 +20,8 @@ namespace qwq {
         DOUBLE,
         BOOLEAN,
         CLASS,
-        ARRAY
+        ARRAY,
+        STRING
     };
 
     class Type : public AstNode {
@@ -35,7 +36,7 @@ namespace qwq {
     class ArrayType : public Type {
     public:
         // TODO 构造函数内部要根据eleType初始化elementType。词法定义好后可以做�?
-        ArrayType(int type, int eleType, int capacity)
+        ArrayType(int type, Type eleType, int capacity)
                 : Type(type), capacity(capacity) {}
 
         TypeName getTypeName() override { return TypeName::ARRAY; }
@@ -82,6 +83,14 @@ namespace qwq {
         TypeName getTypeName() override { return TypeName::CHAR; }
 
     private:
+    };
+
+    class StringType : public Type {
+    public:
+        explicit StringType(int type) : Type(type) {}
+
+        TypeName getTypeName() override { return TypeName::STRING; }
+
     };
 
     class ClassType : public Type {

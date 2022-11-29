@@ -38,9 +38,9 @@ namespace qwq {
         int value;
     };
 
-    class Double : public Literal {
+    class Real : public Literal {
     public:
-        explicit Double(double value) : value(value) {}
+        explicit Real(double value) : value(value) {}
 
     private:
         double value;

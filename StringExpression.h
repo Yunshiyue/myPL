@@ -7,6 +7,8 @@
 
 #include "Expression.h"
 
+#include <utility>
+
 namespace qwq {
 
 
@@ -44,7 +46,10 @@ namespace qwq {
                   rightRange(std::move(rightRange)) {}
 
         // +操作
-        StringOperation(int op, std::shared_ptr<StringExpression> rhs) : op(op), rhs(std::move(rhs)) {}
+        StringOperation(std::shared_ptr<StringExpression> lhs, int op, std::shared_ptr<StringExpression> rhs)
+        : strExpr(std::move(lhs))
+        , op(op)
+        , rhs(std::move(rhs)) {}
 
     private:
         std::shared_ptr<StringExpression> strExpr;
@@ -52,6 +57,14 @@ namespace qwq {
         std::shared_ptr<Expression> leftRange = nullptr;  // substr left
         std::shared_ptr<Expression> rightRange = nullptr;  // substr right
         std::shared_ptr<StringExpression> rhs = nullptr;
+    };
+
+    class StringFuncExpression : public StringExpression {
+    public:
+        explicit StringFuncExpression(std::shared_ptr<FunctionCall> funcExpr) : funcExpr(std::move(funcExpr)) {}
+
+    private:
+        std::shared_ptr<FunctionCall> funcExpr;
     };
 
 }

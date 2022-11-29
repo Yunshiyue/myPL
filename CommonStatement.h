@@ -22,18 +22,25 @@ namespace qwq {
     public:
         using CBPair = std::pair<std::shared_ptr<RelationalExpression>, Block>;
 
-        // if-else
-        explicit IfStatement(std::shared_ptr<CBPair> cbs, std::shared_ptr<Block> elseBlock = nullptr)
-                : ifCbs(std::move(cbs)), elseBlock(std::move(elseBlock)) {}
+//        // if-else
+//        explicit IfStatement(std::shared_ptr<CBPair> cbs, std::shared_ptr<Block> elseBlock = nullptr)
+//                : ifCbs(std::move(cbs)), elseBlock(std::move(elseBlock)) {}
 
         // if-elif-else
-        IfStatement(std::shared_ptr<CBPair> cbs, std::shared_ptr<std::vector<CBPair>> elifCbs,
-                    std::shared_ptr<Block> elseBlock = nullptr)
-                : ifCbs(std::move(cbs)), elifCbs(std::move(elifCbs)), elseBlock(std::move(elseBlock)) {}
+//        IfStatement(std::shared_ptr<CBPair> cbs, std::shared_ptr<std::vector<CBPair>> elifCbs,
+//                    std::shared_ptr<Block> elseBlock = nullptr)
+//                : ifCbs(std::move(cbs)), elifCbs(std::move(elifCbs)), elseBlock(std::move(elseBlock)) {}
+        IfStatement(std::shared_ptr<RelationalExpression> relationalExpr, std::shared_ptr<Block> ifBlock
+                    , std::shared_ptr<Block> elseBlock = nullptr)
+                    : relationalExpr(std::move(relationalExpr))
+                    , ifBlock(std::move(ifBlock))
+                    , elseBlock(std::move(elseBlock)) {}
 
     private:
-        std::shared_ptr<CBPair> ifCbs;
-        std::shared_ptr<std::vector<CBPair>> elifCbs = nullptr;
+//        std::shared_ptr<CBPair> ifCbs;
+//        std::shared_ptr<std::vector<CBPair>> elifCbs = nullptr;
+        std::shared_ptr<RelationalExpression> relationalExpr;
+        std::shared_ptr<Block> ifBlock;
         std::shared_ptr<Block> elseBlock = nullptr;
     };
 
@@ -57,13 +64,16 @@ namespace qwq {
 
     class PyLikeForStatement : public ForStatement {
     public:
-        PyLikeForStatement(std::shared_ptr<Identifier> loopVariable, int left, int right, std::shared_ptr<Block> block)
-                : loopVariable(std::move(loopVariable)), left(left), right(right), ForStatement(std::move(block)) {}
+        PyLikeForStatement(std::shared_ptr<Identifier> loopVariable, std::shared_ptr<Expression> left, std::shared_ptr<Expression> right, std::shared_ptr<Block> block)
+                : loopVariable(std::move(loopVariable))
+                , left(std::move(left))
+                , right(std::move(right))
+                , ForStatement(std::move(block)) {}
 
     private:
         std::shared_ptr<Identifier> loopVariable;
-        int left;
-        int right;
+        std::shared_ptr<Expression> left;
+        std::shared_ptr<Expression> right;
     };
 
     class CLikeForStatement : public ForStatement {
@@ -91,50 +101,17 @@ namespace qwq {
 
     class RangeForStatement : public ForStatement {
     public:
-        RangeForStatement(std::shared_ptr<Type> loopVariableType, std::shared_ptr<Identifier> loopVariable,
+        RangeForStatement(std::shared_ptr<VariableDeclaration> variableDeclaration,
                           std::shared_ptr<Identifier> loopRangeId, std::shared_ptr<Block> block)
-                : loopVariableType(std::move(loopVariableType)), loopVariable(std::move(loopVariable)),
-                  loopRangeId(std::move(loopRangeId)), ForStatement(std::move(block)) {}
+                : variableDeclaration(std::move(variableDeclaration))
+                , loopRangeId(std::move(loopRangeId)), ForStatement(std::move(block)) {}
 
     private:
-        std::shared_ptr<Type> loopVariableType;
-        std::shared_ptr<Identifier> loopVariable;
+        std::shared_ptr<VariableDeclaration> variableDeclaration;
         std::shared_ptr<Identifier> loopRangeId;
     };
 
-    class VariableDeclaration : public CommonStatement {
-    public:
-        // 形如：int a;
-        VariableDeclaration(std::shared_ptr<Type> type, std::shared_ptr<Identifier> id, YYLTYPE loc)
-                : type(std::move(type)), id(std::move(id)), loc(std::move(loc)) {}
 
-//        // 形如：int a = exp;
-//        VariableDeclaration(std::shared_ptr<Type> type, std::shared_ptr<Identifier> id,
-//                            std::shared_ptr<Expression> assignmentExpr, YYLTYPE loc)
-//                : type(std::move(type)), id(std::move(id)), assignmentExpr(std::move(assignmentExpr)),
-//                  loc(std::move(loc)) {}
-
-        // 形如：A<int> a;
-        VariableDeclaration(std::shared_ptr<Type> type, std::shared_ptr<Identifier> id,
-                            std::shared_ptr<Type> templateType, YYLTYPE loc)
-                : type(std::move(type)), id(std::move(id)), templateType(std::move(templateType)),
-                  loc(std::move(loc)) {}
-
-//        // 形如：A<int> a = b;
-//        VariableDeclaration(std::shared_ptr<Type> type, std::shared_ptr<Identifier> id,
-//                            std::shared_ptr<Expression> assignmentExpr, std::shared_ptr<Type> templateType, YYLTYPE loc)
-//                : type(std::move(type)), id(std::move(id)), assignmentExpr(std::move(assignmentExpr)),
-//                  templateType(std::move(templateType)), loc(std::move(loc)) {}
-
-        YYLTYPE getLocation() { return loc; }
-
-    private:
-        std::shared_ptr<Type> type;
-        std::shared_ptr<Identifier> id;
-        std::shared_ptr<Expression> assignmentExpr = nullptr;
-        std::shared_ptr<Type> templateType = nullptr;
-        YYLTYPE loc;
-    };
 
     class ReturnStatement : public CommonStatement {
     public:

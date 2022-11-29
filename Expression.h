@@ -34,19 +34,19 @@ namespace qwq {
     class ArrayAccess : public Expression {
     public:
         // 一维数组
-        ArrayAccess(std::shared_ptr<Identifier> id, int index, YYLTYPE loc)
-                : id(std::move(id)), index(index), loc(std::move(loc)) {}
+        ArrayAccess(std::shared_ptr<Identifier> id, std::shared_ptr<Expression> index, YYLTYPE loc)
+                : id(std::move(id)), index(std::move(index)), loc(std::move(loc)) {}
 
         // 多维数组
-        ArrayAccess(std::shared_ptr<ArrayAccess> arrayAccess, int index, YYLTYPE loc)
-                : arrayExpr(std::move(arrayAccess)), index(index), loc(std::move(loc)) {}
+        ArrayAccess(std::shared_ptr<ArrayAccess> arrayAccess, std::shared_ptr<Expression> index, YYLTYPE loc)
+                : arrayExpr(std::move(arrayAccess)), index(std::move(index)), loc(std::move(loc)) {}
 
         YYLTYPE getLocation() { return loc; }
 
     private:
         std::shared_ptr<Identifier> id = nullptr;
         std::shared_ptr<ArrayAccess> arrayExpr = nullptr;
-        int index;
+        std::shared_ptr<Expression> index;
         YYLTYPE loc;
     };
 
@@ -60,32 +60,33 @@ namespace qwq {
 
     class Item : public Expression {
     public:
-        explicit Item(std::shared_ptr<Factor> lhs,
+        explicit Item(std::shared_ptr<Factor> factor) : rhs(std::move(factor)) {}
+        explicit Item(std::shared_ptr<Item> lhs,
                       std::shared_ptr<Factor> rhs = nullptr,
                       int op = -1)
                 : lhs(std::move(lhs)), op(op), rhs(std::move(rhs)) {}
 
     private:
-        std::shared_ptr<Factor> lhs;
-        std::shared_ptr<Factor> rhs;
-        int op;
+        std::shared_ptr<Item> lhs = nullptr;
+        std::shared_ptr<Factor> rhs = nullptr;
+        int op = -1;
     };
 
     class ArithmeticExpression : public Expression {
     public:
         // 形如：a op b
-        explicit ArithmeticExpression(std::shared_ptr<Item> lhs, std::shared_ptr<Item> rhs,
+        explicit ArithmeticExpression(std::shared_ptr<ArithmeticExpression> lhs, std::shared_ptr<Item> rhs,
                                       int op, YYLTYPE loc)
                 : lhs(std::move(lhs)), rhs(std::move(rhs)), op(op), loc(std::move(loc)) {}
 
         // 形如：a
-        explicit ArithmeticExpression(std::shared_ptr<Item> lhs, YYLTYPE loc)
-                : lhs(std::move(lhs)), loc(std::move(loc)) {}
+        explicit ArithmeticExpression(std::shared_ptr<Item> item, YYLTYPE loc)
+                : rhs(std::move(item)), loc(std::move(loc)) {}
 
         YYLTYPE getLocation() { return loc; }
 
     private:
-        std::shared_ptr<Item> lhs = nullptr;
+        std::shared_ptr<ArithmeticExpression> lhs = nullptr;
         std::shared_ptr<Item> rhs = nullptr;
         int op = -1;
         YYLTYPE loc;
@@ -94,18 +95,18 @@ namespace qwq {
     class LogicalExpression : public Expression {
     public:
         // 形如：a op b
-        explicit LogicalExpression(std::shared_ptr<Factor> lhs, std::shared_ptr<Factor> rhs,
+        explicit LogicalExpression(std::shared_ptr<LogicalExpression> lhs, std::shared_ptr<Factor> rhs,
                                    int op, YYLTYPE loc)
                 : lhs(std::move(lhs)), rhs(std::move(rhs)), op(op), loc(std::move(loc)) {}
 
         // 形如：a
-        explicit LogicalExpression(std::shared_ptr<Factor> lhs, YYLTYPE loc)
-                : lhs(std::move(lhs)), loc(std::move(loc)) {}
+        explicit LogicalExpression(std::shared_ptr<Factor> factor, YYLTYPE loc)
+                : rhs(std::move(factor)), loc(std::move(loc)) {}
 
         YYLTYPE getLocation() { return loc; }
 
     private:
-        std::shared_ptr<Factor> lhs = nullptr;
+        std::shared_ptr<LogicalExpression> lhs = nullptr;
         std::shared_ptr<Factor> rhs = nullptr;
         int op = -1;
         YYLTYPE loc;
@@ -114,15 +115,15 @@ namespace qwq {
 
     class SliceExpression : public Expression {
     public:
-        SliceExpression(std::shared_ptr<Identifier> id, int left, int right, YYLTYPE loc)
-                : id(std::move(id)), left(left), right(right), loc(std::move(loc)) {}
+        SliceExpression(std::shared_ptr<Identifier> id, std::shared_ptr<Expression> left, std::shared_ptr<Expression> right, YYLTYPE loc)
+                : id(std::move(id)), left(std::move(left)), right(std::move(right)), loc(std::move(loc)) {}
 
         YYLTYPE getLocation() { return loc; }
 
     private:
         std::shared_ptr<Identifier> id;
-        int left;
-        int right;
+        std::shared_ptr<Expression> left;
+        std::shared_ptr<Expression> right;
         YYLTYPE loc;
     };
 
@@ -147,13 +148,24 @@ namespace qwq {
 
     class FunctionCall : public Expression {
     public:
-        FunctionCall(std::shared_ptr<Identifier> id, std::shared_ptr<ExpressionList> arguments, YYLTYPE loc)
-                : id(std::move(id)), arguments(std::move(arguments)), loc(std::move(loc)) {}
+        // func(xxx)
+        FunctionCall(std::shared_ptr<Identifier> funcId, std::shared_ptr<ExpressionList> arguments, YYLTYPE loc)
+                : funcId(std::move(funcId))
+                , arguments(std::move(arguments))
+                , loc(std::move(loc)) {}
+
+        // a.func(xxx)
+        FunctionCall(std::shared_ptr<Identifier> varId, std::shared_ptr<Identifier> funcId, std::shared_ptr<ExpressionList> arguments, YYLTYPE loc)
+                : varId(std::move(varId))
+                , funcId(std::move(funcId))
+                , arguments(std::move(arguments))
+                , loc(std::move(loc)) {}
 
         YYLTYPE getLocation() { return loc; }
 
     private:
-        std::shared_ptr<Identifier> id;
+        std::shared_ptr<Identifier> varId = nullptr;
+        std::shared_ptr<Identifier> funcId;
         std::shared_ptr<ExpressionList> arguments;
         YYLTYPE loc;
     };
@@ -164,15 +176,15 @@ namespace qwq {
         explicit RelationalExpression(std::shared_ptr<ArithmeticExpression> lhs,
                                       std::shared_ptr<ArithmeticExpression> rhs, int op, YYLTYPE loc)
                 : lhs(std::move(lhs)), rhs(std::move(rhs)), op(op), loc(std::move(loc)) {}
-
-        // 形如：a
-        explicit RelationalExpression(std::shared_ptr<ArithmeticExpression> lhs, YYLTYPE loc)
-                : lhs(std::move(lhs)), loc(std::move(loc)) {}
+//
+//        // 形如：a
+//        explicit RelationalExpression(std::shared_ptr<ArithmeticExpression> lhs, YYLTYPE loc)
+//                : lhs(std::move(lhs)), loc(std::move(loc)) {}
 
     private:
         std::shared_ptr<ArithmeticExpression> lhs;
-        std::shared_ptr<ArithmeticExpression> rhs = nullptr;
-        int op = -1;
+        std::shared_ptr<ArithmeticExpression> rhs;
+        int op;
         YYLTYPE loc;
     };
 

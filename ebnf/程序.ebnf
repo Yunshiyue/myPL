@@ -30,9 +30,10 @@ variable-declaration ::= <type>['<' <type> '>'] <identifier> ;
                          (* <type>['<' <type> '>'] <identifier> '=' <expression> ';' |
                          <type>['<' <type> '>'] <identifier> '=' <identifier> ';' |
                          <type>['<' <type> '>'] <identifier> '(' <actual-parameter-list> ')' ';'; *)
-variable-declaration-statement ::= <variable-declaration> ';' | <variable-declaration-assign> ';';
 variable-declaration-assign ::= <type>['<' <type> '>'] <identifier> '=' <expression> |
                                 <type>['<' <type> '>'] <identifier> '(' <actual-parameter-list> ')';
+variable-declaration-statement ::= <variable-declaration> ';' | <variable-declaration-assign> ';';
+
 
 # 普通语句
 common-statement ::= <if-statement> | <while-statement> | <for-statement> | <variable-declaration-statement> |

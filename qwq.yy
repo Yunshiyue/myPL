@@ -8,6 +8,7 @@ ${
     #include "Statement.h"
     #include "StringExpression.h"
     #include "Type.h"
+    #include "VariableDeclaration.h"
 
     #include <stdio.h>
     #include <string>
@@ -44,13 +45,24 @@ ${
     // TODO: 根据定义的节点class完善union
     qwq::AstNode *astNode;
     qwq::ClassDeclaration *cDeclare;
+    qwq::ClassHead *classHead;
     qwq::CommonStatement *cStatement;
+    qwq::ForStatement *forStatement;
     qwq::Expression *expr;
     qwq::FunctionDeclaration *fDeclare;
+    qwq::FunctionHead *fHead;
     qwq::Literal *literal;
     qwq::Statement *stmt;
     qwq::StringExpression *sExpr;
     qwq::Block *block;
+    qwq::Type *type;
+    qwq::Identifier *ident;
+    qwq::Item *item;
+    qwq::Factor *factor;
+    qwq::VariableDeclarationAssign *varDeclAssign;
+    qwq::ArithmeticExpression *arithExpr;
+    qwq::LogicalExpression *logicalExpr;
+
     qwq::VariableList *varList;
     qwq::StatementList *stmtList;
     qwq::ExpressionList *exprList;
@@ -94,6 +106,30 @@ ${
 
 // 定义非终结符
 // TODO: 定义非终结符的类型
+%type <astNode> program
+%type <cDeclare> class-decl
+%type <classHead> class-head
+%type <cStatement> common-stmt if-stmt while-stmt jump-stmt for-stmt return-stmt expr-stmt var-decl-stmt
+%type <forStatement> c-like-for py-like-for range-for
+%type <expr> expr assign-expr func-expr relation-expr slice-expr  arr-access
+%type <fDeclare> func-decl
+%type <fHead> func-head
+%type <literal> literal
+%type <stmt> stmt 
+%type <sExpr> str-expr str-operation
+%type <block> block
+%type <type> type val-type
+%type <ident> ident
+%type <item> item
+%type <factor> factor
+%type <varDeclAssign> var-decl var-decl-assign
+
+%type <arithExpr> arithmetic-expr
+%type <logicalExpr> logical-expr
+// 列表
+%type <varList> fp-list
+%type <stmtList> stmt-list
+%type <exprList> ap-list
 // 定义优先级以及结合性
 %right '='
 %left TAND TOR
@@ -108,7 +144,7 @@ ${
 %%
 // TODO: 完成语法
 //程序
-program : program stmt {}
+program : program stmt { $1 = $2; }
         | stmt { $$ = $1;}
         ;
 
@@ -121,6 +157,15 @@ stmt  : func-decl { $$ = $1; }
 type  : val-type { $$ = $1; }
       | ident { $$ = $1; } //只能是class类型的
       ;
+
+//基本类型
+val-type  : TBOOLTK { $$ = new BooleanType(TBOOLTK); }
+          | TINTTK { $$ = new IntType(TINTTK); }
+          | TDOUBLETK { $$ = new DoubleType(TDOUBLETK); }
+          | TCHARTK { $$ = new CharType(TCHARTK); }
+          | TSTRTK { $$ = new StringType(TSTRTK); }
+          | TARRTK '<' type ',' TINTEGER'>' { $$ = new ArrayType(TARRTK, $3, $5); }
+          ;
 
 //模板
 //template  : TTEMP '<' TTYNAME ident '>'
@@ -144,7 +189,7 @@ fp-list : %empty { $$ = new VariableList(); }
 
 stmt-list : %empty { $$ = new StatementList(); }
           | common-stmt { $$ = new StatementList(); $$->push_back(std::shared_ptr<CommonStatement>($1)); }
-          | stmt-list common-stmt { $$->push_back(std::shared_ptr<CommonStatement>($2)); }
+          | stmt-list common-stmt { $1->push_back(std::shared_ptr<CommonStatement>($2)); }
           ; //这里可能有bug，书上写了
 
 block : '{' stmt-list '}' { $$ = new Block(std::shared_ptr<StatementList>($1)); }
@@ -165,109 +210,118 @@ var-decl  : type '<' type '>' ident { $$ = new VariableDeclaration(std::shared_p
           | type ident { $$ = new VariableDeclaration(std::shared_ptr<Type>($1), std::shared_ptr<Type>($2)); }
           ;
 
-var-decl-assign : type ident '=' expr
-                | type '<' type '>' ident '=' expr
-                | type ident '(' ap-list ')'
-                | type '<' type '>' ident '(' ap-list ')'
+var-decl-assign : type ident '=' expr { $$ = new VarDeclByExpr(std::shared_ptr<Type>($1), std::shared_ptr<Identifier>($2), std::shared_ptr<Expression>($4), @$); }
+                | type '<' type '>' ident '=' expr { $$ = new VarDeclByExpr(std::shared_ptr<Type>($1), std::shared_ptr<Type>($3), std::shared_ptr<Identifier>($5), std::shared_ptr<Expression>($7), @$); }
+                | type ident '(' ap-list ')' { $$ = new ObjectDeclaration(std::shared_ptr<Type>($1), nullptr, std::shared_ptr<Identifier>($2), std::shared_ptr<VariableList>($4), @$); }
+                | type '<' type '>' ident '(' ap-list ')' { $$ = new ObjectDeclaration(std::shared_ptr<Type>($1), std::shared_ptr<Type>($3), std::shared_ptr<Identifier>($5), std::shared_ptr<VariableList>($7), @$); }
                 ;
 
-var-decl-stmt : var-decl ';'
-              | var-decl-assign ';'
+var-decl-stmt : var-decl ';' { $$ = new VarDeclAssignStmt($1); }
+              | var-decl-assign ';' { $$ = new VarDeclAssignStmt($1); }
               ;
 
 //普通语句
-common-stmt : if-stmt
-            | while-stmt
-            | for-stmt
-            | var-decl-stmt
-            | return-stmt
-            | expr-stmt
-            | jump-stmt
+common-stmt : if-stmt { $$ = $1; }
+            | while-stmt { $$ = $1; }
+            | for-stmt { $$ = $1; }
+            | var-decl-stmt { $$ = $1; }
+            | return-stmt { $$ = $1; }
+            | expr-stmt { $$ = $1; }
+            | jump-stmt { $$ = $1; }
             ;
 //以下是普通语句
 //if语句
-if-stmt : TIF '(' relation-expr ')' block
-        | TIF '(' relation-expr ')' block TELSE '(' relation-expr ')' block
+if-stmt : TIF '(' relation-expr ')' block { $$ = new IfStatement(std::shared_ptr<RelationalExpression>($3), std::shared_ptr<Block>($5)); }
+        | TIF '(' relation-expr ')' block TELSE block { $$ = new IfStatement(std::shared_ptr<RelationalExpression>($3), std::shared_ptr<Block>($5), std::shared_ptr<Block>($7)); }
         ; 
 
 //while语句
-while-stmt  : TWHILE '(' relation-expr ')' block
+while-stmt  : TWHILE '(' relation-expr ')' block { $$ = new WhileStatement(std::shared_ptr<RelationalExpression>($3), 
+                                                      std::shared_ptr<Block>($5)); }
             ;
 
 //jump语句
-jump-stmt : TBREAK ';'
-          | TCONTINUE ';'
+jump-stmt : TBREAK ';' { $$ = new JumpStatement(TBREAK, @$); }
+          | TCONTINUE ';' { $$ = new JumpStatement(TCONTINUE, @$); }
           ;
 
 // TODO:for循环
 // for 语句
-for-stmt  : c-like-for 
-          | py-like-for
-          | range-for
+for-stmt  : c-like-for  { $$ = $1; }
+          | py-like-for { $$ = $1; }
+          | range-for { $$ = $1; }
           ;
-c-like-for  : TFOR '(' var-decl ';' relation-expr ';' assign-expr ')' block
-            | TFOR '(' assign-expr ';' relation-expr ';' assign-expr ')' block
+c-like-for  : TFOR '(' var-decl ';' relation-expr ';' assign-expr ')' block { $$ = new CLikeForStatement(std::shared_ptr<VariableDeclaration>($3), 
+                  std::shared_ptr<RelationalExpression>($5), std::shared_ptr<AssignExpression>($7), 
+                  std::shared_ptr<Block>($9));;}
+            | TFOR '(' assign-expr ';' relation-expr ';' assign-expr ')' block { $$ = new CLikeForStatement(std::shared_ptr<AssignExpression>($3), 
+                  std::shared_ptr<RelationalExpression>($5), std::shared_ptr<AssignExpression>($7), 
+                  std::shared_ptr<Block>($9));;}
             ;
 
-py-like-for : TFOR ident TIN '(' expr ',' expr ')' block
+py-like-for : TFOR ident TIN '(' expr ',' expr ')' block { $$ = new PyLikeForStatement(std::shared_ptr<Identifier>($2), 
+              std::shared_ptr<Expression>($5), std::shared_ptr<Expression>($7), std::shared_ptr<Block>($9)); }
             ;
 
-range-for : TFOR '(' var-decl TIN ident ')' block
+range-for : TFOR '(' var-decl TIN ident ')' block { $$ = new RangeForStatement(std::shared_ptr<VariableDeclaration>($3), 
+                                                    std::shared_ptr<Identifier>($5), std::shared_ptr<Block>($7)); }
             ;
 
 //返回语句
-return-stmt : TRETURN ';'
-            | TRETURN expr-stmt ';'
+return-stmt : TRETURN ';' { $$ = new ReturnStatement(@$); }
+            | TRETURN expr-stmt ';' { $$ = new ReturnStatement(std::shared_ptr<Expression>(@1), @$); }
             ;
 
 //表达式
-expr  : logical-expr
-      | arithmetic-expr
-      | str-expr
-      | slice-expr
-      | assign-expr
+expr  : logical-expr { $$ = $1; }
+      | arithmetic-expr { $$ = $1; }
+      | str-expr { $$ = $1; }
+      | slice-expr { $$ = $1; }
+      | assign-expr { $$ = $1; }
       ;
 
 //表达式语句
-expr-stmt : expr ';'
+expr-stmt : expr ';' { $$ = new ExpressionStatement(std::shared_ptr<Expression>($1), @$); }
           ;
 
 //赋值表达式
-assign-expr : ident '=' expr
-            | arr-access '=' expr
+assign-expr : ident '=' expr { $$ = new AssignmentExpression(std::shared_ptr<Identifier>($1), std::shared_ptr<Expression>($3), @$); }
+            | arr-access '=' expr { $$ = new AssignmentExpression(std::shared_ptr<ArrayAccess>($1), std::shared_ptr<Expression>($3), @$); }
             ;
 
 //函数表达式
-func-expr : ident '.' ident '(' ap-list ')'
+func-expr : ident '(' ap-list ')' { $$ = new FunctionCall(std::shared_ptr<Identifier>($1), std::shared_ptr<ExpressionList>($3), @$); }
+          | ident '.' ident '(' ap-list ')' { $$ = new FunctionCall(std::shared_ptr<Identifier>($1), std::shared_ptr<Identifier>($3), std::shared_ptr<ExpressionList>($5), @$); }
           ;
 
-ap-list : %empty
-        | expr
-        | ap-list expr
+ap-list : %empty { $$ = new ExpressionList(); }
+        | expr { $$ = new ExpressionList(); $$->push_back(std::shared_ptr<Expression>($1)); }
+        | ap-list expr { $1->push_back(std::shared_ptr<Expression>($2)); }
         ;
 
 //字符串表达式
-str-expr  : TSTRING
-          | ident
-          | str-operation
-          | func-expr
+str-expr  : TSTRING { $$ = new StringLiteral(std::string($1)); }
+          | ident { $$ = new StringIdentifier(std::shared_ptr<Identifier>($1)); }
+          | str-operation { $$ = $1; }
+          | func-expr { $$ = new StringFuncExpression(std::shared_ptr<FunctionCall>($1)); }
           ;
 
-str-operation : str-expr TADD str-expr
-              | str-expr '.' TSUBS '(' expr ',' expr ')'
-              | str-expr '.' TREVS
-              | str-expr '.' TTITLES
-              | str-expr '.' TUPS
-              | str-expr '.' TLOWS
+str-operation : str-expr TADD str-expr { $$ = new StringOperation(std::shared_ptr<StringExpression>($1), $2, std::shared_ptr<StringExpression>($3)); }
+              | str-expr '.' TSUBS '(' expr ',' expr ')' { $$ = new StringOperation(std::shared_ptr<StringExpression>($1), $3, std::shared_ptr<Expression>($5), std::shared_ptr<Expression>($7)); }
+              | str-expr '.' TREVS { $$ = new StringOperation(std::shared_ptr<StringExpression>($1), $3); }
+              | str-expr '.' TTITLES { $$ = new StringOperation(std::shared_ptr<StringExpression>($1), $3); }
+              | str-expr '.' TUPS { $$ = new StringOperation(std::shared_ptr<StringExpression>($1), $3); }
+              | str-expr '.' TLOWS { $$ = new StringOperation(std::shared_ptr<StringExpression>($1), $3); }
               ;
 
 //切片表达式
-slice-expr  : ident '[' expr ':' expr ']'
+slice-expr  : ident '[' expr ':' expr ']' { $$ = new SliceExpression(std::shared_ptr<Identifier>($1), 
+                                            std::shared_ptr<Expression>($3), std::shared_ptr<Expression>($5), @$); }
             ;
 
 //算术表达式
-arithmetic-expr : item
-                | arithmetic-expr addition-opt item
+arithmetic-expr : item { $$ = new ArithmeticExpression(std::shared_ptr<Item>($1), @$); }
+                | arithmetic-expr addition-opt item { $$ = new ArithmeticExpression(std::shared_ptr<ArithmeticExpression>($1), std::shared_ptr<Item>($3), $2, @$); }
                 ;
 
 addition-opt  : TADD
@@ -275,8 +329,8 @@ addition-opt  : TADD
               ;
 
 //逻辑表达式
-logical-expr  : factor
-              | logical-expr logical-opt factor
+logical-expr  : factor { $$ = new LogicalExpression(std::shared_ptr<Factor>($1), @$); }
+              | logical-expr logical-opt factor { $$ = new LogicalExpression(std::shared_ptr<LogicalExpression>($1), std::shared_ptr<Factor>($3), $2, @$); }
               ;
 
 logical-opt : TAND
@@ -284,7 +338,8 @@ logical-opt : TAND
             ;
 
 //关系表达式
-relation-expr : arithmetic-expr relation-opt arithmetic-expr
+relation-expr : arithmetic-expr relation-opt arithmetic-expr { $$ = new RelationalExpression(std::shared_ptr<ArithmeticExpression>($1),
+                                      std::shared_ptr<ArithmeticExpression>($3), $2, @$); }
               ;
 
 relation-opt  : TGT
@@ -296,8 +351,9 @@ relation-opt  : TGT
               ;
 
 //项
-item  : factor
-      | item multi-opt factor
+item  : factor { $$ = new Item(std::shared_ptr<Factor>($1)); }
+      | item multi-opt factor  { $$ = new Item(std::shared_ptr<Item>($1), 
+                                  std::shared_ptr<Factor>($3), $2); }
       ;
 
 multi-opt : TMUL
@@ -308,36 +364,29 @@ multi-opt : TMUL
           ;
 
 //因子
-factor  : ident
-        | arr-access
-        | '(' expr ')'
-        | literal
-        | func-expr
-        | relation-expr
+factor  : ident { $$ = new Factor(std::shared_ptr<Expression>($1)); }
+        | arr-access { $$ = new Factor(std::shared_ptr<Expression>($1)); }
+        | '(' expr ')' { $$ = new Factor(std::shared_ptr<Expression>($2)); }
+        | literal { $$ = new Factor(std::shared_ptr<Expression>($1)); }
+        | func-expr { $$ = new Factor(std::shared_ptr<Expression>($1)); }
+        | relation-expr { $$ = new Factor(std::shared_ptr<Expression>($1)); }
         ;
 
 //数组访问
-arr-access  : ident '[' expr ']'
-            | arr-access '[' expr ']'
+arr-access  : ident '[' expr ']' { $$ = new ArrayAccess(std::shared_ptr<Identifier>($1), std::shared_ptr<Expression>($3), @$); }
+            | arr-access '[' expr ']' { $$ = new ArrayAccess(std::shared_ptr<ArrayAccess>($1), std::shared_ptr<Expression>($3), @$); }
             ;
 
-//基本类型
-val-type  : TBOOLTK
-          | TINTTK
-          | TDOUBLETK
-          | TCHARTK
-          | TSTRTK
-          | TARRTK
-          ;
+
 
 //标识符
-ident : TIDENTIFIER
+ident : TIDENTIFIER { $$ = new Identifier(*$1, @1); }
       ;
 
 //字面值
-literal : TCHAR
-        | TBOOL
-        | TINTEGER
-        | TREAL
+literal : TCHAR { $$ = new Character($1); }
+        | TBOOL { $$ = new Boolean($1); }
+        | TINTEGER { $$ = new Integer($1); }
+        | TREAL { $$ = new Real($1); }
         ;
 %%

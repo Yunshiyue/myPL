@@ -35,4 +35,4 @@ add_executable(myPL
         CommonStatement.cpp
         Literal.cpp
         Type.cpp
-        StringExpression.cpp)
+        StringExpression.cpp VariableDeclaration.cpp VariableDeclaration.h)
