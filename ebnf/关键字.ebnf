@@ -1,8 +1,8 @@
-# ¹Ø¼ü×Ö
+# å…³é”®å­—
 keyword ::= 'if' | 'else' | 'elif' | 'while' | 'this' | 'public' | 'private' | 'protected' | 'extends' | 'null' |
 'def' | 'class' | 'return' | 'break' | 'continue' | 'template' | 'typename' | 'for' | 'in';
 
-# »ù±¾ÀàÐÍ
+# åŸºæœ¬ç±»åž‹
 value-type ::= <bool> | <int> | <float> | <double> | <char> | <string> | <array>;
 bool ::= 'bool';
 int ::= 'int';
@@ -13,7 +13,7 @@ string ::= 'string';
 array ::= 'array' '<' <value-type> ',' <integer> '>';
 
 
-# ±êÊ¶·û
+# æ ‡è¯†ç¬¦
 identifier ::= [<letter> | '_'] {<letter> | <digit> | '_'};
 digit ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9';
 letter ::= 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' | 'k' | 'l' | 'm' | 
@@ -21,18 +21,17 @@ letter ::= 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' | 'k' | 'l'
 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I' | 'J' | 'K' | 'L' | 'M' | 'N' | 
 'O' | 'P' | 'Q' | 'R' | 'S' | 'T' | 'U' | 'V' | 'W' | 'X' | 'Y' | 'Z';
 
-# ÔËËã·û
+# è¿ç®—ç¬¦
 calculation ::= '+' | '-' | '*' | '/' | '%' | '**' | '//' |
-'++' | '--' | 
 '||' | '&&' | '!' |
 '==' | '!=' | '>' | '<' | '>=' | '<=' |
 '=';
 
-# ×ÖÃæÖµ
+# å­—é¢å€¼
 literal ::= <character> | <string-literal> | <number-literal> | <bool-literal>;
 string-literal ::= '"' <char>* '"';
 number-literal ::= <integer> | <real>;
 bool-literal ::= 'true' | 'false';
 integer ::= ['+' | '-'] <digit>+;
-real ::= <digit>+ '.' <digit>+;
+real ::= ['+' | '-'] <digit>+ '.' <digit>+;
 character ::= ''' <digit> | <letter> | ... ''';
