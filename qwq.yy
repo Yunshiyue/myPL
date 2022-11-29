@@ -329,7 +329,6 @@ ident : TIDENTIFIER
 
 //字面值
 literal : TCHAR
-        | TSTRING
         | TBOOL
         | TINTEGER
         | TREAL
