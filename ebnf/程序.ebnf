@@ -9,7 +9,10 @@ function-declaration ::= <function-head><function-body>;
 function-head ::= ['template' '<' 'typename' <identifier> '>'] 'def' <identifier> '(' <foraml-parameter-list> ')' ['->' <type>];
 function-body ::= '{' <statement-list> '}';
 foraml-parameter-list ::= <type> <identifier> {','<type> <identifier>} | null;
+
+# 语句列表和块
 statement-list ::= <common-statement>*;
+block ::= '{' <statement-list> '}';
 
 # 类声明（注意模板）
 class-declaration ::= <class-head> <class-body>;
@@ -33,18 +36,18 @@ common-statement ::= <if-statement> | <while-statement> | <for-statement> | <var
 
 # 以下是普通语句
 # if语句
-if-statement ::= 'if' '(' <relation-expression> ')' '{' <statement-list> '}'
-                {'elif' '(' <relation-expression> ')' '{' <statement-list> '}'} {'else' '{' <statement-list> '}'};
+if-statement ::= 'if' '(' <relation-expression> ')' <block>
+                {'elif' '(' <relation-expression> ')' <block>} {'else' <block>};
 
 # while语句
-while-statement ::= 'while' '(' <relation-expression> ')' '{' <statement-list>  '}';
+while-statement ::= 'while' '(' <relation-expression> ')' <block>;
 jump-statement ::= 'break' ';' | 'continue' ';';
 
 # for语句（类似python的循环（限制左闭右开）、C++的循环、范围循环）
-for-statement ::= 'for' <identifier> 'in' '(' <expression> ',' <expression> ')' '{' <statement-list> '}' |
+for-statement ::= 'for' <identifier> 'in' '(' <expression> ',' <expression> ')' <block> |
                   'for' '(' [<variable-declaration> | <assign-expression>]';' [<relation-expression>] ';' [<assign-expression>]')' 
-                  '{' <statement-list> '}' |
-                  'for' '(' <type> <identifier> 'in' <identifier>')' '{' <statement-list> '}';
+                  <block> |
+                  'for' '(' <type> <identifier> 'in' <identifier>')' <block>;
 
 
 
@@ -86,7 +89,7 @@ arithmetic-expression ::= ['+' | '-'] <item> { <addition-operator> <item> };
 addition-operation ::= '+' | '-';
 
 # 逻辑表达式（包括逻辑运算和关系运算）
-logical-expression ::= <factor> { <logical-operator> <factor>};
+logical-expression ::= ['!'] <factor> { <logical-operator> <factor>};
 logical-operator ::= '&&' | '||';
 
 # 关系表达式
@@ -103,3 +106,4 @@ factor ::= <identifier> | <array-access> | '(' <expression> ')' |
 
 # 新增：数组访问
 array-access ::= <identifier> '[' <expression> ']' | array-access '[' <expression> ']';
+
