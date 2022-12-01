@@ -3,6 +3,7 @@
 %{
     #include <string>
     #include "AstNode.h"
+    #include "qwq.tab.hh"
     //#include "qwq.hpp"
 
     // 保存identifier的具体名称
@@ -118,6 +119,9 @@ identifier  [{letter}_]?[{letter}{digit}_]+
 "<="            return SAVE_TOKEN(TLE);
 "<"             return SAVE_TOKEN(TLT);
 ">"             return SAVE_TOKEN(TGT);
+
+ //其它运算符(函数定义)
+"->"            return SAVE_TOKEN(TARROW);
 
  //除char、string之外的字面量
 "true"          {

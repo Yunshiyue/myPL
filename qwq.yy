@@ -1,4 +1,4 @@
-${
+%{
     #include "AstNode.h"
     #include "ClassDeclaration.h"
     #include "CommonStatement.h"
@@ -86,6 +86,8 @@ ${
 %token <token>      TAND TOR TNOT
 // 比较运算符
 %token <token>      TEQ TNE TGE TLE TGT TLT
+// 其它运算符
+%token <token>      TARROW
 // 关键字
 // 条件语句
 %token <token>      TIF TELSE TELIF
@@ -130,6 +132,11 @@ ${
 %type <varList> fp-list
 %type <stmtList> stmt-list
 %type <exprList> ap-list
+// 操作符
+%type <token> addition-opt
+%type <token> multi-opt
+%type <token> relation-opt
+%type <token> logical-opt
 // 定义优先级以及结合性
 %right '='
 %left TAND TOR
@@ -178,8 +185,8 @@ func-decl : func-head block { $$ = new FunctionDeclaration(std::shared_ptr<Funct
 
 func-head : TDEF ident '(' fp-list ')' { $$ = new FunctionHead(std::shared_ptr<Identifier>($2), std::shared_ptr<VariableList>($4), nullptr); }
           | TTEMP '<' TTYNAME ident '>' TDEF ident '(' fp-list ')' { $$ = new FunctionHead(std::shared_ptr<Identifier>($7), std::shared_ptr<VariableList>($9), nullptr, std::shared_ptr<Identifier>($4)); }
-          | TDEF ident '(' fp-list ')' '->' type { $$ = new FunctionHead(std::shared_ptr<Identifier>($2), std::shared_ptr<VariableList>($4), std::shared_ptr<Type>($7)); }
-          | TTEMP '<' TTYNAME ident '>' TDEF ident '(' fp-list ')' '->' type { $$ = new FunctionHead(std::shared_ptr<Identifier>($7), std::shared_ptr<VariableList>($9), std::shared_ptr<Type>($12), std::shared_ptr<Identifier>($4)); }
+          | TDEF ident '(' fp-list ')' TARROW type { $$ = new FunctionHead(std::shared_ptr<Identifier>($2), std::shared_ptr<VariableList>($4), std::shared_ptr<Type>($7)); }
+          | TTEMP '<' TTYNAME ident '>' TDEF ident '(' fp-list ')' TARROW type { $$ = new FunctionHead(std::shared_ptr<Identifier>($7), std::shared_ptr<VariableList>($9), std::shared_ptr<Type>($12), std::shared_ptr<Identifier>($4)); }
           ; //bug?
 
 fp-list : %empty { $$ = new VariableList(); }
@@ -192,7 +199,7 @@ stmt-list : %empty { $$ = new StatementList(); }
           | stmt-list common-stmt { $1->push_back(std::shared_ptr<CommonStatement>($2)); }
           ; //这里可能有bug，书上写了
 
-block : '{' stmt-list '}' { $$ = new Block(std::shared_ptr<StatementList>($1)); }
+block : '{' stmt-list '}' { $$ = new Block(std::shared_ptr<StatementList>($2)); } // $1 改为 $2
       ;
 
 //类声明
@@ -324,7 +331,7 @@ arithmetic-expr : item { $$ = new ArithmeticExpression(std::shared_ptr<Item>($1)
                 | arithmetic-expr addition-opt item { $$ = new ArithmeticExpression(std::shared_ptr<ArithmeticExpression>($1), std::shared_ptr<Item>($3), $2, @$); }
                 ;
 
-addition-opt  : TADD
+addition-opt  : TADD 
               | TSUB
               ;
 
