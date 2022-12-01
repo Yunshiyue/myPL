@@ -160,7 +160,7 @@ stmt  : func-decl { $$ = $1; }
       ;
 
 type  : val-type { $$ = $1; }
-      | ident { $$ = $1; } //只能是class类型的
+      | ident { $$ = new ClassType(TCLASS, std::shared_ptr<Identifier>($1)); } //只能是class类型的
       ;
 
 //基本类型
