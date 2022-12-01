@@ -29,7 +29,7 @@ namespace qwq {
         std::shared_ptr<Identifier> extendClassId = nullptr;
     };
 
-    class ClassDeclaration : public AstNode {
+    class ClassDeclaration : public Statement {
     public:
         ClassDeclaration(std::shared_ptr<ClassHead> classHead, std::shared_ptr<Block> block)
         : classHead(std::move(classHead))

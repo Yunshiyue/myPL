@@ -26,7 +26,6 @@
           (Current).first_column = YYRHSLOC (Rhs, 1).first_column;      \
           (Current).last_line    = YYRHSLOC (Rhs, N).last_line;         \
           (Current).last_column  = YYRHSLOC (Rhs, N).last_column;       \
-          (Current).file_name = fileNames.top();            \
         }                                                               \
       else                                                              \
         {                                                               \
@@ -34,7 +33,6 @@
             YYRHSLOC (Rhs, 0).last_line;                                \
           (Current).first_column = (Current).last_column =              \
             YYRHSLOC (Rhs, 0).last_column;                              \
-          (Current).file_name = fileNames.top();            \
         }                                                               \
     while (0)
 
