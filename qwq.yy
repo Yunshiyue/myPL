@@ -57,6 +57,7 @@
     qwq::Identifier *ident;
     qwq::Item *item;
     qwq::Factor *factor;
+    qwq::VariableDeclaration* varDecl;
     qwq::VariableDeclarationAssign *varDeclAssign;
     qwq::ArithmeticExpression *arithExpr;
     qwq::LogicalExpression *logicalExpr;
@@ -122,7 +123,8 @@
 %type <ident> ident
 %type <item> item
 %type <factor> factor
-%type <varDeclAssign> var-decl var-decl-assign
+%type <varDecl> var-decl
+%type <varDeclAssign> var-decl-assign
 
 %type <arithExpr> arithmetic-expr
 %type <logicalExpr> logical-expr
@@ -211,8 +213,8 @@ class-head  : TCLASS ident { $$ = new qwq::ClassHead(std::shared_ptr<qwq::Identi
             ; //有点复杂，bug?
 
 //变量声明
-var-decl  : type '<' type '>' ident { $$ = new qwq::VariableDeclarationAssign(std::shared_ptr<qwq::Type>($1), std::shared_ptr<qwq::Type>($3), std::shared_ptr<qwq::Identifier>($5), @$); }
-          | type ident { $$ = new qwq::VariableDeclarationAssign(std::shared_ptr<qwq::Type>($1), std::shared_ptr<qwq::Identifier>($2)); }
+var-decl  : type '<' type '>' ident { $$ = new qwq::VariableDeclaration(std::shared_ptr<qwq::Type>($1), std::shared_ptr<qwq::Type>($3), std::shared_ptr<qwq::Identifier>($5), @$); }
+          | type ident { $$ = new qwq::VariableDeclaration(std::shared_ptr<qwq::Type>($1), std::shared_ptr<qwq::Identifier>($2)); }
           ;
 
 var-decl-assign : type ident '=' expr { $$ = new qwq::VarDeclByExpr(std::shared_ptr<qwq::Type>($1), std::shared_ptr<qwq::Identifier>($2), std::shared_ptr<qwq::Expression>($4), @$); }
