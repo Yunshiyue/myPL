@@ -225,7 +225,7 @@ class-head  : TCLASS ident { $$ = new qwq::ClassHead(std::shared_ptr<qwq::Identi
 
 //变量声明
 var-decl  : type '<' type '>' ident { $$ = new qwq::VariableDeclaration(std::shared_ptr<qwq::Type>($1), std::shared_ptr<qwq::Type>($3), std::shared_ptr<qwq::Identifier>($5), @$); }
-          | type ident { $$ = new qwq::VariableDeclaration(std::shared_ptr<qwq::Type>($1), std::shared_ptr<qwq::Identifier>($2)); }
+          | type ident { $$ = new qwq::VariableDeclaration(std::shared_ptr<qwq::Type>($1), std::shared_ptr<qwq::Identifier>($2), @$); }
           ;
 
 var-decl-assign : type ident '=' expr { $$ = new qwq::VarDeclByExpr(std::shared_ptr<qwq::Type>($1), std::shared_ptr<qwq::Identifier>($2), std::shared_ptr<qwq::Expression>($4), @$); }
