@@ -276,7 +276,7 @@ range-for : TFOR '(' var-decl TIN ident ')' block { $$ = new qwq::RangeForStatem
 
 //返回语句
 return-stmt : TRETURN ';' { $$ = new qwq::ReturnStatement(@$); }
-            | TRETURN expr-stmt ';' { $$ = new qwq::ReturnStatement(std::shared_ptr<qwq::Expression>(@1), @$); }
+            | TRETURN expr-stmt { $$ = new qwq::ReturnStatement(std::shared_ptr<qwq::Expression>($1), @$); }
             ;
 
 //表达式
