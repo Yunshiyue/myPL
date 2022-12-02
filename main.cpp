@@ -14,7 +14,7 @@ int main(int argc, char** argv) {
         fileName = argv[1];
     }
 
-    yyin == fopen(fileName.c_str(), "r+");
+    yyin = fopen(fileName.c_str(), "r+");
     if (yyin == nullptr) {
         std::cout << "File " << fileName << "not found. Abort" << std::endl;
         return -1;
