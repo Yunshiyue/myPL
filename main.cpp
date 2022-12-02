@@ -3,6 +3,7 @@
 
 extern int yyparse();
 extern int yylex_destroy();
+extern FILE* yyin;
 
 int main(int argc, char** argv) {
     std::string fileName;
@@ -16,7 +17,7 @@ int main(int argc, char** argv) {
     yyin == fopen(fileName.c_str(), "r+");
     if (yyin == nullptr) {
         std::cout << "File " << fileName << "not found. Abort" << std::endl;
-        return -1
+        return -1;
     }
 
     // TODO: 判断是否语法分析成功
