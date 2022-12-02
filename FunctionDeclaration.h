@@ -15,12 +15,12 @@ namespace qwq {
 
     class FunctionHead : public AstNode {
         FunctionHead(std::shared_ptr<Identifier> id, std::shared_ptr<VariableList> arguments,
-                     std::shared_ptr<Type> returnType, std::shared_ptr<Type> templateType = nullptr)
+                     std::shared_ptr<Type> returnType, std::shared_ptr<Identifier> templateType = nullptr)
                 : returnType(std::move(returnType)), id(std::move(id)), arguments(std::move(arguments))
                 , templateType(std::move(templateType)) {}
 
         FunctionHead(std::shared_ptr<Identifier> id, std::shared_ptr<VariableList> arguments,
-                     std::shared_ptr<Type> templateType = nullptr)
+                     std::shared_ptr<Identifier> templateType = nullptr)
                 : id(std::move(id)), arguments(std::move(arguments))
                 , templateType(std::move(templateType)) {}
     private:

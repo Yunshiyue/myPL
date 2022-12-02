@@ -195,9 +195,9 @@ func-decl : func-head block { $$ = new qwq::FunctionDeclaration(std::shared_ptr<
           ;
 
 func-head : TDEF ident '(' fp-list ')' { $$ = new qwq::FunctionHead(std::shared_ptr<qwq::Identifier>($2), std::shared_ptr<qwq::VariableList>($4), nullptr); }
-          | TTEMP '<' TTYNAME ident '>' TDEF ident '(' fp-list ')' { $$ = new qwq::FunctionHead(std::shared_ptr<qwq::Identifier>($7), std::shared_ptr<qwq::VariableList>($9), nullptr, std::shared_ptr<qwq::Identifier>($4)); }
+          | TTEMP '<' TTYNAME type '>' TDEF ident '(' fp-list ')' { $$ = new qwq::FunctionHead(std::shared_ptr<qwq::Identifier>($7), std::shared_ptr<qwq::VariableList>($9), nullptr, std::shared_ptr<qwq::Identifier>($4)); }
           | TDEF ident '(' fp-list ')' TARROW type { $$ = new qwq::FunctionHead(std::shared_ptr<qwq::Identifier>($2), std::shared_ptr<qwq::VariableList>($4), std::shared_ptr<qwq::Type>($7)); }
-          | TTEMP '<' TTYNAME ident '>' TDEF ident '(' fp-list ')' TARROW type { $$ = new qwq::FunctionHead(std::shared_ptr<qwq::Identifier>($7), std::shared_ptr<qwq::VariableList>($9), std::shared_ptr<qwq::Type>($12), std::shared_ptr<qwq::Identifier>($4)); }
+          | TTEMP '<' TTYNAME type '>' TDEF ident '(' fp-list ')' TARROW type { $$ = new qwq::FunctionHead(std::shared_ptr<qwq::Identifier>($7), std::shared_ptr<qwq::VariableList>($9), std::shared_ptr<qwq::Type>($12), std::shared_ptr<qwq::Identifier>($4)); }
           ; //bug?
 
 fp-list : %empty { $$ = new qwq::VariableList(); }
