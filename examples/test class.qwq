@@ -1,0 +1,9 @@
+template <typename T>
+class test_class_int
+{
+    T a = 1;
+    T b = 2;
+    def testF() -> T {
+        return a+b;
+    }
+}

@@ -79,19 +79,21 @@ namespace qwq {
     class ObjectDeclaration : VariableDeclarationAssign {
     public:
         ObjectDeclaration(std::shared_ptr<Type> type, std::shared_ptr<Type> templateType, std::shared_ptr<Identifier> id,
-                          std::shared_ptr<VariableList> variableList, YYLTYPE loc)
+                          std::shared_ptr<ExpressionList> expressionList, YYLTYPE loc)
                      : VariableDeclarationAssign(std::move(type), std::move(id), std::move(templateType), std::move(loc))
-                     , variableList(std::move(variableList)) {}
+                     , ExpressionList(std::move(expressionList)) {}
     private:
-        std::shared_ptr<VariableList> variableList;
+        std::shared_ptr<ExpressionList> expressionList;
     };
 
     class VarDeclAssignStmt : public CommonStatement {
     public:
-        explicit VarDeclAssignStmt(std::shared_ptr<VariableDeclarationAssign> variableDeclarationAssign)
+        explicit VarDeclAssignStmt(std::shared_ptr<Expression> variableDeclarationAssign)
         : variableDeclarationAssign(std::move(variableDeclarationAssign)) {}
+        // explicit VarDeclAssignStmt(std::shared_ptr<VariableDeclarationAssign> variableDeclarationAssign)
+        // : variableDeclarationAssign(std::move(variableDeclarationAssign)) {}
     private:
-        std::shared_ptr<VariableDeclarationAssign> variableDeclarationAssign;
+        std::shared_ptr<Expression> variableDeclarationAssign;
     };
 }
 
