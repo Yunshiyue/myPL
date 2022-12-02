@@ -190,8 +190,8 @@ func-head : TDEF ident '(' fp-list ')' { $$ = new qwq::FunctionHead(std::shared_
           ; //bug?
 
 fp-list : %empty { $$ = new qwq::VariableList(); }
-        | var-decl { $$ = new qwq::VariableList(); $$->push_back(std::shared_ptr<qwq::VariableDeclarationAssign>($1)); }
-        | fp-list ',' var-decl { $1->push_back(std::shared_ptr<qwq::VariableDeclarationAssign>($3)); }
+        | var-decl { $$ = new qwq::VariableList(); $$->push_back(std::shared_ptr<qwq::VariableDeclaration>($1)); }
+        | fp-list ',' var-decl { $1->push_back(std::shared_ptr<qwq::VariableDeclaration>($3)); }
         ;
 
 stmt-list : %empty { $$ = new qwq::StatementList(); }
@@ -258,7 +258,7 @@ for-stmt  : c-like-for  { $$ = $1; }
           | py-like-for { $$ = $1; }
           | range-for { $$ = $1; }
           ;
-c-like-for  : TFOR '(' var-decl ';' relation-expr ';' assign-expr ')' block { $$ = new qwq::CLikeForStatement(std::shared_ptr<qwq::VariableDeclarationAssign>($3), 
+c-like-for  : TFOR '(' var-decl ';' relation-expr ';' assign-expr ')' block { $$ = new qwq::CLikeForStatement(std::shared_ptr<qwq::VariableDeclaration>($3), 
                   std::shared_ptr<qwq::RelationalExpression>($5), std::shared_ptr<qwq::AssignExpression>($7), 
                   std::shared_ptr<qwq::Block>($9));;}
             | TFOR '(' assign-expr ';' relation-expr ';' assign-expr ')' block { $$ = new qwq::CLikeForStatement(std::shared_ptr<qwq::AssignExpression>($3), 
@@ -270,7 +270,7 @@ py-like-for : TFOR ident TIN '(' expr ',' expr ')' block { $$ = new qwq::PyLikeF
               std::shared_ptr<qwq::Expression>($5), std::shared_ptr<qwq::Expression>($7), std::shared_ptr<qwq::Block>($9)); }
             ;
 
-range-for : TFOR '(' var-decl TIN ident ')' block { $$ = new qwq::RangeForStatement(std::shared_ptr<qwq::VariableDeclarationAssign>($3), 
+range-for : TFOR '(' var-decl TIN ident ')' block { $$ = new qwq::RangeForStatement(std::shared_ptr<qwq::VariableDeclaration>($3), 
                                                     std::shared_ptr<qwq::Identifier>($5), std::shared_ptr<qwq::Block>($7)); }
             ;
 
