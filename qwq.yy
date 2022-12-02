@@ -160,7 +160,7 @@ stmt  : func-decl { $$ = $1; }
       ;
 
 type  : val-type { $$ = $1; }
-      | ident { $$ = new qwq::ClassType(TCLASS, std::shared_ptr<Identifier>($1)); } //只能是class类型的
+      | ident { $$ = new qwq::ClassType(TCLASS, std::shared_ptr<qwq::Identifier>($1)); } //只能是class类型的
       ;
 
 //基本类型
@@ -177,48 +177,48 @@ val-type  : TBOOLTK { $$ = new qwq::BooleanType(TBOOLTK); }
 //          ;
 //以下是statement的4部分
 //函数声明
-func-decl : func-head block { $$ = new qwq::FunctionDeclaration(std::shared_ptr<FunctionHead>($1), 
-                                                                std::shared_ptr<Block>($2)); }
+func-decl : func-head block { $$ = new qwq::FunctionDeclaration(std::shared_ptr<qwq::FunctionHead>($1), 
+                                                                std::shared_ptr<qwq::Block>($2)); }
           ;
 
-func-head : TDEF ident '(' fp-list ')' { $$ = new qwq::FunctionHead(std::shared_ptr<Identifier>($2), std::shared_ptr<VariableList>($4), nullptr); }
-          | TTEMP '<' TTYNAME ident '>' TDEF ident '(' fp-list ')' { $$ = new qwq::FunctionHead(std::shared_ptr<Identifier>($7), std::shared_ptr<VariableList>($9), nullptr, std::shared_ptr<Identifier>($4)); }
-          | TDEF ident '(' fp-list ')' TARROW type { $$ = new qwq::FunctionHead(std::shared_ptr<Identifier>($2), std::shared_ptr<VariableList>($4), std::shared_ptr<Type>($7)); }
-          | TTEMP '<' TTYNAME ident '>' TDEF ident '(' fp-list ')' TARROW type { $$ = new qwq::FunctionHead(std::shared_ptr<Identifier>($7), std::shared_ptr<VariableList>($9), std::shared_ptr<Type>($12), std::shared_ptr<Identifier>($4)); }
+func-head : TDEF ident '(' fp-list ')' { $$ = new qwq::FunctionHead(std::shared_ptr<qwq::Identifier>($2), std::shared_ptr<qwq::VariableList>($4), nullptr); }
+          | TTEMP '<' TTYNAME ident '>' TDEF ident '(' fp-list ')' { $$ = new qwq::FunctionHead(std::shared_ptr<qwq::Identifier>($7), std::shared_ptr<qwq::VariableList>($9), nullptr, std::shared_ptr<qwq::Identifier>($4)); }
+          | TDEF ident '(' fp-list ')' TARROW type { $$ = new qwq::FunctionHead(std::shared_ptr<qwq::Identifier>($2), std::shared_ptr<qwq::VariableList>($4), std::shared_ptr<qwq::Type>($7)); }
+          | TTEMP '<' TTYNAME ident '>' TDEF ident '(' fp-list ')' TARROW type { $$ = new qwq::FunctionHead(std::shared_ptr<qwq::Identifier>($7), std::shared_ptr<qwq::VariableList>($9), std::shared_ptr<qwq::Type>($12), std::shared_ptr<qwq::Identifier>($4)); }
           ; //bug?
 
 fp-list : %empty { $$ = new qwq::VariableList(); }
-        | var-decl { $$ = new qwq::VariableList(); $$->push_back(std::shared_ptr<VariableDeclaration>($1)); }
-        | fp-list ',' var-decl { $1->push_back(std::shared_ptr<VariableDeclaration>($3)); }
+        | var-decl { $$ = new qwq::VariableList(); $$->push_back(std::shared_ptr<qwq::VariableDeclarationAssign>($1)); }
+        | fp-list ',' var-decl { $1->push_back(std::shared_ptr<qwq::VariableDeclarationAssign>($3)); }
         ;
 
 stmt-list : %empty { $$ = new qwq::StatementList(); }
-          | common-stmt { $$ = new qwq::StatementList(); $$->push_back(std::shared_ptr<CommonStatement>($1)); }
-          | stmt-list common-stmt { $1->push_back(std::shared_ptr<CommonStatement>($2)); }
+          | common-stmt { $$ = new qwq::StatementList(); $$->push_back(std::shared_ptr<qwq::CommonStatement>($1)); }
+          | stmt-list common-stmt { $1->push_back(std::shared_ptr<qwq::CommonStatement>($2)); }
           ; //这里可能有bug，书上写了
 
-block : '{' stmt-list '}' { $$ = new qwq::Block(std::shared_ptr<StatementList>($2)); } // $1 改为 $2
+block : '{' stmt-list '}' { $$ = new qwq::Block(std::shared_ptr<qwq::StatementList>($2)); } // $1 改为 $2
       ;
 
 //类声明
-class-decl  : class-head block { $$ = new qwq::ClassDeclaration(std::shared_ptr<ClassHead>($1), std::shared_ptr<Block>($2)); }
+class-decl  : class-head block { $$ = new qwq::ClassDeclaration(std::shared_ptr<qwq::ClassHead>($1), std::shared_ptr<qwq::Block>($2)); }
             ; //应该只有var和func的声明
 
-class-head  : TCLASS ident { $$ = new qwq::ClassHead(std::shared_ptr<Identifier>($2), nullptr, nullptr); }
-            | TTEMP '<' TTYNAME ident '>' TCLASS ident { $$ = new qwq::ClassHead(std::shared_ptr<Identifier>($7), std::shared_ptr<Identifier>($4), nullptr); }
-            | TCLASS ident TEXTEND ident { $$ = new qwq::ClassHead(std::shared_ptr<Identifier>($2), nullptr, std::shared_ptr<Identifier>($4)); }
-            | TTEMP '<' TTYNAME ident '>' TCLASS ident TEXTEND ident { $$ = new qwq::ClassHead(std::shared_ptr<Identifier>($7), std::shared_ptr<Identifier>($4), std::shared_ptr<Identifier>($9)); }
+class-head  : TCLASS ident { $$ = new qwq::ClassHead(std::shared_ptr<qwq::Identifier>($2), nullptr, nullptr); }
+            | TTEMP '<' TTYNAME ident '>' TCLASS ident { $$ = new qwq::ClassHead(std::shared_ptr<qwq::Identifier>($7), std::shared_ptr<qwq::Identifier>($4), nullptr); }
+            | TCLASS ident TEXTEND ident { $$ = new qwq::ClassHead(std::shared_ptr<qwq::Identifier>($2), nullptr, std::shared_ptr<qwq::Identifier>($4)); }
+            | TTEMP '<' TTYNAME ident '>' TCLASS ident TEXTEND ident { $$ = new qwq::ClassHead(std::shared_ptr<qwq::Identifier>($7), std::shared_ptr<qwq::Identifier>($4), std::shared_ptr<qwq::Identifier>($9)); }
             ; //有点复杂，bug?
 
 //变量声明
-var-decl  : type '<' type '>' ident { $$ = new qwq::VariableDeclaration(std::shared_ptr<Type>($1), std::shared_ptr<Type>($3), std::shared_ptr<Identifier>($5), @$); }
-          | type ident { $$ = new qwq::VariableDeclaration(std::shared_ptr<Type>($1), std::shared_ptr<Type>($2)); }
+var-decl  : type '<' type '>' ident { $$ = new qwq::VariableDeclarationAssign(std::shared_ptr<qwq::Type>($1), std::shared_ptr<qwq::Type>($3), std::shared_ptr<qwq::Identifier>($5), @$); }
+          | type ident { $$ = new qwq::VariableDeclarationAssign(std::shared_ptr<qwq::Type>($1), std::shared_ptr<qwq::Identifier>($2)); }
           ;
 
-var-decl-assign : type ident '=' expr { $$ = new qwq::VarDeclByExpr(std::shared_ptr<Type>($1), std::shared_ptr<Identifier>($2), std::shared_ptr<Expression>($4), @$); }
-                | type '<' type '>' ident '=' expr { $$ = new qwq::VarDeclByExpr(std::shared_ptr<Type>($1), std::shared_ptr<Type>($3), std::shared_ptr<Identifier>($5), std::shared_ptr<Expression>($7), @$); }
-                | type ident '(' ap-list ')' { $$ = new qwq::ObjectDeclaration(std::shared_ptr<Type>($1), nullptr, std::shared_ptr<Identifier>($2), std::shared_ptr<VariableList>($4), @$); }
-                | type '<' type '>' ident '(' ap-list ')' { $$ = new qwq::ObjectDeclaration(std::shared_ptr<Type>($1), std::shared_ptr<Type>($3), std::shared_ptr<Identifier>($5), std::shared_ptr<VariableList>($7), @$); }
+var-decl-assign : type ident '=' expr { $$ = new qwq::VarDeclByExpr(std::shared_ptr<qwq::Type>($1), std::shared_ptr<qwq::Identifier>($2), std::shared_ptr<qwq::Expression>($4), @$); }
+                | type '<' type '>' ident '=' expr { $$ = new qwq::VarDeclByExpr(std::shared_ptr<qwq::Type>($1), std::shared_ptr<qwq::Type>($3), std::shared_ptr<qwq::Identifier>($5), std::shared_ptr<qwq::Expression>($7), @$); }
+                | type ident '(' ap-list ')' { $$ = new qwq::ObjectDeclaration(std::shared_ptr<qwq::Type>($1), nullptr, std::shared_ptr<qwq::Identifier>($2), std::shared_ptr<qwq::VariableList>($4), @$); }
+                | type '<' type '>' ident '(' ap-list ')' { $$ = new qwq::ObjectDeclaration(std::shared_ptr<qwq::Type>($1), std::shared_ptr<qwq::Type>($3), std::shared_ptr<qwq::Identifier>($5), std::shared_ptr<qwq::VariableList>($7), @$); }
                 ;
 
 var-decl-stmt : var-decl ';' { $$ = new qwq::VarDeclAssignStmt($1); }
@@ -236,13 +236,13 @@ common-stmt : if-stmt { $$ = $1; }
             ;
 //以下是普通语句
 //if语句
-if-stmt : TIF '(' relation-expr ')' block { $$ = new qwq::IfStatement(std::shared_ptr<RelationalExpression>($3), std::shared_ptr<Block>($5)); }
-        | TIF '(' relation-expr ')' block TELSE block { $$ = new qwq::IfStatement(std::shared_ptr<RelationalExpression>($3), std::shared_ptr<Block>($5), std::shared_ptr<Block>($7)); }
+if-stmt : TIF '(' relation-expr ')' block { $$ = new qwq::IfStatement(std::shared_ptr<qwq::RelationalExpression>($3), std::shared_ptr<qwq::Block>($5)); }
+        | TIF '(' relation-expr ')' block TELSE block { $$ = new qwq::IfStatement(std::shared_ptr<qwq::RelationalExpression>($3), std::shared_ptr<qwq::Block>($5), std::shared_ptr<qwq::Block>($7)); }
         ; 
 
 //while语句
-while-stmt  : TWHILE '(' relation-expr ')' block { $$ = new qwq::WhileStatement(std::shared_ptr<RelationalExpression>($3), 
-                                                      std::shared_ptr<Block>($5)); }
+while-stmt  : TWHILE '(' relation-expr ')' block { $$ = new qwq::WhileStatement(std::shared_ptr<qwq::RelationalExpression>($3), 
+                                                      std::shared_ptr<qwq::Block>($5)); }
             ;
 
 //jump语句
@@ -256,25 +256,25 @@ for-stmt  : c-like-for  { $$ = $1; }
           | py-like-for { $$ = $1; }
           | range-for { $$ = $1; }
           ;
-c-like-for  : TFOR '(' var-decl ';' relation-expr ';' assign-expr ')' block { $$ = new qwq::CLikeForStatement(std::shared_ptr<VariableDeclaration>($3), 
-                  std::shared_ptr<RelationalExpression>($5), std::shared_ptr<AssignExpression>($7), 
-                  std::shared_ptr<Block>($9));;}
-            | TFOR '(' assign-expr ';' relation-expr ';' assign-expr ')' block { $$ = new qwq::CLikeForStatement(std::shared_ptr<AssignExpression>($3), 
-                  std::shared_ptr<RelationalExpression>($5), std::shared_ptr<AssignExpression>($7), 
-                  std::shared_ptr<Block>($9));;}
+c-like-for  : TFOR '(' var-decl ';' relation-expr ';' assign-expr ')' block { $$ = new qwq::CLikeForStatement(std::shared_ptr<qwq::VariableDeclarationAssign>($3), 
+                  std::shared_ptr<qwq::RelationalExpression>($5), std::shared_ptr<qwq::AssignExpression>($7), 
+                  std::shared_ptr<qwq::Block>($9));;}
+            | TFOR '(' assign-expr ';' relation-expr ';' assign-expr ')' block { $$ = new qwq::CLikeForStatement(std::shared_ptr<qwq::AssignExpression>($3), 
+                  std::shared_ptr<qwq::RelationalExpression>($5), std::shared_ptr<qwq::AssignExpression>($7), 
+                  std::shared_ptr<qwq::Block>($9));;}
             ;
 
-py-like-for : TFOR ident TIN '(' expr ',' expr ')' block { $$ = new qwq::PyLikeForStatement(std::shared_ptr<Identifier>($2), 
-              std::shared_ptr<Expression>($5), std::shared_ptr<Expression>($7), std::shared_ptr<Block>($9)); }
+py-like-for : TFOR ident TIN '(' expr ',' expr ')' block { $$ = new qwq::PyLikeForStatement(std::shared_ptr<qwq::Identifier>($2), 
+              std::shared_ptr<qwq::Expression>($5), std::shared_ptr<qwq::Expression>($7), std::shared_ptr<qwq::Block>($9)); }
             ;
 
-range-for : TFOR '(' var-decl TIN ident ')' block { $$ = new qwq::RangeForStatement(std::shared_ptr<VariableDeclaration>($3), 
-                                                    std::shared_ptr<Identifier>($5), std::shared_ptr<Block>($7)); }
+range-for : TFOR '(' var-decl TIN ident ')' block { $$ = new qwq::RangeForStatement(std::shared_ptr<qwq::VariableDeclarationAssign>($3), 
+                                                    std::shared_ptr<qwq::Identifier>($5), std::shared_ptr<qwq::Block>($7)); }
             ;
 
 //返回语句
 return-stmt : TRETURN ';' { $$ = new qwq::ReturnStatement(@$); }
-            | TRETURN expr-stmt ';' { $$ = new qwq::ReturnStatement(std::shared_ptr<Expression>(@1), @$); }
+            | TRETURN expr-stmt ';' { $$ = new qwq::ReturnStatement(std::shared_ptr<qwq::Expression>(@1), @$); }
             ;
 
 //表达式
@@ -286,47 +286,47 @@ expr  : logical-expr { $$ = $1; }
       ;
 
 //表达式语句
-expr-stmt : expr ';' { $$ = new qwq::ExpressionStatement(std::shared_ptr<Expression>($1), @$); }
+expr-stmt : expr ';' { $$ = new qwq::ExpressionStatement(std::shared_ptr<qwq::Expression>($1), @$); }
           ;
 
 //赋值表达式
-assign-expr : ident '=' expr { $$ = new qwq::AssignmentExpression(std::shared_ptr<Identifier>($1), std::shared_ptr<Expression>($3), @$); }
-            | arr-access '=' expr { $$ = new qwq::AssignmentExpression(std::shared_ptr<ArrayAccess>($1), std::shared_ptr<Expression>($3), @$); }
+assign-expr : ident '=' expr { $$ = new qwq::AssignmentExpression(std::shared_ptr<qwq::Identifier>($1), std::shared_ptr<qwq::Expression>($3), @$); }
+            | arr-access '=' expr { $$ = new qwq::AssignmentExpression(std::shared_ptr<qwq::ArrayAccess>($1), std::shared_ptr<qwq::Expression>($3), @$); }
             ;
 
 //函数表达式
-func-expr : ident '(' ap-list ')' { $$ = new qwq::FunctionCall(std::shared_ptr<Identifier>($1), std::shared_ptr<ExpressionList>($3), @$); }
-          | ident '.' ident '(' ap-list ')' { $$ = new qwq::FunctionCall(std::shared_ptr<Identifier>($1), std::shared_ptr<Identifier>($3), std::shared_ptr<ExpressionList>($5), @$); }
+func-expr : ident '(' ap-list ')' { $$ = new qwq::FunctionCall(std::shared_ptr<qwq::Identifier>($1), std::shared_ptr<qwq::ExpressionList>($3), @$); }
+          | ident '.' ident '(' ap-list ')' { $$ = new qwq::FunctionCall(std::shared_ptr<qwq::Identifier>($1), std::shared_ptr<qwq::Identifier>($3), std::shared_ptr<qwq::ExpressionList>($5), @$); }
           ;
 
 ap-list : %empty { $$ = new qwq::ExpressionList(); }
-        | expr { $$ = new qwq::ExpressionList(); $$->push_back(std::shared_ptr<Expression>($1)); }
-        | ap-list expr { $1->push_back(std::shared_ptr<Expression>($2)); }
+        | expr { $$ = new qwq::ExpressionList(); $$->push_back(std::shared_ptr<qwq::Expression>($1)); }
+        | ap-list expr { $1->push_back(std::shared_ptr<qwq::Expression>($2)); }
         ;
 
 //字符串表达式
 str-expr  : TSTRING { $$ = new qwq::StringLiteral(std::string($1)); }
-          | ident { $$ = new qwq::StringIdentifier(std::shared_ptr<Identifier>($1)); }
+          | ident { $$ = new qwq::StringIdentifier(std::shared_ptr<qwq::Identifier>($1)); }
           | str-operation { $$ = $1; }
-          | func-expr { $$ = new qwq::StringFuncExpression(std::shared_ptr<FunctionCall>($1)); }
+          | func-expr { $$ = new qwq::StringFuncExpression(std::shared_ptr<qwq::FunctionCall>($1)); }
           ;
 
-str-operation : str-expr TADD str-expr { $$ = new qwq::StringOperation(std::shared_ptr<StringExpression>($1), $2, std::shared_ptr<StringExpression>($3)); }
-              | str-expr '.' TSUBS '(' expr ',' expr ')' { $$ = new qwq::StringOperation(std::shared_ptr<StringExpression>($1), $3, std::shared_ptr<Expression>($5), std::shared_ptr<Expression>($7)); }
-              | str-expr '.' TREVS { $$ = new qwq::StringOperation(std::shared_ptr<StringExpression>($1), $3); }
-              | str-expr '.' TTITLES { $$ = new qwq::StringOperation(std::shared_ptr<StringExpression>($1), $3); }
-              | str-expr '.' TUPS { $$ = new qwq::StringOperation(std::shared_ptr<StringExpression>($1), $3); }
-              | str-expr '.' TLOWS { $$ = new qwq::StringOperation(std::shared_ptr<StringExpression>($1), $3); }
+str-operation : str-expr TADD str-expr { $$ = new qwq::StringOperation(std::shared_ptr<qwq::StringExpression>($1), $2, std::shared_ptr<qwq::StringExpression>($3)); }
+              | str-expr '.' TSUBS '(' expr ',' expr ')' { $$ = new qwq::StringOperation(std::shared_ptr<qwq::StringExpression>($1), $3, std::shared_ptr<qwq::Expression>($5), std::shared_ptr<qwq::Expression>($7)); }
+              | str-expr '.' TREVS { $$ = new qwq::StringOperation(std::shared_ptr<qwq::StringExpression>($1), $3); }
+              | str-expr '.' TTITLES { $$ = new qwq::StringOperation(std::shared_ptr<qwq::StringExpression>($1), $3); }
+              | str-expr '.' TUPS { $$ = new qwq::StringOperation(std::shared_ptr<qwq::StringExpression>($1), $3); }
+              | str-expr '.' TLOWS { $$ = new qwq::StringOperation(std::shared_ptr<qwq::StringExpression>($1), $3); }
               ;
 
 //切片表达式
-slice-expr  : ident '[' expr ':' expr ']' { $$ = new qwq::SliceExpression(std::shared_ptr<Identifier>($1), 
-                                            std::shared_ptr<Expression>($3), std::shared_ptr<Expression>($5), @$); }
+slice-expr  : ident '[' expr ':' expr ']' { $$ = new qwq::SliceExpression(std::shared_ptr<qwq::Identifier>($1), 
+                                            std::shared_ptr<qwq::Expression>($3), std::shared_ptr<qwq::Expression>($5), @$); }
             ;
 
 //算术表达式
-arithmetic-expr : item { $$ = new qwq::ArithmeticExpression(std::shared_ptr<Item>($1), @$); }
-                | arithmetic-expr addition-opt item { $$ = new qwq::ArithmeticExpression(std::shared_ptr<ArithmeticExpression>($1), std::shared_ptr<Item>($3), $2, @$); }
+arithmetic-expr : item { $$ = new qwq::ArithmeticExpression(std::shared_ptr<qwq::Item>($1), @$); }
+                | arithmetic-expr addition-opt item { $$ = new qwq::ArithmeticExpression(std::shared_ptr<qwq::ArithmeticExpression>($1), std::shared_ptr<qwq::Item>($3), $2, @$); }
                 ;
 
 addition-opt  : TADD 
@@ -334,8 +334,8 @@ addition-opt  : TADD
               ;
 
 //逻辑表达式
-logical-expr  : factor { $$ = new qwq::LogicalExpression(std::shared_ptr<Factor>($1), @$); }
-              | logical-expr logical-opt factor { $$ = new qwq::LogicalExpression(std::shared_ptr<LogicalExpression>($1), std::shared_ptr<Factor>($3), $2, @$); }
+logical-expr  : factor { $$ = new qwq::LogicalExpression(std::shared_ptr<qwq::Factor>($1), @$); }
+              | logical-expr logical-opt factor { $$ = new qwq::LogicalExpression(std::shared_ptr<qwq::LogicalExpression>($1), std::shared_ptr<qwq::Factor>($3), $2, @$); }
               ;
 
 logical-opt : TAND
@@ -343,8 +343,8 @@ logical-opt : TAND
             ;
 
 //关系表达式
-relation-expr : arithmetic-expr relation-opt arithmetic-expr { $$ = new qwq::RelationalExpression(std::shared_ptr<ArithmeticExpression>($1),
-                                      std::shared_ptr<ArithmeticExpression>($3), $2, @$); }
+relation-expr : arithmetic-expr relation-opt arithmetic-expr { $$ = new qwq::RelationalExpression(std::shared_ptr<qwq::ArithmeticExpression>($1),
+                                      std::shared_ptr<qwq::ArithmeticExpression>($3), $2, @$); }
               ;
 
 relation-opt  : TGT
@@ -356,9 +356,9 @@ relation-opt  : TGT
               ;
 
 //项
-item  : factor { $$ = new qwq::Item(std::shared_ptr<Factor>($1)); }
-      | item multi-opt factor  { $$ = new qwq::Item(std::shared_ptr<Item>($1), 
-                                  std::shared_ptr<Factor>($3), $2); }
+item  : factor { $$ = new qwq::Item(std::shared_ptr<qwq::Factor>($1)); }
+      | item multi-opt factor  { $$ = new qwq::Item(std::shared_ptr<qwq::Item>($1), 
+                                  std::shared_ptr<qwq::Factor>($3), $2); }
       ;
 
 multi-opt : TMUL
@@ -369,17 +369,17 @@ multi-opt : TMUL
           ;
 
 //因子
-factor  : ident { $$ = new qwq::Factor(std::shared_ptr<Expression>($1)); }
-        | arr-access { $$ = new qwq::Factor(std::shared_ptr<Expression>($1)); }
-        | '(' expr ')' { $$ = new qwq::Factor(std::shared_ptr<Expression>($2)); }
-        | literal { $$ = new qwq::Factor(std::shared_ptr<Expression>($1)); }
-        | func-expr { $$ = new qwq::Factor(std::shared_ptr<Expression>($1)); }
-        | relation-expr { $$ = new qwq::Factor(std::shared_ptr<Expression>($1)); }
+factor  : ident { $$ = new qwq::Factor(std::shared_ptr<qwq::Expression>($1)); }
+        | arr-access { $$ = new qwq::Factor(std::shared_ptr<qwq::Expression>($1)); }
+        | '(' expr ')' { $$ = new qwq::Factor(std::shared_ptr<qwq::Expression>($2)); }
+        | literal { $$ = new qwq::Factor(std::shared_ptr<qwq::Expression>($1)); }
+        | func-expr { $$ = new qwq::Factor(std::shared_ptr<qwq::Expression>($1)); }
+        | relation-expr { $$ = new qwq::Factor(std::shared_ptr<qwq::Expression>($1)); }
         ;
 
 //数组访问
-arr-access  : ident '[' expr ']' { $$ = new qwq::ArrayAccess(std::shared_ptr<Identifier>($1), std::shared_ptr<Expression>($3), @$); }
-            | arr-access '[' expr ']' { $$ = new qwq::ArrayAccess(std::shared_ptr<ArrayAccess>($1), std::shared_ptr<Expression>($3), @$); }
+arr-access  : ident '[' expr ']' { $$ = new qwq::ArrayAccess(std::shared_ptr<qwq::Identifier>($1), std::shared_ptr<qwq::Expression>($3), @$); }
+            | arr-access '[' expr ']' { $$ = new qwq::ArrayAccess(std::shared_ptr<qwq::ArrayAccess>($1), std::shared_ptr<qwq::Expression>($3), @$); }
             ;
 
 
