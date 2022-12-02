@@ -47,6 +47,11 @@
     qwq::CommonStatement *cStatement;
     qwq::ForStatement *forStatement;
     qwq::Expression *expr;
+    qwq::ArrayAccess *arrAcc;
+    qwq::RelationalExpression *relationExpr;
+    qwq::SliceExpression *sliceExpr;
+    qwq::FunctionCall *funcExpr;
+    qwq::AssignExpression *assignExpr;
     qwq::FunctionDeclaration *fDeclare;
     qwq::FunctionHead *fHead;
     qwq::Literal *literal;
@@ -61,7 +66,6 @@
     qwq::VariableDeclarationAssign *varDeclAssign;
     qwq::ArithmeticExpression *arithExpr;
     qwq::LogicalExpression *logicalExpr;
-
     qwq::VariableList *varList;
     qwq::StatementList *stmtList;
     qwq::ExpressionList *exprList;
@@ -112,7 +116,14 @@
 %type <classHead> class-head
 %type <cStatement> common-stmt if-stmt while-stmt jump-stmt for-stmt return-stmt expr-stmt var-decl-stmt
 %type <forStatement> c-like-for py-like-for range-for
-%type <expr> expr assign-expr func-expr relation-expr slice-expr  arr-access
+%type <expr> expr
+
+%type <arrAcc> arr-access
+%type <relationExpr> relation-expr 
+%type <sliceExpr> slice-expr
+%type <funcExpr> func-expr
+%type <assignExpr> assign-expr
+
 %type <fDeclare> func-decl
 %type <fHead> func-head
 %type <literal> literal
@@ -276,7 +287,7 @@ range-for : TFOR '(' var-decl TIN ident ')' block { $$ = new qwq::RangeForStatem
 
 //返回语句
 return-stmt : TRETURN ';' { $$ = new qwq::ReturnStatement(@$); }
-            | TRETURN expr-stmt { $$ = new qwq::ReturnStatement(std::shared_ptr<qwq::Expression>($1), @$); }
+            | TRETURN expr ';' { $$ = new qwq::ReturnStatement(std::shared_ptr<qwq::Expression>($1), @$); }
             ;
 
 //表达式
