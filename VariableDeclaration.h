@@ -60,7 +60,7 @@ namespace qwq {
         YYLTYPE loc;
     };
 
-    class VarDeclByExpr : VariableDeclarationAssign {
+    class VarDeclByExpr : public VariableDeclarationAssign {
     public:
         // 形如：int a = exp;
         VarDeclByExpr(std::shared_ptr<Type> type, std::shared_ptr<Identifier> id,
@@ -76,7 +76,7 @@ namespace qwq {
         std::shared_ptr<Expression> assignmentExpr = nullptr;
     };
 
-    class ObjectDeclaration : VariableDeclarationAssign {
+    class ObjectDeclaration : public VariableDeclarationAssign {
     public:
         ObjectDeclaration(std::shared_ptr<Type> type, std::shared_ptr<Type> templateType, std::shared_ptr<Identifier> id,
                           std::shared_ptr<ExpressionList> expressionList, YYLTYPE loc)

@@ -188,7 +188,7 @@ namespace qwq {
         YYLTYPE loc;
     };
 
-    class Block : Expression {
+    class Block : public Expression {
     public:
         std::shared_ptr<StatementList> statementList;
         explicit Block(std::shared_ptr<StatementList> statementList) : statementList(std::move(statementList)) {}
