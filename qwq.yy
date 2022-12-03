@@ -47,6 +47,11 @@
     qwq::CommonStatement *cStatement;
     qwq::ForStatement *forStatement;
     qwq::Expression *expr;
+    qwq::ArrayAccess *arrAcc;
+    qwq::RelationalExpression *relationExpr;
+    qwq::SliceExpression *sliceExpr;
+    qwq::FunctionCall *funcExpr;
+    qwq::AssignExpression *assignExpr;
     qwq::FunctionDeclaration *fDeclare;
     qwq::FunctionHead *fHead;
     qwq::Literal *literal;
@@ -61,7 +66,6 @@
     qwq::VariableDeclarationAssign *varDeclAssign;
     qwq::ArithmeticExpression *arithExpr;
     qwq::LogicalExpression *logicalExpr;
-
     qwq::VariableList *varList;
     qwq::StatementList *stmtList;
     qwq::ExpressionList *exprList;
@@ -112,7 +116,14 @@
 %type <classHead> class-head
 %type <cStatement> common-stmt if-stmt while-stmt jump-stmt for-stmt return-stmt expr-stmt var-decl-stmt
 %type <forStatement> c-like-for py-like-for range-for
-%type <expr> expr assign-expr func-expr relation-expr slice-expr  arr-access
+%type <expr> expr
+
+%type <arrAcc> arr-access
+%type <relationExpr> relation-expr 
+%type <sliceExpr> slice-expr
+%type <funcExpr> func-expr
+%type <assignExpr> assign-expr
+
 %type <fDeclare> func-decl
 %type <fHead> func-head
 %type <literal> literal
@@ -190,8 +201,8 @@ func-head : TDEF ident '(' fp-list ')' { $$ = new qwq::FunctionHead(std::shared_
           ; //bug?
 
 fp-list : %empty { $$ = new qwq::VariableList(); }
-        | var-decl { $$ = new qwq::VariableList(); $$->push_back(std::shared_ptr<qwq::VariableDeclarationAssign>($1)); }
-        | fp-list ',' var-decl { $1->push_back(std::shared_ptr<qwq::VariableDeclarationAssign>($3)); }
+        | var-decl { $$ = new qwq::VariableList(); $$->push_back(std::shared_ptr<qwq::VariableDeclaration>($1)); }
+        | fp-list ',' var-decl { $1->push_back(std::shared_ptr<qwq::VariableDeclaration>($3)); }
         ;
 
 stmt-list : %empty { $$ = new qwq::StatementList(); }
@@ -258,7 +269,7 @@ for-stmt  : c-like-for  { $$ = $1; }
           | py-like-for { $$ = $1; }
           | range-for { $$ = $1; }
           ;
-c-like-for  : TFOR '(' var-decl ';' relation-expr ';' assign-expr ')' block { $$ = new qwq::CLikeForStatement(std::shared_ptr<qwq::VariableDeclarationAssign>($3), 
+c-like-for  : TFOR '(' var-decl ';' relation-expr ';' assign-expr ')' block { $$ = new qwq::CLikeForStatement(std::shared_ptr<qwq::VariableDeclaration>($3), 
                   std::shared_ptr<qwq::RelationalExpression>($5), std::shared_ptr<qwq::AssignExpression>($7), 
                   std::shared_ptr<qwq::Block>($9));;}
             | TFOR '(' assign-expr ';' relation-expr ';' assign-expr ')' block { $$ = new qwq::CLikeForStatement(std::shared_ptr<qwq::AssignExpression>($3), 
@@ -270,13 +281,13 @@ py-like-for : TFOR ident TIN '(' expr ',' expr ')' block { $$ = new qwq::PyLikeF
               std::shared_ptr<qwq::Expression>($5), std::shared_ptr<qwq::Expression>($7), std::shared_ptr<qwq::Block>($9)); }
             ;
 
-range-for : TFOR '(' var-decl TIN ident ')' block { $$ = new qwq::RangeForStatement(std::shared_ptr<qwq::VariableDeclarationAssign>($3), 
+range-for : TFOR '(' var-decl TIN ident ')' block { $$ = new qwq::RangeForStatement(std::shared_ptr<qwq::VariableDeclaration>($3), 
                                                     std::shared_ptr<qwq::Identifier>($5), std::shared_ptr<qwq::Block>($7)); }
             ;
 
 //返回语句
 return-stmt : TRETURN ';' { $$ = new qwq::ReturnStatement(@$); }
-            | TRETURN expr-stmt ';' { $$ = new qwq::ReturnStatement(std::shared_ptr<qwq::Expression>($1), @$); }
+            | TRETURN expr ';' { $$ = new qwq::ReturnStatement(std::shared_ptr<qwq::Expression>($1), @$); }
             ;
 
 //表达式
