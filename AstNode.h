@@ -8,6 +8,8 @@
 #include <vector>
 #include <memory>
 #include <string>
+#include "Element.h"
+#include "SymbolManager.h"
 
 struct YYLTYPE {
         int first_line{0};
@@ -35,6 +37,7 @@ namespace qwq {
     class AstNode {
     public:
         virtual ~AstNode() = default;
+        virtual Element eval()  { return EMPTY; };
     };
 }
 

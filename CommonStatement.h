@@ -35,7 +35,7 @@ namespace qwq {
                     : relationalExpr(std::move(relationalExpr))
                     , ifBlock(std::move(ifBlock))
                     , elseBlock(std::move(elseBlock)) {}
-
+        virtual Element eval() override;
     private:
 //        std::shared_ptr<CBPair> ifCbs;
 //        std::shared_ptr<std::vector<CBPair>> elifCbs = nullptr;
@@ -48,7 +48,7 @@ namespace qwq {
     public:
         WhileStatement(std::shared_ptr<RelationalExpression> condition, std::shared_ptr<Block> block)
                 : condition(std::move(condition)), block(std::move(block)) {}
-
+        virtual Element eval() override;
     private:
         std::shared_ptr<RelationalExpression> condition;
         std::shared_ptr<Block> block;
@@ -57,7 +57,7 @@ namespace qwq {
     class ForStatement : public CommonStatement {
     public:
         explicit ForStatement(std::shared_ptr<Block> block) : block(std::move(block)) {}
-
+        virtual Element eval() override;
     protected:
         std::shared_ptr<Block> block;
     };
@@ -69,7 +69,7 @@ namespace qwq {
                 , left(std::move(left))
                 , right(std::move(right))
                 , ForStatement(std::move(block)) {}
-
+        virtual Element eval() override;
     private:
         std::shared_ptr<Identifier> loopVariable;
         std::shared_ptr<Expression> left;
@@ -91,6 +91,7 @@ namespace qwq {
                           std::shared_ptr<Block> block)
                 : firstExpr2(std::move(firstExpr2)), judgeExpr(std::move(judgeExpr)), assignExpr(std::move(assignExpr)),
                   ForStatement(std::move(block)) {}
+        virtual Element eval() override;
 
     private:
         std::shared_ptr<VariableDeclaration> firstExpr1 = nullptr;  // 注意：expr1和expr2只能用1个
@@ -105,6 +106,7 @@ namespace qwq {
                           std::shared_ptr<Identifier> loopRangeId, std::shared_ptr<Block> block)
                 : variableDeclaration(std::move(variableDeclaration))
                 , loopRangeId(std::move(loopRangeId)), ForStatement(std::move(block)) {}
+        virtual Element eval() override;
 
     private:
         std::shared_ptr<VariableDeclaration> variableDeclaration;
@@ -123,6 +125,7 @@ namespace qwq {
         explicit ReturnStatement(YYLTYPE loc) : loc(std::move(loc)) {}
 
         YYLTYPE getLocation() { return loc; }
+        virtual Element eval() override;
 
     private:
         std::shared_ptr<Expression> returnExpr = nullptr;
@@ -135,6 +138,7 @@ namespace qwq {
                 : expr(std::move(expr)), loc(std::move(loc)) {}
 
         YYLTYPE getLocation() { return loc; }
+        virtual Element eval() override;
 
     private:
         std::shared_ptr<Expression> expr;
@@ -146,6 +150,7 @@ namespace qwq {
         explicit JumpStatement(int op, YYLTYPE loc) : op(op), loc(std::move(loc)) {}
 
         YYLTYPE getLocation() { return loc; }
+        virtual Element eval() override;
 
     private:
         int op;

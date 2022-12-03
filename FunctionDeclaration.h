@@ -23,6 +23,8 @@ namespace qwq {
                      std::shared_ptr<Type> templateType = nullptr)
                 : id(std::move(id)), arguments(std::move(arguments))
                 , templateType(std::move(templateType)) {}
+        virtual Element eval() override;
+
     private:
         std::shared_ptr<Type> returnType = nullptr;
         std::shared_ptr<Identifier> id;
@@ -35,6 +37,7 @@ namespace qwq {
         FunctionDeclaration(std::shared_ptr<FunctionHead> functionHead, std::shared_ptr<Block> block)
         : functionHead(std::move(functionHead))
         , block(std::move(block)) {}
+        virtual Element eval() override;
 
     private:
         friend class ClassDeclaration;

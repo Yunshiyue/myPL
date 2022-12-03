@@ -17,7 +17,7 @@ namespace qwq {
     class Character : public Literal {
     public:
         explicit Character(int value) : value(value) {}
-
+        virtual Element eval() override;
     private:
         int value;
     };
@@ -25,6 +25,7 @@ namespace qwq {
     class Boolean : public Literal {
     public:
         explicit Boolean(int v) { v >= 1 ? value = 1 : value = 0; }
+        virtual Element eval() override;
 
     private:
         int value;
@@ -33,6 +34,7 @@ namespace qwq {
     class Integer : public Literal {
     public:
         explicit Integer(int v) : value(v) {}
+        virtual Element eval() override;
 
     private:
         int value;
@@ -41,6 +43,7 @@ namespace qwq {
     class Real : public Literal {
     public:
         explicit Real(double value) : value(value) {}
+        virtual Element eval() override;
 
     private:
         double value;

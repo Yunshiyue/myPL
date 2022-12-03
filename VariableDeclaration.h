@@ -36,6 +36,7 @@ namespace qwq {
 //                  templateType(std::move(templateType)), loc(std::move(loc)) {}
 
         YYLTYPE getLocation() { return loc; }
+        virtual Element eval() override;
 
     private:
         std::shared_ptr<Type> type;
@@ -53,6 +54,8 @@ namespace qwq {
                                   , id(std::move(id))
                                   , templateType(std::move(templateType))
                                   , loc(std::move(loc)) {}
+        virtual Element eval() override;
+
     protected:
         std::shared_ptr<Type> type;
         std::shared_ptr<Identifier> id;
@@ -72,6 +75,8 @@ namespace qwq {
                       std::shared_ptr<Expression> assignmentExpr, YYLTYPE loc)
                 : VariableDeclarationAssign(std::move(type), std::move(id), std::move(templateType), std::move(loc))
                 , assignmentExpr(std::move(assignmentExpr)) {}
+        virtual Element eval() override;
+
     private:
         std::shared_ptr<Expression> assignmentExpr = nullptr;
     };
@@ -82,6 +87,8 @@ namespace qwq {
                           std::shared_ptr<VariableList> variableList, YYLTYPE loc)
                      : VariableDeclarationAssign(std::move(type), std::move(id), std::move(templateType), std::move(loc))
                      , variableList(std::move(variableList)) {}
+        virtual Element eval() override;
+
     private:
         std::shared_ptr<VariableList> variableList;
     };
@@ -90,6 +97,8 @@ namespace qwq {
     public:
         explicit VarDeclAssignStmt(std::shared_ptr<VariableDeclarationAssign> variableDeclarationAssign)
         : variableDeclarationAssign(std::move(variableDeclarationAssign)) {}
+        virtual Element eval() override;
+
     private:
         std::shared_ptr<VariableDeclarationAssign> variableDeclarationAssign;
     };
