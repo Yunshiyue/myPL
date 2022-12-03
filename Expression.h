@@ -196,7 +196,7 @@ namespace qwq {
         YYLTYPE loc;
     };
 
-    class Block : Expression {
+    class Block : public Expression {
     public:
         explicit Block(std::shared_ptr<StatementList> statementList) : statementList(std::move(statementList)) {}
         virtual Element eval() override;

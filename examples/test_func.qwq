@@ -1,0 +1,4 @@
+template <typename T>
+def test_add_func (T a, T b) -> T {
+    return a+b ;
+}
