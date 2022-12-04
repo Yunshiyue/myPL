@@ -609,25 +609,32 @@ char *yytext;
     #include "qwq_parser.hpp"
     //#include "qwq.hpp"
 
-    // 保存identifier的具体名�?
+    // 保存identifier的具体名�?
     #define SAVE_IDENTIFIER yylval.string = new std::string(yytext, yyleng)
-    // 保存整数具体的�?
+    // 保存整数具体的�?
     #define SAVE_INTEGER yylval.integer = std::stoll(std::string(yytext, yyleng))
-    // 保存小数具体的�?
+    // 保存小数具体的�?
     #define SAVE_REAL yylval.real = std::stod(std::string(yytext, yyleng))
-    // 保存bool变量具体的�?,不需要在此进行判�?
+    // 保存bool变量具体的�?,不需要在此进行判�?
     //#define SAVE_BOOLEAN yylval.boolean = std::string(yytext, yyleng) == "true" ? true : false
-    // 保存关键字对应的touken�?
+    // 保存关键字对应的touken�?
     #define SAVE_TOKEN(t) (yylval.token = t)
-    // 字符串以及字符的值的保存在状�?<STR>以及<CHARACTER>中已经实现了
+    // 字符串以及字符的值的保存在状�?<STR>以及<CHARACTER>中已经实现了
 
     int yylcolumn = 1;
 
     std::string g_str;
 
-#line 629 "qwq_tokens.cpp"
+int yyerror(char const * s )
+{
+    printf("ERROR %s in '%s' at line %d col %d\n", s, yytext, yylineno, yylcolumn);
+    printf("  parsed %s %d.%d-%d.%d\n", yylloc.file_name.c_str(), yylloc.first_line, yylloc.first_column, yylloc.last_line, yylloc.last_column);
+    return 1;
+}
 
-#line 631 "qwq_tokens.cpp"
+#line 636 "qwq_tokens.cpp"
+
+#line 638 "qwq_tokens.cpp"
 
 #define INITIAL 0
 #define STR 1
@@ -846,12 +853,12 @@ YY_DECL
 		}
 
 	{
-#line 45 "qwq.l"
+#line 52 "qwq.l"
 
 
-#line 48 "qwq.l"
+#line 55 "qwq.l"
  /* 字符串以及字符（需要改进）*/
-#line 855 "qwq_tokens.cpp"
+#line 862 "qwq_tokens.cpp"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -920,7 +927,7 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 49 "qwq.l"
+#line 56 "qwq.l"
 {
                 g_str = "";
                 BEGIN(STR);
@@ -928,7 +935,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 53 "qwq.l"
+#line 60 "qwq.l"
 {
                 g_str = "";
                 BEGIN(CHARACTER);
@@ -936,7 +943,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 57 "qwq.l"
+#line 64 "qwq.l"
 {
                 BEGIN(INITIAL);
                 yylval.string = new std::string(g_str);
@@ -945,7 +952,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 62 "qwq.l"
+#line 69 "qwq.l"
 {
                     BEGIN(INITIAL);
                     yylval.character = g_str[0];
@@ -955,7 +962,7 @@ YY_RULE_SETUP
 case 5:
 /* rule 5 can match eol */
 YY_RULE_SETUP
-#line 67 "qwq.l"
+#line 74 "qwq.l"
 {
                     g_str += std::string(yytext);
                 }
@@ -963,265 +970,265 @@ YY_RULE_SETUP
 case 6:
 /* rule 6 can match eol */
 YY_RULE_SETUP
-#line 70 "qwq.l"
+#line 77 "qwq.l"
 {
                     g_str += std::string(yytext);
                 }
 	YY_BREAK
-/* 关键�?(29个关键字)
-    控制关键�? */
+/* 关键�?(29个关键字)
+    控制关键�? */
 case 7:
 YY_RULE_SETUP
-#line 76 "qwq.l"
+#line 83 "qwq.l"
 return SAVE_TOKEN(TIF);
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 77 "qwq.l"
+#line 84 "qwq.l"
 return SAVE_TOKEN(TELSE);
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 78 "qwq.l"
+#line 85 "qwq.l"
 return SAVE_TOKEN(TELIF);
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 79 "qwq.l"
+#line 86 "qwq.l"
 return SAVE_TOKEN(TFOR);
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 80 "qwq.l"
+#line 87 "qwq.l"
 return SAVE_TOKEN(TWHILE);
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 81 "qwq.l"
+#line 88 "qwq.l"
 return SAVE_TOKEN(TTHIS);
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 82 "qwq.l"
+#line 89 "qwq.l"
 return SAVE_TOKEN(TPUBLIC);
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 83 "qwq.l"
+#line 90 "qwq.l"
 return SAVE_TOKEN(TPRIVATE);
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 84 "qwq.l"
+#line 91 "qwq.l"
 return SAVE_TOKEN(TPROTECTED);
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 85 "qwq.l"
+#line 92 "qwq.l"
 return SAVE_TOKEN(TEXTEND);
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 86 "qwq.l"
+#line 93 "qwq.l"
 return SAVE_TOKEN(TDEF);
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 87 "qwq.l"
+#line 94 "qwq.l"
 return SAVE_TOKEN(TCLASS);
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 88 "qwq.l"
+#line 95 "qwq.l"
 return SAVE_TOKEN(TRETURN);
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 89 "qwq.l"
+#line 96 "qwq.l"
 return SAVE_TOKEN(TBREAK);
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 90 "qwq.l"
+#line 97 "qwq.l"
 return SAVE_TOKEN(TCONTINUE);
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 91 "qwq.l"
+#line 98 "qwq.l"
 return SAVE_TOKEN(TIN);
 	YY_BREAK
-/* 类型关键�? */
+/* 类型关键�? */
 case 23:
 YY_RULE_SETUP
-#line 93 "qwq.l"
+#line 100 "qwq.l"
 return SAVE_TOKEN(TINTTK);
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 94 "qwq.l"
+#line 101 "qwq.l"
 return SAVE_TOKEN(TBOOLTK);
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 95 "qwq.l"
+#line 102 "qwq.l"
 return SAVE_TOKEN(TDOUBLETK);
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 96 "qwq.l"
+#line 103 "qwq.l"
 return SAVE_TOKEN(TCHARTK);
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 97 "qwq.l"
+#line 104 "qwq.l"
 return SAVE_TOKEN(TSTRTK);
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 98 "qwq.l"
+#line 105 "qwq.l"
 return SAVE_TOKEN(TARRTK);
 	YY_BREAK
 /* 模板 */
 case 29:
 YY_RULE_SETUP
-#line 100 "qwq.l"
+#line 107 "qwq.l"
 return SAVE_TOKEN(TTEMP);
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 101 "qwq.l"
+#line 108 "qwq.l"
 return SAVE_TOKEN(TTYNAME);
 	YY_BREAK
-/* 字符串操�? */
+/* 字符串操�? */
 case 31:
 YY_RULE_SETUP
-#line 103 "qwq.l"
+#line 110 "qwq.l"
 return SAVE_TOKEN(TSUBS);
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 104 "qwq.l"
+#line 111 "qwq.l"
 return SAVE_TOKEN(TREVS);
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 105 "qwq.l"
+#line 112 "qwq.l"
 return SAVE_TOKEN(TTITLES);
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 106 "qwq.l"
+#line 113 "qwq.l"
 return SAVE_TOKEN(TUPS);
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 107 "qwq.l"
+#line 114 "qwq.l"
 return SAVE_TOKEN(TLOWS);
 	YY_BREAK
-/* 运算�? */
-/* 算数运算�? */
+/* 运算�? */
+/* 算数运算�? */
 case 36:
 YY_RULE_SETUP
-#line 112 "qwq.l"
+#line 119 "qwq.l"
 return SAVE_TOKEN(TPOWER);
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 113 "qwq.l"
+#line 120 "qwq.l"
 return SAVE_TOKEN(TEDIV);
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 114 "qwq.l"
+#line 121 "qwq.l"
 return SAVE_TOKEN(TSADD);
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 115 "qwq.l"
+#line 122 "qwq.l"
 return SAVE_TOKEN(TSSUB);
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 116 "qwq.l"
+#line 123 "qwq.l"
 return SAVE_TOKEN(TADD);
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 117 "qwq.l"
+#line 124 "qwq.l"
 return SAVE_TOKEN(TSUB);
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 118 "qwq.l"
+#line 125 "qwq.l"
 return SAVE_TOKEN(TMUL);
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 119 "qwq.l"
+#line 126 "qwq.l"
 return SAVE_TOKEN(TDIV);
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 120 "qwq.l"
+#line 127 "qwq.l"
 return SAVE_TOKEN(TMOD);
 	YY_BREAK
-/* 逻辑运算�? */
+/* 逻辑运算�? */
 case 45:
 YY_RULE_SETUP
-#line 122 "qwq.l"
+#line 129 "qwq.l"
 return SAVE_TOKEN(TOR);
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 123 "qwq.l"
+#line 130 "qwq.l"
 return SAVE_TOKEN(TAND);
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 124 "qwq.l"
+#line 131 "qwq.l"
 return SAVE_TOKEN(TNOT);
 	YY_BREAK
-/* 关系运算�? */
+/* 关系运算�? */
 case 48:
 YY_RULE_SETUP
-#line 126 "qwq.l"
+#line 133 "qwq.l"
 return SAVE_TOKEN(TEQ);
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 127 "qwq.l"
+#line 134 "qwq.l"
 return SAVE_TOKEN(TNE);
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 128 "qwq.l"
+#line 135 "qwq.l"
 return SAVE_TOKEN(TGE);
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 129 "qwq.l"
+#line 136 "qwq.l"
 return SAVE_TOKEN(TLE);
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 130 "qwq.l"
+#line 137 "qwq.l"
 return SAVE_TOKEN(TLT);
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 131 "qwq.l"
+#line 138 "qwq.l"
 return SAVE_TOKEN(TGT);
 	YY_BREAK
-/* 其它运算�?(函数定义) */
+/* 其它运算�?(函数定义) */
 case 54:
 YY_RULE_SETUP
-#line 134 "qwq.l"
+#line 141 "qwq.l"
 return SAVE_TOKEN(TARROW);
 	YY_BREAK
 /* 除char、string之外的字面量 */
 case 55:
 YY_RULE_SETUP
-#line 137 "qwq.l"
+#line 144 "qwq.l"
 {
                     yylval.boolean = 1;
                     return TBOOL;
@@ -1229,7 +1236,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 141 "qwq.l"
+#line 148 "qwq.l"
 {
                     yylval.boolean = 0;
                     return TBOOL;
@@ -1237,7 +1244,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 145 "qwq.l"
+#line 152 "qwq.l"
 {
                     SAVE_INTEGER;
                     return TINTEGER;
@@ -1245,7 +1252,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 149 "qwq.l"
+#line 156 "qwq.l"
 {
                     SAVE_REAL;
                     return TREAL;
@@ -1254,65 +1261,65 @@ YY_RULE_SETUP
 /* 不需要进行额外处理的字符 */
 case 59:
 YY_RULE_SETUP
-#line 154 "qwq.l"
+#line 161 "qwq.l"
 return '(';
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 155 "qwq.l"
+#line 162 "qwq.l"
 return ')';
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 156 "qwq.l"
+#line 163 "qwq.l"
 return '[';
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 157 "qwq.l"
+#line 164 "qwq.l"
 return ']';
 	YY_BREAK
 case 63:
 YY_RULE_SETUP
-#line 158 "qwq.l"
+#line 165 "qwq.l"
 return '{';
 	YY_BREAK
 case 64:
 YY_RULE_SETUP
-#line 159 "qwq.l"
+#line 166 "qwq.l"
 return '}';
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
-#line 160 "qwq.l"
+#line 167 "qwq.l"
 return '.';
 	YY_BREAK
 case 66:
 YY_RULE_SETUP
-#line 161 "qwq.l"
+#line 168 "qwq.l"
 return ',';
 	YY_BREAK
 case 67:
 YY_RULE_SETUP
-#line 162 "qwq.l"
+#line 169 "qwq.l"
 return ':';
 	YY_BREAK
 case 68:
 YY_RULE_SETUP
-#line 163 "qwq.l"
+#line 170 "qwq.l"
 return '=';
 	YY_BREAK
-/* 需要忽略的空白�? */
+/* 需要忽略的空白�? */
 case 69:
 /* rule 69 can match eol */
 YY_RULE_SETUP
-#line 165 "qwq.l"
+#line 172 "qwq.l"
 
 	YY_BREAK
-/* 标识�? */
+/* 标识�? */
 case 70:
 YY_RULE_SETUP
-#line 167 "qwq.l"
+#line 174 "qwq.l"
 {
                     SAVE_IDENTIFIER;
                     return TIDENTIFIER;
@@ -1321,7 +1328,7 @@ YY_RULE_SETUP
 /* 对未知字符的处理 */
 case 71:
 YY_RULE_SETUP
-#line 172 "qwq.l"
+#line 179 "qwq.l"
 {
                     printf("line %d, len %d Unknown token %s !\n", yylineno, yyleng, yytext);
                     yyterminate();
@@ -1329,10 +1336,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 72:
 YY_RULE_SETUP
-#line 176 "qwq.l"
+#line 183 "qwq.l"
 ECHO;
 	YY_BREAK
-#line 1336 "qwq_tokens.cpp"
+#line 1343 "qwq_tokens.cpp"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(STR):
 case YY_STATE_EOF(CHARACTER):
@@ -2351,5 +2358,5 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 176 "qwq.l"
+#line 183 "qwq.l"
 

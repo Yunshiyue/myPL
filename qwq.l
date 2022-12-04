@@ -13,21 +13,28 @@
     #include "qwq_parser.hpp"
     //#include "qwq.hpp"
 
-    // 保存identifier的具体名�?
+    // 保存identifier的具体名�?
     #define SAVE_IDENTIFIER yylval.string = new std::string(yytext, yyleng)
-    // 保存整数具体的�?
+    // 保存整数具体的�?
     #define SAVE_INTEGER yylval.integer = std::stoll(std::string(yytext, yyleng))
-    // 保存小数具体的�?
+    // 保存小数具体的�?
     #define SAVE_REAL yylval.real = std::stod(std::string(yytext, yyleng))
-    // 保存bool变量具体的�?,不需要在此进行判�?
+    // 保存bool变量具体的�?,不需要在此进行判�?
     //#define SAVE_BOOLEAN yylval.boolean = std::string(yytext, yyleng) == "true" ? true : false
-    // 保存关键字对应的touken�?
+    // 保存关键字对应的touken�?
     #define SAVE_TOKEN(t) (yylval.token = t)
-    // 字符串以及字符的值的保存在状�?<STR>以及<CHARACTER>中已经实现了
+    // 字符串以及字符的值的保存在状�?<STR>以及<CHARACTER>中已经实现了
 
     int yylcolumn = 1;
 
     std::string g_str;
+
+int yyerror(char const * s )
+{
+    printf("ERROR %s in '%s' at line %d col %d\n", s, yytext, yylineno, yylcolumn);
+    printf("  parsed %s %d.%d-%d.%d\n", yylloc.file_name.c_str(), yylloc.first_line, yylloc.first_column, yylloc.last_line, yylloc.last_column);
+    return 1;
+}
 
 %}
 
@@ -70,8 +77,8 @@ identifier  [{letter}_]?[{letter}{digit}_]+
                     g_str += std::string(yytext);
                 }
 
- /* 关键�?(29个关键字)
-    控制关键�? */
+ /* 关键�?(29个关键字)
+    控制关键�? */
 "if"            return SAVE_TOKEN(TIF);
 "else"          return SAVE_TOKEN(TELSE);
 "elif"          return SAVE_TOKEN(TELIF);
@@ -88,7 +95,7 @@ identifier  [{letter}_]?[{letter}{digit}_]+
 "break"         return SAVE_TOKEN(TBREAK);
 "continue"      return SAVE_TOKEN(TCONTINUE);
 "in"            return SAVE_TOKEN(TIN);
- /* 类型关键�? */
+ /* 类型关键�? */
 "int"           return SAVE_TOKEN(TINTTK);
 "bool"          return SAVE_TOKEN(TBOOLTK);
 "double"        return SAVE_TOKEN(TDOUBLETK);
@@ -98,7 +105,7 @@ identifier  [{letter}_]?[{letter}{digit}_]+
  /* 模板 */
 "template"      return SAVE_TOKEN(TTEMP);
 "typename"      return SAVE_TOKEN(TTYNAME);
- /* 字符串操�? */
+ /* 字符串操�? */
 "substr"        return SAVE_TOKEN(TSUBS);
 "reverse"       return SAVE_TOKEN(TREVS);
 "title"         return SAVE_TOKEN(TTITLES);
@@ -106,8 +113,8 @@ identifier  [{letter}_]?[{letter}{digit}_]+
 "lowercase"     return SAVE_TOKEN(TLOWS);
 
 
- /* 运算�? */
- /* 算数运算�? */
+ /* 运算�? */
+ /* 算数运算�? */
 "**"            return SAVE_TOKEN(TPOWER);
 "//"            return SAVE_TOKEN(TEDIV);
 "++"            return SAVE_TOKEN(TSADD);
@@ -117,11 +124,11 @@ identifier  [{letter}_]?[{letter}{digit}_]+
 "*"             return SAVE_TOKEN(TMUL);
 "/"             return SAVE_TOKEN(TDIV);
 "%"             return SAVE_TOKEN(TMOD);
- /* 逻辑运算�? */
+ /* 逻辑运算�? */
 "||"            return SAVE_TOKEN(TOR);
 "&&"            return SAVE_TOKEN(TAND);
 "!"             return SAVE_TOKEN(TNOT);
- /* 关系运算�? */
+ /* 关系运算�? */
 "=="            return SAVE_TOKEN(TEQ);
 "!="            return SAVE_TOKEN(TNE);
 ">="            return SAVE_TOKEN(TGE);
@@ -129,7 +136,7 @@ identifier  [{letter}_]?[{letter}{digit}_]+
 "<"             return SAVE_TOKEN(TLT);
 ">"             return SAVE_TOKEN(TGT);
 
- /* 其它运算�?(函数定义) */
+ /* 其它运算�?(函数定义) */
 "->"            return SAVE_TOKEN(TARROW);
 
  /* 除char、string之外的字面量 */
@@ -160,9 +167,9 @@ identifier  [{letter}_]?[{letter}{digit}_]+
 ","             return ',';
 ":"             return ':';
 "="             return '=';
- /* 需要忽略的空白�? */
+ /* 需要忽略的空白�? */
 [ \t\n\r]
- /* 标识�? */
+ /* 标识�? */
 {identifier}    {
                     SAVE_IDENTIFIER;
                     return TIDENTIFIER;

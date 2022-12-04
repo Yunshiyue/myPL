@@ -9,7 +9,7 @@ int main(int argc, char** argv) {
     std::string fileName;
 
     if (argc == 1) {
-        fileName = "./examples/test_full.liq";
+        fileName = "/home/qingyue/data/cpp/myPL/examples/test_while.qwq";
     } else {
         fileName = argv[1];
     }
@@ -21,7 +21,11 @@ int main(int argc, char** argv) {
     }
 
     // TODO: 判断是否语法分析成功
-
+    if (yyparse()) {
+        std::cout << "fail" << std::endl;
+        yylex_destroy();
+        return 1;
+    }
     std::cout << "grammaAnalyze success";
     fclose(yyin);
     yylex_destroy();
