@@ -19,6 +19,8 @@ struct YYLTYPE {
         std::string file_name;
     };
 
+YYLTYPE defaultLoc = {0, 0, 0, 0, ""};
+
 namespace qwq {
 
 

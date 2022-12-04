@@ -13,19 +13,20 @@
 namespace qwq {
 
 
-    enum class TypeName {
-        NONE,
-        INT,
-        CHAR,
-        DOUBLE,
-        BOOLEAN,
-        CLASS,
-        ARRAY,
-        STRING
-    };
+//    enum class TypeName {
+//        NONE,
+//        INT,
+//        CHAR,
+//        DOUBLE,
+//        BOOLEAN,
+//        CLASS,
+//        ARRAY,
+//        STRING
+//    };
 
     class Type : public AstNode {
     public:
+        using TypeName = Element::ElementType;
         explicit Type(int type) : type(type) {}
 
         virtual TypeName getTypeName() { return TypeName::NONE; };
@@ -52,7 +53,7 @@ namespace qwq {
     public:
         explicit IntType(int type) : Type(type) {}
 
-        TypeName getTypeName() override { return TypeName::INT; }
+        TypeName getTypeName() override { return TypeName::INTEGER; }
 
     private:
     };
@@ -71,7 +72,7 @@ namespace qwq {
     public:
         explicit BooleanType(int type) : Type(type) {}
 
-        TypeName getTypeName() override { return TypeName::BOOLEAN; }
+        TypeName getTypeName() override { return TypeName::BOOL; }
 
     private:
     };

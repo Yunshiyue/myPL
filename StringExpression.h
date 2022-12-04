@@ -8,6 +8,7 @@
 #include "Expression.h"
 
 #include <utility>
+#include <algorithm>
 
 namespace qwq {
 
@@ -20,7 +21,7 @@ namespace qwq {
     public:
         // 字符串字面值
         explicit StringLiteral(std::string s) : value(std::move(s)) {}
-        virtual Element eval() override;
+        Element eval() override;
 
     private:
         std::string value;
@@ -29,7 +30,7 @@ namespace qwq {
     class StringIdentifier : public StringExpression {
     public:
         explicit StringIdentifier(std::shared_ptr<Identifier> id) : id(std::move(id)) {}
-        virtual Element eval() override;
+        Element eval() override;
 
     private:
         std::shared_ptr<Identifier> id;
@@ -52,7 +53,7 @@ namespace qwq {
         : strExpr(std::move(lhs))
         , op(op)
         , rhs(std::move(rhs)) {}
-        virtual Element eval() override;
+        Element eval() override;
 
     private:
         std::shared_ptr<StringExpression> strExpr;
@@ -65,7 +66,7 @@ namespace qwq {
     class StringFuncExpression : public StringExpression {
     public:
         explicit StringFuncExpression(std::shared_ptr<FunctionCall> funcExpr) : funcExpr(std::move(funcExpr)) {}
-        virtual Element eval() override;
+        Element eval() override;
 
     private:
         std::shared_ptr<FunctionCall> funcExpr;

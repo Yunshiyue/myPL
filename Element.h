@@ -13,7 +13,7 @@
 
 class Element {
 public:
-    enum class ElementType  { INTEGER, DOUBLE, CHAR, BOOL, ARRAY, STRING};
+    enum class ElementType  { NONE, INTEGER, DOUBLE, CHAR, BOOL, ARRAY, STRING, CLASS };
     Element() = default;
     Element(ElementType type, int val) : type(type), intVal(val) {}
     Element(ElementType type, double val) : type(type), doubleVal(val) {}

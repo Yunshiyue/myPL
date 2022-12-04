@@ -11,6 +11,7 @@
 #include "Type.h"
 
 namespace qwq {
+    class VariableDeclaration;
 
     class CommonStatement : public Statement {
     public:

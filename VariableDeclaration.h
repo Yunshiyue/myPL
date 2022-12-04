@@ -36,12 +36,11 @@ namespace qwq {
 //                  templateType(std::move(templateType)), loc(std::move(loc)) {}
 
         YYLTYPE getLocation() { return loc; }
-        virtual Element eval() override;
+        Element eval() override;
 
     private:
         std::shared_ptr<Type> type;
         std::shared_ptr<Identifier> id;
-        std::shared_ptr<Expression> assignmentExpr = nullptr;
         std::shared_ptr<Type> templateType = nullptr;
         YYLTYPE loc;
     };
@@ -54,7 +53,12 @@ namespace qwq {
                                   , id(std::move(id))
                                   , templateType(std::move(templateType))
                                   , loc(std::move(loc)) {}
-        virtual Element eval() override;
+
+        VariableDeclarationAssign(std::shared_ptr<Type> type, std::shared_ptr<Identifier> id)
+                : type(std::move(type))
+                , id(std::move(id))
+                {}
+
 
     protected:
         std::shared_ptr<Type> type;
@@ -67,15 +71,15 @@ namespace qwq {
     public:
         // 形如：int a = exp;
         VarDeclByExpr(std::shared_ptr<Type> type, std::shared_ptr<Identifier> id,
-                      std::shared_ptr<Expression> assignmentExpr, YYLTYPE loc)
+                      std::shared_ptr<Expression> assignmentExpr, YYLTYPE loc = {0,0,0,0,""})
                 : VariableDeclarationAssign(std::move(type), std::move(id), nullptr, std::move(loc))
                 , assignmentExpr(std::move(assignmentExpr)) {}
         // 形如：A<int> a = b;
         VarDeclByExpr(std::shared_ptr<Type> type, std::shared_ptr<Type> templateType, std::shared_ptr<Identifier> id,
-                      std::shared_ptr<Expression> assignmentExpr, YYLTYPE loc)
+                      std::shared_ptr<Expression> assignmentExpr, YYLTYPE loc = {0,0,0,0,""})
                 : VariableDeclarationAssign(std::move(type), std::move(id), std::move(templateType), std::move(loc))
                 , assignmentExpr(std::move(assignmentExpr)) {}
-        virtual Element eval() override;
+        Element eval() override;
 
     private:
         std::shared_ptr<Expression> assignmentExpr = nullptr;
@@ -97,7 +101,7 @@ namespace qwq {
     public:
         explicit VarDeclAssignStmt(std::shared_ptr<Expression> variableDeclarationAssign)
         : variableDeclarationAssign(std::move(variableDeclarationAssign)) {}
-        virtual Element eval() override;
+        Element eval() override;
 
         // explicit VarDeclAssignStmt(std::shared_ptr<VariableDeclarationAssign> variableDeclarationAssign)
         // : variableDeclarationAssign(std::move(variableDeclarationAssign)) {}

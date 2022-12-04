@@ -20,14 +20,17 @@ namespace qwq {
 
     class Identifier : public Expression {
     public:
-        explicit Identifier(std::string name, YYLTYPE loc) : name(std::move(name)), loc(std::move(loc)) {}
+        explicit Identifier(std::string name, YYLTYPE loc = defaultLoc) : name(std::move(name)), loc(std::move(loc)) {}
 
         Identifier(const Identifier &id) : name(id.name), loc(id.loc) {}
 
         YYLTYPE getLocation() { return loc; }
-        virtual Element eval() override;
-    private:
+        Element eval() override;
+
         std::string name;
+        ElePtr symbol;
+    private:
+
         YYLTYPE loc;
     };
 
@@ -42,7 +45,7 @@ namespace qwq {
                 : arrayExpr(std::move(arrayAccess)), index(std::move(index)), loc(std::move(loc)) {}
 
         YYLTYPE getLocation() { return loc; }
-        virtual Element eval() override;
+        Element eval() override;
 
     private:
         std::shared_ptr<Identifier> id = nullptr;
@@ -54,7 +57,7 @@ namespace qwq {
     class Factor : public Expression {
     public:
         explicit Factor(std::shared_ptr<Expression> exp) : exp(std::move(exp)) {}
-        virtual Element eval() override;
+        Element eval() override;
 
     private:
         std::shared_ptr<Expression> exp;
@@ -67,7 +70,7 @@ namespace qwq {
                       std::shared_ptr<Factor> rhs = nullptr,
                       int op = -1)
                 : lhs(std::move(lhs)), op(op), rhs(std::move(rhs)) {}
-        virtual Element eval() override;
+        Element eval() override;
 
     private:
         std::shared_ptr<Item> lhs = nullptr;
@@ -87,7 +90,7 @@ namespace qwq {
                 : rhs(std::move(item)), loc(std::move(loc)) {}
 
         YYLTYPE getLocation() { return loc; }
-        virtual Element eval() override;
+        Element eval() override;
 
     private:
         std::shared_ptr<ArithmeticExpression> lhs = nullptr;
@@ -108,7 +111,7 @@ namespace qwq {
                 : rhs(std::move(factor)), loc(std::move(loc)) {}
 
         YYLTYPE getLocation() { return loc; }
-        virtual Element eval() override;
+        Element eval() override;
 
     private:
         std::shared_ptr<LogicalExpression> lhs = nullptr;
@@ -124,7 +127,7 @@ namespace qwq {
                 : id(std::move(id)), left(std::move(left)), right(std::move(right)), loc(std::move(loc)) {}
 
         YYLTYPE getLocation() { return loc; }
-        virtual Element eval() override;
+        Element eval() override;
 
     private:
         std::shared_ptr<Identifier> id;
@@ -136,7 +139,7 @@ namespace qwq {
     class AssignExpression : public Expression {
     public:
         // 给标识符赋值
-        AssignExpression(std::shared_ptr<Identifier> id, std::shared_ptr<Expression> rhs, YYLTYPE loc)
+        AssignExpression(std::shared_ptr<Identifier> id, std::shared_ptr<Expression> rhs, YYLTYPE loc = defaultLoc)
                 : id(std::move(id)), rhs(std::move(rhs)), loc(std::move(loc)) {}
 
         // 给数组赋值
@@ -144,7 +147,7 @@ namespace qwq {
                 : arrayExpr(std::move(arrayAccess)), rhs(std::move(rhs)), loc(std::move(loc)) {}
 
         YYLTYPE getLocation() { return loc; }
-
+        Element eval() override;
     private:
         std::shared_ptr<Identifier> id = nullptr;
         std::shared_ptr<Expression> rhs = nullptr;
@@ -168,7 +171,7 @@ namespace qwq {
                 , loc(std::move(loc)) {}
 
         YYLTYPE getLocation() { return loc; }
-        virtual Element eval() override;
+        Element eval() override;
 
     private:
         std::shared_ptr<Identifier> varId = nullptr;
@@ -187,7 +190,7 @@ namespace qwq {
 //        // 形如：a
 //        explicit RelationalExpression(std::shared_ptr<ArithmeticExpression> lhs, YYLTYPE loc)
 //                : lhs(std::move(lhs)), loc(std::move(loc)) {}
-        virtual Element eval() override;
+        Element eval() override;
 
     private:
         std::shared_ptr<ArithmeticExpression> lhs;
@@ -199,7 +202,7 @@ namespace qwq {
     class Block : public Expression {
     public:
         explicit Block(std::shared_ptr<StatementList> statementList) : statementList(std::move(statementList)) {}
-        virtual Element eval() override;
+        Element eval() override;
 
         std::shared_ptr<StatementList> statementList;
     };

@@ -3,3 +3,7 @@
 //
 
 #include "FunctionDeclaration.h"
+
+Element qwq::FunctionDeclaration::eval() {
+    return EMPTY;
+}
