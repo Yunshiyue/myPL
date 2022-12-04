@@ -3,7 +3,7 @@
 %{
     #include <string>
     #include "AstNode.h"
-    #include "qwq_parser.cpp"
+    #include "qwq_parser.hpp"
     //#include "qwq.hpp"
 
     // 保存identifier的具体名称
