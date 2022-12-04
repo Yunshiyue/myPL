@@ -1,5 +1,3 @@
-%option noyywrap yylineno
-
 %{
     #include <string>
     #include "AstNode.h"
@@ -23,6 +21,8 @@
     std::string g_str;
 
 %}
+
+%option noyywrap yylineno
 
 %x STR
 %x CHARACTER
