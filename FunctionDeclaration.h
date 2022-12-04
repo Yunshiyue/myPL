@@ -14,13 +14,14 @@
 namespace qwq {
 
     class FunctionHead : public AstNode {
-        FunctionHead(std::shared_ptr<Identifier> id, std::shared_ptr<VariableList> arguments,
-                     std::shared_ptr<Type> returnType, std::shared_ptr<Identifier> templateType = nullptr)
+    public:
+        FunctionHead(std::shared_ptr<Type> templateType, std::shared_ptr<Identifier> id, 
+                     std::shared_ptr<VariableList> arguments, std::shared_ptr<Type> returnType)
                 : returnType(std::move(returnType)), id(std::move(id)), arguments(std::move(arguments))
                 , templateType(std::move(templateType)) {}
 
-        FunctionHead(std::shared_ptr<Identifier> id, std::shared_ptr<VariableList> arguments,
-                     std::shared_ptr<Identifier> templateType = nullptr)
+        FunctionHead(std::shared_ptr<Type> templateType, std::shared_ptr<Identifier> id, 
+                     std::shared_ptr<VariableList> arguments)
                 : id(std::move(id)), arguments(std::move(arguments))
                 , templateType(std::move(templateType)) {}
         virtual Element eval() override;

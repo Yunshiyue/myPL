@@ -3,11 +3,11 @@
 %{
     #include <string>
     #include "AstNode.h"
-    #include "qwq.tab.hh"
+    #include "qwq_parser.cpp"
     //#include "qwq.hpp"
 
     // 保存identifier的具体名称
-    #define SAVE_IDENTIFIER yylval.iName = new std::string(yytext, yyleng)
+    #define SAVE_IDENTIFIER yylval.string = new std::string(yytext, yyleng)
     // 保存整数具体的值
     #define SAVE_INTEGER yylval.integer = std::stoll(std::string(yytext, yyleng))
     // 保存小数具体的值
@@ -52,7 +52,7 @@ identifier  [{letter}_]?[{letter}{digit}_]+
 <CHARACTER>"'"  {
                     BEGIN(INITIAL);
                     yylval.character = g_str[0];
-                    return TCHAR
+                    return TCHAR;
                 }
 <STR>[^"]       {
                     g_str += std::string(yytext);
@@ -103,8 +103,8 @@ identifier  [{letter}_]?[{letter}{digit}_]+
 "//"            return SAVE_TOKEN(TEDIV);
 "++"            return SAVE_TOKEN(TSADD);
 "--"            return SAVE_TOKEN(TSSUB);
-"+"             return SAVE_TOKEN(ADD);
-"-"             return SAVE_TOKEN(SUB);
+"+"             return SAVE_TOKEN(TADD);
+"-"             return SAVE_TOKEN(TSUB);
 "*"             return SAVE_TOKEN(TMUL);
 "/"             return SAVE_TOKEN(TDIV);
 "%"             return SAVE_TOKEN(TMOD);
@@ -138,7 +138,7 @@ identifier  [{letter}_]?[{letter}{digit}_]+
                 }
 {real}          {
                     SAVE_REAL;
-                    return TDOUBLE;
+                    return TREAL;
                 }
  /* 不需要进行额外处理的字符 */
 "("             return '(';

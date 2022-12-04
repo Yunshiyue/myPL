@@ -24,8 +24,8 @@ namespace qwq {
 //                  loc(std::move(loc)) {}
 
         // 形如：A<int> a;
-        VariableDeclaration(std::shared_ptr<Type> type, std::shared_ptr<Identifier> id,
-                            std::shared_ptr<Type> templateType, YYLTYPE loc)
+        VariableDeclaration(std::shared_ptr<Type> type, std::shared_ptr<Type> templateType,
+                            std::shared_ptr<Identifier> id, YYLTYPE loc)
                 : type(std::move(type)), id(std::move(id)), templateType(std::move(templateType)),
                   loc(std::move(loc)) {}
 

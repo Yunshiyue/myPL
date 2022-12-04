@@ -1,3 +1,9 @@
+%code requires {
+
+# define YYLTYPE_IS_DECLARED 1 /* alert the parser that we have our own definition */
+
+}
+
 %{
     #include "AstNode.h"
     #include "ClassDeclaration.h"
@@ -182,7 +188,7 @@ val-type  : TBOOLTK { $$ = new qwq::BooleanType(TBOOLTK); }
           | TDOUBLETK { $$ = new qwq::DoubleType(TDOUBLETK); }
           | TCHARTK { $$ = new qwq::CharType(TCHARTK); }
           | TSTRTK { $$ = new qwq::StringType(TSTRTK); }
-          | TARRTK '<' type ',' TINTEGER'>' { $$ = new qwq::ArrayType(TARRTK, $3, $5); }
+          | TARRTK '<' type ',' TINTEGER'>' { $$ = new qwq::ArrayType(TARRTK, std::shared_ptr<qwq::Type>$3, $5); }
           ;
 
 //模板
@@ -194,10 +200,10 @@ func-decl : func-head block { $$ = new qwq::FunctionDeclaration(std::shared_ptr<
                                                                 std::shared_ptr<qwq::Block>($2)); }
           ;
 
-func-head : TDEF ident '(' fp-list ')' { $$ = new qwq::FunctionHead(std::shared_ptr<qwq::Identifier>($2), std::shared_ptr<qwq::VariableList>($4), nullptr); }
-          | TTEMP '<' TTYNAME type '>' TDEF ident '(' fp-list ')' { $$ = new qwq::FunctionHead(std::shared_ptr<qwq::Identifier>($7), std::shared_ptr<qwq::VariableList>($9), nullptr, std::shared_ptr<qwq::Identifier>($4)); }
-          | TDEF ident '(' fp-list ')' TARROW type { $$ = new qwq::FunctionHead(std::shared_ptr<qwq::Identifier>($2), std::shared_ptr<qwq::VariableList>($4), std::shared_ptr<qwq::Type>($7)); }
-          | TTEMP '<' TTYNAME type '>' TDEF ident '(' fp-list ')' TARROW type { $$ = new qwq::FunctionHead(std::shared_ptr<qwq::Identifier>($7), std::shared_ptr<qwq::VariableList>($9), std::shared_ptr<qwq::Type>($12), std::shared_ptr<qwq::Identifier>($4)); }
+func-head : TDEF ident '(' fp-list ')' { $$ = new qwq::FunctionHead(nullptr, std::shared_ptr<qwq::Identifier>($2), std::shared_ptr<qwq::VariableList>($4), nullptr); }
+          | TTEMP '<' TTYNAME type '>' TDEF ident '(' fp-list ')' { $$ = new qwq::FunctionHead(std::shared_ptr<qwq::Type>($4), std::shared_ptr<qwq::Identifier>($7), std::shared_ptr<qwq::VariableList>($9), nullptr); }
+          | TDEF ident '(' fp-list ')' TARROW type { $$ = new qwq::FunctionHead(nullptr, std::shared_ptr<qwq::Identifier>($2), std::shared_ptr<qwq::VariableList>($4), std::shared_ptr<qwq::Type>($7)); }
+          | TTEMP '<' TTYNAME type '>' TDEF ident '(' fp-list ')' TARROW type { $$ = new qwq::FunctionHead(std::shared_ptr<qwq::Type>($4), std::shared_ptr<qwq::Identifier>($7), std::shared_ptr<qwq::VariableList>($9), std::shared_ptr<qwq::Type>($12)); }
           ; //bug?
 
 fp-list : %empty { $$ = new qwq::VariableList(); }
