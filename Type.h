@@ -35,16 +35,16 @@ namespace qwq {
 
     class ArrayType : public Type {
     public:
-        // TODO 构造函数内部要根据eleType初始化elementType。词法定义好后可以做�?
-        ArrayType(int type, Type eleType, int capacity)
-                : Type(type), capacity(capacity) {}
+        ArrayType(int type, std::shared_ptr<Type> eleType, int capacity)
+                : Type(type), elementType(std::move(eleType)), capacity(capacity) {}
 
         TypeName getTypeName() override { return TypeName::ARRAY; }
 
-        TypeName getElementName() { return elementType; }
+        TypeName getElementName() { return elementType->getTypeName(); }
+        int getCapacity() const { return capacity; }
 
     private:
-        TypeName elementType;   // 数组存放元素的类型
+        std::shared_ptr<Type> elementType;   // 数组存放元素的类型
         int capacity;
     };
 
