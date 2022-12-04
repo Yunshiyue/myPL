@@ -98,7 +98,7 @@ namespace qwq {
         explicit VarDeclAssignStmt(std::shared_ptr<Expression> variableDeclarationAssign)
         : variableDeclarationAssign(std::move(variableDeclarationAssign)) {}
         virtual Element eval() override;
-        
+
         // explicit VarDeclAssignStmt(std::shared_ptr<VariableDeclarationAssign> variableDeclarationAssign)
         // : variableDeclarationAssign(std::move(variableDeclarationAssign)) {}
     private:
