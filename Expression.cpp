@@ -134,3 +134,23 @@ Element qwq::AssignExpression::eval() {
     }
     return result;
 }
+
+// TODO
+Element qwq::FunctionCall::eval() {
+    return AstNode::eval();
+}
+
+// TODO
+Element qwq::Block::eval() {
+    return AstNode::eval();
+}
+
+// TODO
+Element qwq::SliceExpression::eval() {
+    return AstNode::eval();
+}
+
+// TODO
+Element qwq::ArrayAccess::eval() {
+    return AstNode::eval();
+}

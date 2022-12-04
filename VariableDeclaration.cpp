@@ -43,3 +43,8 @@ Element qwq::VarDeclAssignStmt::eval() {
     variableDeclarationAssign->eval();
     return EMPTY;
 }
+
+// TODO
+Element qwq::ObjectDeclaration::eval() {
+    return AstNode::eval();
+}

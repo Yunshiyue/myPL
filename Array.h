@@ -13,6 +13,7 @@ class Array {
 public:
     enum class ArrayType { INTEGER, DOUBLE, CHAR, BOOL, STRING };
 
+    Array() = default;
     bool operator==(const Array& rhs) const;
     bool operator!=(const Array& rhs) const;
     Array& operator=(const Array& rhs);

@@ -91,7 +91,7 @@ namespace qwq {
                           std::shared_ptr<ExpressionList> expressionList, YYLTYPE loc)
                      : VariableDeclarationAssign(std::move(type), std::move(id), std::move(templateType), std::move(loc))
                      , expressionList(std::move(expressionList)) {}
-        virtual Element eval() override;
+        Element eval() override;
 
     private:
         std::shared_ptr<ExpressionList> expressionList;

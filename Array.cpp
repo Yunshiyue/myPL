@@ -3,3 +3,15 @@
 //
 
 #include "Array.h"
+
+bool Array::operator==(const Array &rhs) const {
+    return false;
+}
+
+bool Array::operator!=(const Array &rhs) const {
+    return false;
+}
+
+Array &Array::operator=(const Array &rhs) {
+    return *this;
+}

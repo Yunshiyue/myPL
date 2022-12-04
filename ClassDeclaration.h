@@ -19,7 +19,7 @@ namespace qwq {
                   : id(std::move(id))
                   , templateId(std::move(templateId))
                   , extendClassId(std::move(extendClassId)) {}
-        virtual Element eval() override {
+        Element eval() override {
             // TODO
             return EMPTY;
         }
@@ -37,7 +37,7 @@ namespace qwq {
         ClassDeclaration(std::shared_ptr<ClassHead> classHead, std::shared_ptr<Block> block)
         : classHead(std::move(classHead))
         , block(std::move(block)) {}
-        virtual Element eval() override {
+        Element eval() override {
             // TODO
             return EMPTY;
         }
