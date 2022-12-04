@@ -3,3 +3,5 @@
 //
 
 #include "AstNode.h"
+
+YYLTYPE defaultLoc = {0, 0, 0, 0, ""};
