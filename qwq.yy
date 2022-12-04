@@ -165,6 +165,7 @@
 // 定义开始的非终结符
 %start program
 %debug
+%locations
 %%
 // TODO: 完成语法
 //程序
