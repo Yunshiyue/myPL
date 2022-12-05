@@ -143,8 +143,26 @@ Element qwq::AssignExpression::eval() {
     // 给标识符赋值
     if (id != nullptr) {
         result = id->eval();
-        result = value;
-        *(id->symbol) = result;
+
+        // 右边非数组
+        if (value.type != Element::ElementType::ARRAY) {
+            result = value;
+            *(id->symbol) = result;
+        }
+        // 右边为数组
+        else {
+            if (result.type == Element::ElementType::INTEGER || result.type == Element::ElementType::BOOL ||
+                    result.type == Element::ElementType::CHAR) {
+                result.intVal = *value.array.intData[0];
+            }
+            else if (result.type == Element::ElementType::DOUBLE) {
+                result.doubleVal = *value.array.doubleData[0];
+            }
+            else if (result.type == Element::ElementType::STRING) {
+                result.strVal = *value.array.stringData[0];
+            }
+            *(id->symbol) = result;
+        }
     }
     else {
         // 如果右侧也是数组，则整体赋值
