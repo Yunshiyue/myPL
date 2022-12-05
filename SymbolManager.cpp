@@ -3,8 +3,9 @@
 //
 
 #include "SymbolManager.h"
+#include "FunctionDeclaration.h"
 
-
+using namespace qwq;
 /*
  * Symbol Table
  */

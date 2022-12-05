@@ -14,7 +14,7 @@ namespace qwq {
     class VariableDeclaration : public Expression {
     public:
         // 形如：int a;
-        VariableDeclaration(std::shared_ptr<Type> type, std::shared_ptr<Identifier> id, YYLTYPE loc)
+        VariableDeclaration(std::shared_ptr<Type> type, std::shared_ptr<Identifier> id, YYLTYPE loc = defaultLoc)
                 : type(std::move(type)), id(std::move(id)), loc(std::move(loc)) {}
 
 //        // 形如：int a = exp;
@@ -37,6 +37,8 @@ namespace qwq {
 
         YYLTYPE getLocation() { return loc; }
         Element eval() override;
+        virtual std::shared_ptr<Type> getType() { return type; }
+        virtual std::shared_ptr<Identifier> getIdentifier() { return id; }
 
     private:
         std::shared_ptr<Type> type;
@@ -58,7 +60,8 @@ namespace qwq {
                 : type(std::move(type))
                 , id(std::move(id))
                 {}
-
+        virtual std::shared_ptr<Type> getType() { return type; }
+        virtual std::shared_ptr<Identifier> getIdentifier() { return id; }
 
     protected:
         std::shared_ptr<Type> type;

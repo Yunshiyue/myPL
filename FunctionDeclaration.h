@@ -9,7 +9,7 @@
 
 #include "Statement.h"
 #include "Type.h"
-#include "ClassDeclaration.h"
+//#include "ClassDeclaration.h"
 
 namespace qwq {
 
@@ -39,9 +39,10 @@ namespace qwq {
         : functionHead(std::move(functionHead))
         , block(std::move(block)) {}
         Element eval() override;
-
+        std::shared_ptr<FunctionHead> getHead() { return functionHead; }
+        std::shared_ptr<Block> getBlock() { return block; }
     private:
-        friend class ClassDeclaration;
+        //friend class ClassDeclaration;
         std::shared_ptr<FunctionHead> functionHead;
         std::shared_ptr<Block> block;
     };

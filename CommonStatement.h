@@ -15,6 +15,7 @@ namespace qwq {
 
     class CommonStatement : public Statement {
     public:
+        Element eval() override { return EMPTY; }
     private:
     };
 

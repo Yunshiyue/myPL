@@ -9,10 +9,13 @@
 
 #include "AstNode.h"
 
+
 namespace qwq {
 
 
     class Type;
+    class VariableDeclaration;
+    class FunctionDeclaration;
 
     class Expression : public AstNode {
     public:

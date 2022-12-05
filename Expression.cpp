@@ -3,6 +3,9 @@
 //
 
 #include "Expression.h"
+#include "FunctionDeclaration.h"
+#include "VariableDeclaration.h"
+
 
 Element qwq::Identifier::eval() {
     // 从符号表中找对应的符号
@@ -137,12 +140,57 @@ Element qwq::AssignExpression::eval() {
 
 // TODO
 Element qwq::FunctionCall::eval() {
+    // 检查是否有该函数的声明
+    auto funcDecl = SymbolManager::lookupF(funcId->name);
+    if (funcDecl == nullptr) {
+        std::cerr << "no such functions called: " << funcId->name << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    // 检查参数个数是否相符
+    if (funcDecl->getHead()->arguments->size() != arguments->size()) {
+        std::cerr << "need " << funcDecl->getHead()->arguments->size() << " parameters, but providing " << arguments->size() << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    SymbolManager::addLayer();
+    SymbolManager::addStatus(SymbolManager::FUNC);
+
+    // 参数声明并定义
+    for (int i = 0; i < arguments->size(); i++) {
+        VarDeclByExpr* temp = new VarDeclByExpr((*(funcDecl->getHead()->arguments))[i]->getType(),
+                                           (*(funcDecl->getHead()->arguments))[i]->getIdentifier(), (*arguments)[i]);
+        temp->eval();
+        delete temp;
+    }
+
+    // 执行函数体
+    Element result = funcDecl->getBlock()->eval();
+    if (SymbolManager::topStatus() == SymbolManager::RETURN) {
+        SymbolManager::popStatus();
+        SymbolManager::popStatus();
+        SymbolManager::popLayer();
+        return result;
+    }
+
+
+    SymbolManager::popStatus();
+    SymbolManager::popLayer();
     return AstNode::eval();
 }
 
-// TODO
 Element qwq::Block::eval() {
-    return AstNode::eval();
+    SymbolManager::addLayer();
+    for (auto& s : *statementList) {
+        auto result = s->eval();
+        if (SymbolManager::topStatus() == SymbolManager::CONTINUE ||
+            SymbolManager::topStatus() == SymbolManager::BREAK ||
+            SymbolManager::topStatus() == SymbolManager::RETURN)
+            break;
+            //return result;
+    }
+    SymbolManager::popLayer();
+    return EMPTY;
 }
 
 // TODO
