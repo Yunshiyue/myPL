@@ -180,7 +180,7 @@ stmt  : func-decl { $$ = $1; }
       ;
 
 type  : val-type { $$ = $1; }
-      | ident { $$ = new qwq::ClassType(TCLASS, std::shared_ptr<qwq::Identifier>($1)); } //只能是class类型的
+      /* | ident { $$ = new qwq::ClassType(TCLASS, std::shared_ptr<qwq::Identifier>($1)); } //只能是class类型的 */
       ;
 
 //基本类型
@@ -328,7 +328,7 @@ ap-list : %empty { $$ = new qwq::ExpressionList(); }
 str-expr  : TSTRING { $$ = new qwq::StringLiteral(std::string(*$1)); }
           | ident { $$ = new qwq::StringIdentifier(std::shared_ptr<qwq::Identifier>($1)); }
           | str-operation { $$ = $1; }
-          | func-expr { $$ = new qwq::StringFuncExpression(std::shared_ptr<qwq::FunctionCall>($1)); }
+          /* | func-expr { $$ = new qwq::StringFuncExpression(std::shared_ptr<qwq::FunctionCall>($1)); } */
           ;
 
 str-operation : str-expr TADD str-expr { $$ = new qwq::StringOperation(std::shared_ptr<qwq::StringExpression>($1), $2, std::shared_ptr<qwq::StringExpression>($3)); }
