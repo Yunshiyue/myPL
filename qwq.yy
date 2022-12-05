@@ -276,7 +276,7 @@ for-stmt  : c-like-for  { $$ = $1; }
           | py-like-for { $$ = $1; }
           | range-for { $$ = $1; }
           ;
-c-like-for  : TFOR '(' var-decl ';' relation-expr ';' assign-expr ')' block { $$ = new qwq::CLikeForStatement(std::shared_ptr<qwq::VariableDeclaration>($3), 
+c-like-for  : TFOR '(' var-decl-assign ';' relation-expr ';' assign-expr ')' block { $$ = new qwq::CLikeForStatement(std::shared_ptr<qwq::VariableDeclarationAssign>($3), 
                   std::shared_ptr<qwq::RelationalExpression>($5), std::shared_ptr<qwq::AssignExpression>($7), 
                   std::shared_ptr<qwq::Block>($9));;}
             | TFOR '(' assign-expr ';' relation-expr ';' assign-expr ')' block { $$ = new qwq::CLikeForStatement(std::shared_ptr<qwq::AssignExpression>($3), 
