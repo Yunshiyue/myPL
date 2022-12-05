@@ -107,13 +107,63 @@ std::shared_ptr<Array> Array::at(std::vector<int> index) {
 
     // 维数相同，只有一个元素
     if (sizeList.size() == index.size()) {
+        // 只有1个元素，所以是1维
         result->sizeList.push_back(1);
+
+        // 计算放入元素的索引，行主序
+        int cIndex = 0;
+        for (int i = 0; i < index.size() - 1; i++) {
+            int c = index[i];
+            for (int j = i + 1; j < sizeList.size(); j++) {
+                c *= sizeList[j];
+            }
+            cIndex += c;
+        }
+        cIndex += index[index.size() - 1];
+
+        // 放入
+        if (type == ArrayType::INTEGER || type == ArrayType::BOOL || type == ArrayType::CHAR) {
+            result->intData.push_back(intData[cIndex]);
+        }
+        else if (type == ArrayType::DOUBLE) {
+            result->doubleData.push_back(doubleData[cIndex]);
+        }
+        else {
+            result->stringData.push_back(stringData[cIndex]);
+        }
     }
     // 维数不同，返回一个数组
     else {
         int num = sizeList.size() - index.size();
+        // 加入维度
         for (int i = sizeList.size() - num; i < sizeList.size(); i++) {
             result->sizeList.push_back(sizeList[i]);
+        }
+
+        // 确定开始的索引
+        int startIndex = 0;
+        for (int i = 0; i < index.size() - 1; i++) {
+            int c = index[i];
+            for (int j = i + 1; j < sizeList.size(); j++) {
+                c *= sizeList[j];
+            }
+            startIndex += c;
+        }
+        int length = result->getTotalLength();
+
+        // 放入数据
+        // 放入
+        if (type == ArrayType::INTEGER || type == ArrayType::BOOL || type == ArrayType::CHAR) {
+            for (int i = 0; i < length; i++)
+                result->intData.push_back(intData[i]);
+        }
+        else if (type == ArrayType::DOUBLE) {
+            for (int i = 0; i < length; i++)
+                result->doubleData.push_back(doubleData[i]);
+        }
+        else {
+            for (int i = 0; i < length; i++)
+                result->stringData.push_back(stringData[i]);
         }
     }
 

@@ -49,6 +49,14 @@ namespace qwq {
 
         YYLTYPE getLocation() { return loc; }
         Element eval() override;
+        std::shared_ptr<Identifier> getId() {
+            if (id != nullptr) {
+                return id;
+            }
+            else {
+                return arrayExpr->getId();
+            }
+        }
 
     private:
         std::shared_ptr<Identifier> id = nullptr;
