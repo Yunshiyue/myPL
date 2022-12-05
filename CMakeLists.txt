@@ -37,4 +37,9 @@ ${FLEX_Lexer_OUTPUTS}
         CommonStatement.cpp
         Literal.cpp
         Type.cpp
-        StringExpression.cpp VariableDeclaration.cpp VariableDeclaration.h SymbolManager.cpp SymbolManager.h Element.cpp Element.h Array.cpp Array.h)
+        StringExpression.cpp 
+        VariableDeclaration.cpp VariableDeclaration.h 
+        SymbolManager.cpp SymbolManager.h 
+        Element.cpp Element.h 
+        Array.cpp Array.h
+        ProgramBlock.cpp)

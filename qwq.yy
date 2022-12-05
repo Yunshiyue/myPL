@@ -15,10 +15,11 @@
     #include "StringExpression.h"
     #include "Type.h"
     #include "VariableDeclaration.h"
-
+    #include "ProgramBlock.h"
     #include <stdio.h>
     #include <string>
 
+    qwq::ProgramBlock* programBlock;
     extern int yylex();
     int yyerror(char const * s);
     #define YYERROR_VERBOSE
@@ -75,6 +76,7 @@
     qwq::VariableList *varList;
     qwq::StatementList *stmtList;
     qwq::ExpressionList *exprList;
+    qwq::ProgramBlock *allStmts;
     long long integer;
     double real;
     int boolean;
@@ -149,6 +151,7 @@
 %type <varList> fp-list
 %type <stmtList> stmt-list
 %type <exprList> ap-list
+%type <allStmts> all-stmt-list
 // 操作符
 %type <token> addition-opt
 %type <token> multi-opt
@@ -169,9 +172,18 @@
 %%
 // TODO: 完成语法
 //程序
+/*
 program : program stmt { $1 = $2; }
         | stmt { $$ = $1;}
+        ;*/
+
+program : %empty { /*programBlock = new qwq::ProgramBlock();*/ }
+        | all-stmt-list { /*programBlock = $1;*/ }
         ;
+
+all-stmt-list : stmt { $$ = new qwq::ProgramBlock(); $$->stmts->push_back(std::shared_ptr<qwq::Statement>($1)); }
+              | all-stmt-list stmt { $1->stmts->push_back(std::shared_ptr<qwq::Statement>($2));  }
+              ;
 
 //语句
 stmt  : func-decl { $$ = $1; }
@@ -214,7 +226,7 @@ fp-list : %empty { $$ = new qwq::VariableList(); }
 
 stmt-list : %empty { $$ = new qwq::StatementList(); }
           | common-stmt { $$ = new qwq::StatementList(); $$->push_back(std::shared_ptr<qwq::CommonStatement>($1)); }
-          | stmt-list common-stmt { $1->push_back(std::shared_ptr<qwq::CommonStatement>($2)); }
+          | stmt-list ',' common-stmt { $1->push_back(std::shared_ptr<qwq::CommonStatement>($3)); $$ = $1; }
           ; //这里可能有bug，书上写了
 
 block : '{' stmt-list '}' { $$ = new qwq::Block(std::shared_ptr<qwq::StatementList>($2)); } // $1 改为 $2
