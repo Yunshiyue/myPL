@@ -6,6 +6,20 @@
 #include "FunctionDeclaration.h"
 #include "VariableDeclaration.h"
 
+Array::ArrayType switchToArrayType(Element::ElementType type) {
+    switch (type) {
+        case Element::ElementType::INTEGER:
+            return Array::ArrayType::INTEGER;
+        case Element::ElementType::CHAR:
+            return Array::ArrayType::CHAR;
+        case Element::ElementType::BOOL:
+            return Array::ArrayType::BOOL;
+        case Element::ElementType::DOUBLE:
+            return Array::ArrayType::DOUBLE;
+        case Element::ElementType::STRING:
+            return Array::ArrayType::STRING;
+    }
+}
 
 Element qwq::Identifier::eval() {
     // 从符号表中找对应的符号
@@ -123,22 +137,58 @@ Element qwq::RelationalExpression::eval() {
 }
 
 Element qwq::AssignExpression::eval() {
-    // 给标识符赋值
     Element result;
-    auto value = arrayExpr->eval();
+    auto value = rhs->eval();
+
+    // 给标识符赋值
     if (id != nullptr) {
         result = id->eval();
-        result = value;
-        *(id->symbol) = result;
-    }
-    // TODO 给数组赋值
-    else {
 
+        // 右边非数组
+        if (value.type != Element::ElementType::ARRAY) {
+            result = value;
+            *(id->symbol) = result;
+        }
+        // 右边为数组
+        else {
+            if (result.type == Element::ElementType::INTEGER || result.type == Element::ElementType::BOOL ||
+                    result.type == Element::ElementType::CHAR) {
+                result.intVal = *value.array.intData[0];
+            }
+            else if (result.type == Element::ElementType::DOUBLE) {
+                result.doubleVal = *value.array.doubleData[0];
+            }
+            else if (result.type == Element::ElementType::STRING) {
+                result.strVal = *value.array.stringData[0];
+            }
+            *(id->symbol) = result;
+        }
+    }
+    else {
+        // 如果右侧也是数组，则整体赋值
+        if (value.type == Element::ElementType::ARRAY) {
+            result = arrayExpr->eval();
+            result.array = value.array;
+        }
+        // 如果右侧是单独的数字，则单独赋值
+        else {
+            // 里面修改指针指向的内容
+            result = arrayExpr->eval();
+            if (value.type == Element::ElementType::INTEGER || value.type == Element::ElementType::BOOL ||
+                    value.type == Element::ElementType::CHAR) {
+                *result.array.intData[0] = value.intVal;
+            }
+            else if (value.type == Element::ElementType::DOUBLE) {
+                *result.array.doubleData[0] = value.doubleVal;
+            }
+            if (value.type == Element::ElementType::STRING) {
+                *result.array.stringData[0] = value.strVal;
+            }
+        }
     }
     return result;
 }
 
-// TODO
 Element qwq::FunctionCall::eval() {
     // 检查是否有该函数的声明
     auto funcDecl = SymbolManager::lookupF(funcId->name);
@@ -193,12 +243,79 @@ Element qwq::Block::eval() {
     return EMPTY;
 }
 
-// TODO
 Element qwq::SliceExpression::eval() {
-    return AstNode::eval();
+    auto arr = SymbolManager::lookup(id->name);
+    if (arr->type != Element::ElementType::ARRAY) {
+        std::cerr << "cannot use slice on a non-array type" << std::endl;
+        exit(1);
+    }
+
+    auto leftRange = left->eval();
+    auto rightRange = right->eval();
+    if (leftRange.type != Element::ElementType::INTEGER || rightRange.type != Element::ElementType::INTEGER) {
+        std::cerr << "non-integer type for range of slice expr" << std::endl;
+        exit(1);
+    }
+    Element result;
+    result.type = arr->type;
+
+    // 构建array
+    Array arrRes;
+    arrRes.type = switchToArrayType(result.type);
+    arrRes.sizeList.push_back(rightRange.intVal - leftRange.intVal);
+    if (arrRes.type == Array::ArrayType::INTEGER || arrRes.type == Array::ArrayType::BOOL ||
+        arrRes.type == Array::ArrayType::CHAR) {
+        for (int i = leftRange.intVal; i < rightRange.intVal; i++) {
+            arrRes.intData.push_back(arr->array.intData[i]);
+        }
+    }
+    else if (arrRes.type == Array::ArrayType::DOUBLE) {
+        for (int i = leftRange.intVal; i < rightRange.intVal; i++) {
+            arrRes.doubleData.push_back(arr->array.doubleData[i]);
+        }
+    }
+    else if (arrRes.type == Array::ArrayType::STRING) {
+        for (int i = leftRange.intVal; i < rightRange.intVal; i++) {
+            arrRes.stringData.push_back(arr->array.stringData[i]);
+        }
+    }
+    result.array = arrRes;
+
+    return result;
 }
 
-// TODO
 Element qwq::ArrayAccess::eval() {
-    return AstNode::eval();
+    // 检查下标类型
+    auto indexEle = index->eval();
+    if (indexEle.type != Element::ElementType::INTEGER) {
+        std::cerr << " subscript must be a integer type" << std::endl;
+        exit(1);
+    }
+
+    // 一个下标
+    if (id != nullptr) {
+        auto idEle = SymbolManager::lookup(id->name);
+        if (idEle->type != Element::ElementType::ARRAY) {
+            std::cerr << "cannot visit a non-array type by subscript" << std::endl;
+            exit(1);
+        }
+
+        // 根据下标获取
+        auto a = idEle->array.at({indexEle.intVal});
+        Element result;
+        result.type = Element::ElementType::ARRAY;
+        result.array = *a;
+        return result;
+    }
+    // 多维数组
+    else {
+        auto arr = arrayExpr->eval();
+
+        // 根据下标获取
+        auto a = arr.array.at({indexEle.intVal});
+        Element result;
+        result.type = Element::ElementType::ARRAY;
+        result.array = *a;
+        return result;
+    }
 }
