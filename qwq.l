@@ -46,8 +46,8 @@ int yyerror(char const * s )
 digit       [0-9]
 integer     [+-]?{digit}+
 real        [+-]?{digit}+\.{digit}+
-letter      [a-zA-Z]
-identifier  [{letter}_]?[{letter}{digit}_]+
+/* letter      [a-zA-Z] */
+identifier  [a-zA-Z_]?[a-zA-Z0-9_]+
 
 %%
 
@@ -167,6 +167,7 @@ identifier  [{letter}_]?[{letter}{digit}_]+
 ","             return ',';
 ":"             return ':';
 "="             return '=';
+";"             return ';';
  /* 需要忽略的空白�? */
 [ \t\n\r]
  /* 标识�? */

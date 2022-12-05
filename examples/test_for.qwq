@@ -3,8 +3,6 @@ for i in (0 , 10) {
     continue;
 }
 
-// 少了一个range-like
-
 for (int j = 1; j <= 2; j=j+1) {
     continue;
 }

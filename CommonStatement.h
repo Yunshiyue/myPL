@@ -12,6 +12,7 @@
 
 namespace qwq {
     class VariableDeclaration;
+    class VariableDeclarationAssign;
 
     class CommonStatement : public Statement {
     public:
@@ -78,7 +79,7 @@ namespace qwq {
 
     class CLikeForStatement : public ForStatement {
     public:
-        CLikeForStatement(std::shared_ptr<VariableDeclaration> firstExpr1,
+        CLikeForStatement(std::shared_ptr<VariableDeclarationAssign> firstExpr1,
                           std::shared_ptr<RelationalExpression> judgeExpr,
                           std::shared_ptr<AssignExpression> assignExpr,
                           std::shared_ptr<Block> block)
@@ -94,7 +95,7 @@ namespace qwq {
         Element eval() override;
 
     private:
-        std::shared_ptr<VariableDeclaration> firstExpr1 = nullptr;  // 注意：expr1和expr2只能用1个
+        std::shared_ptr<VariableDeclarationAssign> firstExpr1 = nullptr;  // 注意：expr1和expr2只能用1个
         std::shared_ptr<AssignExpression> firstExpr2 = nullptr;
         std::shared_ptr<RelationalExpression> judgeExpr = nullptr;
         std::shared_ptr<AssignExpression> assignExpr = nullptr;
