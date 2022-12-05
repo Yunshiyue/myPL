@@ -177,11 +177,12 @@ program : program stmt { $1 = $2; }
         | stmt { $$ = $1;}
         ;*/
 
-program :  all-stmt-list { programBlock = $1; }
+program : %empty { $$ = new qwq::ProgramBlock(); }
+        | all-stmt-list { programBlock = $1; }
         ;
 
 all-stmt-list : stmt { $$ = new qwq::ProgramBlock(); $$->stmts->push_back(std::shared_ptr<qwq::Statement>($1)); }
-              | all-stmt-list stmt { $1->stmts->push_back(std::shared_ptr<qwq::Statement>($2));  }
+              | all-stmt-list stmt { $1->stmts->push_back(std::shared_ptr<qwq::Statement>($2));  $$ = $1; }
               ;
 
 //语句
