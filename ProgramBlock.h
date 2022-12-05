@@ -10,11 +10,12 @@ namespace qwq {
     class ProgramBlock : public AstNode
     {
     public:
+        using AllStmts = std::vector<std::shared_ptr<Statement>>;
         ProgramBlock() = default;
         
         Element eval() override;
     
-        std::shared_ptr<std::vector<std::shared_ptr<Statement>>> stmts;
+        std::shared_ptr<AllStmts> stmts = std::make_shared<AllStmts>();
     
     };
 }

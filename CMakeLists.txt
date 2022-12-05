@@ -42,4 +42,4 @@ ${FLEX_Lexer_OUTPUTS}
         SymbolManager.cpp SymbolManager.h 
         Element.cpp Element.h 
         Array.cpp Array.h
-        ProgramBlock.cpp)
+        ProgramBlock.cpp ProgramBlock.h)

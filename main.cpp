@@ -1,6 +1,8 @@
 #include <iostream>
 #include "Expression.h"
+#include "ProgramBlock.h"
 
+extern qwq::ProgramBlock* programBlock;
 extern int yyparse();
 extern int yylex_destroy();
 extern FILE* yyin;
