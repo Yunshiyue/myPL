@@ -9,6 +9,8 @@ find_package(FLEX)
 BISON_TARGET(
         Parser
         qwq.yy ${CMAKE_CURRENT_BINARY_DIR}/qwq_parser.cpp
+        COMPILE_FLAGS --report=solved
+        COMPILE_FLAGS -v
 )
 
 FLEX_TARGET(
