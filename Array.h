@@ -26,6 +26,7 @@ public:
     Array& operator=(const Array& rhs);
 
     std::shared_ptr<Array> at(std::vector<int> index);
+    std::shared_ptr<Array> at2(int index);
     int getTotalLength() const;
     //void push_size(int i);
     friend std::ostream& operator<<(std::ostream& out, const Array& array);

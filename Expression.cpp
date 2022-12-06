@@ -125,7 +125,7 @@ Element qwq::AssignExpression::eval() {
     Element result;
     auto value = rhs->eval();
 
-    // 给标识符赋值
+    // 给标识符赋值,ident may be a array 
     if (id != nullptr) {
         result = id->eval();
 
@@ -154,15 +154,18 @@ Element qwq::AssignExpression::eval() {
         }
     }
     else {
+        result = arrayExpr->eval();
         // 如果右侧也是数组，则整体赋值
-        if (value.type == Element::ElementType::ARRAY) {
-            result = arrayExpr->eval();
+        if (value.type == Element::ElementType::ARRAY && result.array.getTotalLength() > 1) {
             result.array = value.array;
+            // std::cout << "A" << value.array << std::endl;
+            // std::cout << "A" << result.array << std::endl;
+
         }
         // 如果右侧是单独的数字，则单独赋值
         else {
             // 里面修改指针指向的内容
-            result = arrayExpr->eval();
+            
             if (value.type == Element::ElementType::INTEGER || value.type == Element::ElementType::BOOL ||
                     value.type == Element::ElementType::CHAR) {
                 *result.array.intData[0] = value.intVal;
@@ -170,8 +173,21 @@ Element qwq::AssignExpression::eval() {
             else if (value.type == Element::ElementType::DOUBLE) {
                 *result.array.doubleData[0] = value.doubleVal;
             }
-            if (value.type == Element::ElementType::STRING) {
+            else if (value.type == Element::ElementType::STRING) {
                 *result.array.stringData[0] = value.strVal;
+            }
+            // array
+            else {
+                if (value.array.type == Array::ArrayType::INTEGER || value.array.type == Array::ArrayType::BOOL ||
+                    value.array.type == Array::ArrayType::CHAR) {
+                    *result.array.intData[0] = *value.array.intData[0];
+                }
+                else if (value.array.type == Array::ArrayType::DOUBLE) {
+                    *result.array.doubleData[0] = *value.array.doubleData[0];
+                }
+                else if (value.array.type == Array::ArrayType::STRING) {
+                    *result.array.stringData[0] = *value.array.stringData[0];
+                }
             }
         }
     }
@@ -294,7 +310,7 @@ Element qwq::ArrayAccess::eval() {
         }
 
         // 根据下标获取
-        auto a = idEle->array.at({indexEle.intVal});
+        auto a = idEle->array.at2({indexEle.intVal});
         Element result;
         result.type = Element::ElementType::ARRAY;
         result.array = *a;
@@ -305,7 +321,7 @@ Element qwq::ArrayAccess::eval() {
         auto arr = arrayExpr->eval();
 
         // 根据下标获取
-        auto a = arr.array.at({indexEle.intVal});
+        auto a = arr.array.at2({indexEle.intVal});
         Element result;
         result.type = Element::ElementType::ARRAY;
         result.array = *a;

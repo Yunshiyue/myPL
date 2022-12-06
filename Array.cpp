@@ -88,9 +88,18 @@ Array &Array::operator=(const Array &rhs) {
     }
 
     // 这里复制指针，不是值
-    intData = rhs.intData;
-    doubleData = rhs.doubleData;
-    stringData = rhs.stringData;
+    // intData = rhs.intData;
+    // doubleData = rhs.doubleData;
+    // stringData = rhs.stringData;
+    for (int i = 0; i < intData.size(); i++) {
+        *intData[i] = *rhs.intData[i];
+    }
+    for (int i = 0; i < doubleData.size(); i++) {
+        *doubleData[i] = *rhs.doubleData[i];
+    }
+    for (int i = 0; i < stringData.size(); i++) {
+        *stringData[i] = *rhs.stringData[i];
+    }
     return *this;
 }
 
@@ -180,6 +189,59 @@ std::shared_ptr<Array> Array::at(std::vector<int> index) {
     return result;
 }
 
+std::shared_ptr<Array> Array::at2(int index) {
+    std::shared_ptr<Array> result = std::make_shared<Array>();
+    result->type = type;
+
+    // 1D
+    if (sizeList.size() == 1) {
+        // 只有1个元素，所以是1维
+        result->sizeList.push_back(1);
+
+        // 放入
+        if (type == ArrayType::INTEGER || type == ArrayType::BOOL || type == ArrayType::CHAR) {
+            result->intData.push_back(intData[index]);
+        }
+        else if (type == ArrayType::DOUBLE) {
+            result->doubleData.push_back(doubleData[index]);
+        }
+        else {
+            result->stringData.push_back(stringData[index]);
+        }
+    }
+    // 维数不同，返回一个数组
+    else {
+        
+        // 加入维度
+        for (int i = 1; i < sizeList.size(); i++) {
+            result->sizeList.push_back(sizeList[i]);
+        }
+
+        // 确定开始的索引
+        int startIndex = index;
+        for (int i = 1; i < sizeList.size(); i++) {
+            startIndex *= sizeList[i];
+        }
+        int length = result->getTotalLength();
+
+        // 放入数据
+        // 放入
+        if (type == ArrayType::INTEGER || type == ArrayType::BOOL || type == ArrayType::CHAR) {
+            for (int i = startIndex; i < startIndex + length; i++)
+                result->intData.push_back(intData[i]);
+        }
+        else if (type == ArrayType::DOUBLE) {
+            for (int i = startIndex; i < startIndex + length; i++)
+                result->doubleData.push_back(doubleData[i]);
+        }
+        else {
+            for (int i = startIndex; i < startIndex + length; i++)
+                result->stringData.push_back(stringData[i]);
+        }
+    }
+
+    return result;
+}
 // void Array::push_size(int i) {
 //     sizeList.push_back(i);
 //     const int total = getTotalLength();
