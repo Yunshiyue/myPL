@@ -5,3 +5,13 @@ string d = "how are you?";
 string dt = d.title;
 string du = d.uppercase;
 string dl = d.lowercase;
+string dr = d.reverse;
+
+print(s);
+print(ss);
+print(c);
+print(d);
+print(dt);
+print(du);
+print(dl);
+print(dr);

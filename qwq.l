@@ -140,6 +140,8 @@ identifier  [a-zA-Z_]?[a-zA-Z0-9_]+
 "<"             return SAVE_TOKEN(TLT);
 ">"             return SAVE_TOKEN(TGT);
 
+"print"         return SAVE_TOKEN(PRINT);
+
  /* 其它运算�?(函数定义) */
 "->"            return SAVE_TOKEN(TARROW);
 

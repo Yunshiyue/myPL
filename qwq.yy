@@ -117,12 +117,14 @@
 // 字符串操作
 %token <token>      TSUBS TREVS TTITLES TUPS TLOWS
 
+%token <token>      PRINT
+
 // 定义非终结符
 // TODO: 定义非终结符的类型
 %type <astNode> program
 %type <cDeclare> class-decl
 %type <classHead> class-head
-%type <cStatement> common-stmt if-stmt while-stmt jump-stmt for-stmt return-stmt expr-stmt var-decl-stmt
+%type <cStatement> common-stmt if-stmt while-stmt jump-stmt for-stmt return-stmt expr-stmt var-decl-stmt print-stmt
 %type <forStatement> c-like-for py-like-for range-for
 %type <expr> expr
 
@@ -265,6 +267,7 @@ common-stmt : if-stmt { $$ = $1; }
             | return-stmt { $$ = $1; }
             | expr-stmt { $$ = $1; }
             | jump-stmt { $$ = $1; }
+            | print-stmt { $$ = $1; }
             ;
 //以下是普通语句
 //if语句
@@ -426,4 +429,7 @@ literal : TCHAR { $$ = new qwq::Character($1); }
         | TINTEGER { $$ = new qwq::Integer($1); }
         | TREAL { $$ = new qwq::Real($1); }
         ;
+
+print-stmt : PRINT '(' expr ')' ';' { $$ = new qwq::PrintStatement(std::shared_ptr<qwq::Expression>($3)); }
+           ;
 %%

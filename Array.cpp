@@ -178,3 +178,8 @@ std::shared_ptr<Array> Array::at(std::vector<int> index) {
 
     return result;
 }
+
+std::ostream& operator<<(std::ostream& out, const Array& array) {
+    
+    return out;
+}

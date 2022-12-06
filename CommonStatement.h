@@ -159,6 +159,17 @@ namespace qwq {
         YYLTYPE loc;
     };
 
+    class PrintStatement : public CommonStatement {
+    public:
+        explicit PrintStatement(std::shared_ptr<Expression> expr) : expr(std::move(expr)) {}
+
+        
+        Element eval() override;
+
+    private:
+        std::shared_ptr<Expression> expr;
+    };
+
 }
 
 #endif //MYPL_COMMONSTATEMENT_H

@@ -171,3 +171,32 @@ Element qwq::JumpStatement::eval() {
     }
     return EMPTY;
 }
+
+Element qwq::PrintStatement::eval() {
+    auto expEle = expr->eval();
+    if (expEle.type == Element::ElementType::INTEGER) {
+        std::cout << expEle.intVal << std::endl;
+    }
+    else if (expEle.type == Element::ElementType::CHAR) {
+        std::cout << static_cast<char>(expEle.intVal) << std::endl;
+    }
+    else if (expEle.type == Element::ElementType::BOOL) {
+        if (expEle.intVal >= 1) {
+            std::cout << true << std::endl;
+        }
+        else 
+        {
+            std::cout << false << std::endl;
+        }
+    }
+    else if (expEle.type == Element::ElementType::DOUBLE) {
+        std::cout << expEle.doubleVal << std::endl;
+
+    }
+    else if (expEle.type == Element::ElementType::STRING) {
+        std::cout << expEle.strVal << std::endl;
+    }
+    else {
+        std::cout << expEle.array << std::endl;
+    }
+}

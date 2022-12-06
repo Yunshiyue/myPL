@@ -9,6 +9,7 @@
 #include <vector>
 #include <memory>
 #include <string>
+#include <iostream>
 
 
 class Array {
@@ -27,7 +28,7 @@ public:
     std::shared_ptr<Array> at(std::vector<int> index);
     int getTotalLength() const;
 
-
+    friend std::ostream& operator<<(std::ostream& out, const Array& array);
 
     ArrayType type = ArrayType::NONE;
     std::vector<int> sizeList;  // 记录每一维的size
