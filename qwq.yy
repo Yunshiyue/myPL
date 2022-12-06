@@ -341,7 +341,7 @@ ap-list : %empty { $$ = new qwq::ExpressionList(); }
 
 //字符串表达式
 str-expr  : TSTRING { $$ = new qwq::StringLiteral(std::string(*$1)); }
-          | ident { $$ = new qwq::StringIdentifier(std::shared_ptr<qwq::Identifier>($1)); }
+          /* | ident { $$ = new qwq::StringIdentifier(std::shared_ptr<qwq::Identifier>($1)); } */
           | str-operation { $$ = $1; }
           /* | func-expr { $$ = new qwq::StringFuncExpression(std::shared_ptr<qwq::FunctionCall>($1)); } */
           ;
@@ -352,6 +352,13 @@ str-operation : str-expr TADD str-expr { $$ = new qwq::StringOperation(std::shar
               | str-expr '.' TTITLES { $$ = new qwq::StringOperation(std::shared_ptr<qwq::StringExpression>($1), 4); }
               | str-expr '.' TUPS { $$ = new qwq::StringOperation(std::shared_ptr<qwq::StringExpression>($1), 5); }
               | str-expr '.' TLOWS { $$ = new qwq::StringOperation(std::shared_ptr<qwq::StringExpression>($1), 6); }
+              | ident '.' TSUBS '(' expr ',' expr ')' { $$ = new qwq::StringOperation(std::shared_ptr<qwq::StringExpression>(new qwq::StringIdentifier(std::shared_ptr<qwq::Identifier>($1))), 2, std::shared_ptr<qwq::Expression>($5), std::shared_ptr<qwq::Expression>($7)); }
+              | ident '.' TREVS { $$ = new qwq::StringOperation(std::shared_ptr<qwq::StringExpression>(new qwq::StringIdentifier(std::shared_ptr<qwq::Identifier>($1))), 3); }
+              | ident '.' TTITLES { $$ = new qwq::StringOperation(std::shared_ptr<qwq::StringExpression>(new qwq::StringIdentifier(std::shared_ptr<qwq::Identifier>($1))), 4); }
+              | ident '.' TUPS { $$ = new qwq::StringOperation(std::shared_ptr<qwq::StringExpression>(new qwq::StringIdentifier(std::shared_ptr<qwq::Identifier>($1))), 5); }
+              | ident '.' TLOWS { $$ = new qwq::StringOperation(std::shared_ptr<qwq::StringExpression>(new qwq::StringIdentifier(std::shared_ptr<qwq::Identifier>($1))), 6); }
+              /* | ident TADD str-expr { $$ = new qwq::StringOperation(std::shared_ptr<qwq::StringExpression>(new qwq::StringIdentifier(std::shared_ptr<qwq::Identifier>($1))), 1, std::shared_ptr<qwq::StringExpression>($3)); } */
+              /* | str-expr TADD ident { $$ = new qwq::StringOperation(std::shared_ptr<qwq::StringExpression>($1), 1, std::shared_ptr<qwq::StringExpression>(new qwq::StringIdentifier(std::shared_ptr<qwq::Identifier>($1)))); } */
               ;
 
 //切片表达式
