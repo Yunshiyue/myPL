@@ -27,8 +27,9 @@ public:
 
     std::shared_ptr<Array> at(std::vector<int> index);
     int getTotalLength() const;
-
+    //void push_size(int i);
     friend std::ostream& operator<<(std::ostream& out, const Array& array);
+    void alloc_size();
 
     ArrayType type = ArrayType::NONE;
     std::vector<int> sizeList;  // 记录每一维的size

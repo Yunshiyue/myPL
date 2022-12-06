@@ -203,7 +203,7 @@ val-type  : TBOOLTK { $$ = new qwq::BooleanType(TBOOLTK); }
           | TDOUBLETK { $$ = new qwq::DoubleType(TDOUBLETK); }
           | TCHARTK { $$ = new qwq::CharType(TCHARTK); }
           | TSTRTK { $$ = new qwq::StringType(TSTRTK); }
-          | TARRTK '<' type ',' TINTEGER'>' { $$ = new qwq::ArrayType(TARRTK, std::shared_ptr<qwq::Type>$3, $5); }
+          | TARRTK TLT type ',' TINTEGER TGT { $$ = new qwq::ArrayType(TARRTK, std::shared_ptr<qwq::Type>($3), $5); }
           ;
 
 //模板

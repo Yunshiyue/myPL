@@ -1,0 +1,17 @@
+array<int, 10> a;
+for (int i = 0; i < 10; i = i + 1) {
+    a[i] = i;
+}
+
+print(a);
+
+array<int, 5> b = a[2: 7];
+print(b);
+b[3] = 444;
+print(b);
+
+int b4 = b[4];
+print(b4);
+
+array<int, 10> aCopy = a;
+print(aCopy);

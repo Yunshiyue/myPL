@@ -42,6 +42,7 @@ namespace qwq {
         TypeName getTypeName() override { return TypeName::ARRAY; }
 
         TypeName getElementName() { return elementType->getTypeName(); }
+        std::shared_ptr<Type> getElementType() { return elementType; }
         int getCapacity() const { return capacity; }
 
     private:

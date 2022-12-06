@@ -7,20 +7,7 @@
 #include "VariableDeclaration.h"
 // #include "qwq_parser.cpp"
 
-Array::ArrayType switchToArrayType(Element::ElementType type) {
-    switch (type) {
-        case Element::ElementType::INTEGER:
-            return Array::ArrayType::INTEGER;
-        case Element::ElementType::CHAR:
-            return Array::ArrayType::CHAR;
-        case Element::ElementType::BOOL:
-            return Array::ArrayType::BOOL;
-        case Element::ElementType::DOUBLE:
-            return Array::ArrayType::DOUBLE;
-        case Element::ElementType::STRING:
-            return Array::ArrayType::STRING;
-    }
-}
+
 
 Element qwq::Identifier::eval() {
     // 从符号表中找对应的符号
@@ -159,6 +146,10 @@ Element qwq::AssignExpression::eval() {
             else if (result.type == Element::ElementType::STRING) {
                 result.strVal = *value.array.stringData[0];
             }
+            // both sides are arrays
+            else if (result.type == Element::ElementType::ARRAY) {
+                result.array = value.array;
+            }
             *(id->symbol) = result;
         }
     }
@@ -263,7 +254,7 @@ Element qwq::SliceExpression::eval() {
 
     // 构建array
     Array arrRes;
-    arrRes.type = switchToArrayType(result.type);
+    arrRes.type = arr->array.type;
     arrRes.sizeList.push_back(rightRange.intVal - leftRange.intVal);
     if (arrRes.type == Array::ArrayType::INTEGER || arrRes.type == Array::ArrayType::BOOL ||
         arrRes.type == Array::ArrayType::CHAR) {

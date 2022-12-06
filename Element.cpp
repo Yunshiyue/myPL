@@ -433,10 +433,53 @@ Element &Element::operator=(const Element &rhs) {
     if (type == ElementType::ARRAY && rhs.type == ElementType::ARRAY) {
         array = rhs.array;
     }
-    // 一个是数组，另一个不是
-    else if(type == ElementType::ARRAY || rhs.type == ElementType::ARRAY) {
-        std::cerr << "cannot assign array with other type" << std::endl;
-        exit(1);
+    // rhs is array but lhs is not
+    else if (type != ElementType::ARRAY && rhs.type == ElementType::ARRAY) {
+        if (rhs.array.getTotalLength() != 1) {
+            std::cerr << "cannot assign array to a non-array" << std::endl;
+            exit(1);
+        }
+        if (rhs.array.type != switchToArrayType(type)) {
+            std::cerr << "type is not same" << std::endl;
+            exit(1);
+        }
+        if (type == ElementType::BOOL || type == ElementType::INTEGER || type == ElementType::CHAR) {
+            intVal = *rhs.array.intData[0];
+        }
+        else if (type == ElementType::DOUBLE) {
+            doubleVal = *rhs.array.doubleData[0];
+        }
+        else if (type == ElementType::STRING) {
+            strVal = *rhs.array.stringData[0];
+        }
+        else {
+            std::cerr << "rhs is a none-type array" << std::endl;
+            exit(1);
+        }
+    }
+    // lhs is array but rhs is not
+    else if(type == ElementType::ARRAY && rhs.type != ElementType::ARRAY) {
+        if (array.getTotalLength() != 1) {
+            std::cerr << "cannot assign array to a non-array2" << std::endl;
+            exit(1);
+        }
+        if (array.type != switchToArrayType(rhs.type)) {
+            std::cerr << "type is not same2" << std::endl;
+            exit(1);
+        }
+        if (rhs.type == ElementType::BOOL || rhs.type == ElementType::INTEGER || rhs.type == ElementType::CHAR) {
+            *array.intData[0] = rhs.intVal;
+        }
+        else if (rhs.type == ElementType::DOUBLE) {
+            *array.doubleData[0] = rhs.doubleVal;
+        }
+        else if (rhs.type == ElementType::STRING) {
+            *array.stringData[0] = rhs.strVal;
+        }
+        else {
+            std::cerr << "rhs is a none-type array2" << std::endl;
+            exit(1);
+        }
     }
     // string赋值
     else if (type == ElementType::STRING && rhs.type == ElementType::STRING) {
@@ -536,4 +579,19 @@ Element Element::ediv(const Element &rhs) const {
         exit(1);
     }
     return result;
+}
+
+Array::ArrayType switchToArrayType(Element::ElementType type) {
+    switch (type) {
+        case Element::ElementType::INTEGER:
+            return Array::ArrayType::INTEGER;
+        case Element::ElementType::CHAR:
+            return Array::ArrayType::CHAR;
+        case Element::ElementType::BOOL:
+            return Array::ArrayType::BOOL;
+        case Element::ElementType::DOUBLE:
+            return Array::ArrayType::DOUBLE;
+        case Element::ElementType::STRING:
+            return Array::ArrayType::STRING;
+    }
 }

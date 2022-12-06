@@ -58,8 +58,9 @@ bool Array::operator!=(const Array &rhs) const {
 }
 
 Array &Array::operator=(const Array &rhs) {
-    if (rhs.type == ArrayType::NONE) {
+    if (type == ArrayType::NONE) {
         // 这里复制指针，不是值
+        type = rhs.type;
         sizeList = rhs.sizeList;
         intData = rhs.intData;
         doubleData = rhs.doubleData;
@@ -179,7 +180,61 @@ std::shared_ptr<Array> Array::at(std::vector<int> index) {
     return result;
 }
 
+// void Array::push_size(int i) {
+//     sizeList.push_back(i);
+//     const int total = getTotalLength();
+//     intData.reserve(total);
+//     doubleData.reserve(total);
+//     stringData.reserve(total);
+// }
+
+void Array::alloc_size() {
+    const int total = getTotalLength();
+    if (type == ArrayType::BOOL || type == ArrayType::CHAR || type == ArrayType::INTEGER) {
+        intData.resize(total);
+        for (auto& p : intData) {
+            p = std::make_shared<int>(0);
+        }
+    }
+    else if (type == ArrayType::DOUBLE) {
+        doubleData.reserve(total);
+        for (auto& p : doubleData) {
+            p = std::make_shared<double>(0.0);
+        }
+    }
+    else if (type == ArrayType::DOUBLE) {
+        stringData.reserve(total);
+        for (auto& p : stringData) {
+            p = std::make_shared<std::string>("");
+        }
+    }
+    else {
+        std::cerr << "array has none type, cannot alloc memory" << std::endl;
+        exit(1);
+    }
+}
+
+
+
 std::ostream& operator<<(std::ostream& out, const Array& array) {
-    
+    if (array.type == Array::ArrayType::BOOL || array.type == Array::ArrayType::CHAR || array.type == Array::ArrayType::INTEGER) {
+        for (const auto& a : array.intData) {
+            std::cout << *a << "  ";
+        }
+    }
+    else if (array.type == Array::ArrayType::DOUBLE) {
+        for (const auto& a : array.doubleData) {
+            std::cout << *a << "  ";
+        }
+    }
+    else if (array.type == Array::ArrayType::STRING) {
+        for (const auto& a : array.stringData) {
+            std::cout << *a << "  ";
+        }
+    }
+    else {
+        std::cout << "empty array" << std::endl;
+    }
     return out;
 }
+

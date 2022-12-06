@@ -11,6 +11,8 @@
 #include <utility>
 #include "Array.h"
 
+
+
 class Element {
 public:
     enum class ElementType  { NONE, INTEGER, DOUBLE, CHAR, BOOL, ARRAY, STRING, CLASS };
@@ -49,5 +51,6 @@ public:
 
 const Element EMPTY = { Element::ElementType::INTEGER, 0 };
 
+Array::ArrayType switchToArrayType(Element::ElementType type);
 
 #endif //MYPL_ELEMENT_H

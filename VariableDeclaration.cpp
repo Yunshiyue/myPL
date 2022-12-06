@@ -4,7 +4,6 @@
 
 #include "VariableDeclaration.h"
 
-
 // TODO 模板未实现
 Element qwq::VariableDeclaration::eval() {
     // 当前作用域不可以重复声明
@@ -17,6 +16,19 @@ Element qwq::VariableDeclaration::eval() {
     // 变量声明时，符号表新建记录
     ElePtr result = std::make_shared<Element>();
     result->type = type->getTypeName();
+
+    // deal with array
+    if (result->type == Element::ElementType::ARRAY) {
+        auto arrayType = std::dynamic_pointer_cast<ArrayType>(type);
+        result->array.sizeList.push_back(arrayType->getCapacity());
+        // look for the deepest array
+        while (arrayType->getElementName() == Element::ElementType::ARRAY) {
+            arrayType = std::dynamic_pointer_cast<ArrayType>(arrayType->getElementType());
+            result->array.sizeList.push_back(arrayType->getCapacity());
+        }
+        result->array.type = switchToArrayType(arrayType->getElementName());
+        result->array.alloc_size();
+    }
     SymbolManager::add(id->name, result);
     return *result;
 }
