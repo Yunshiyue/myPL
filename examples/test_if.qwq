@@ -6,3 +6,4 @@ if (i <= j) {
 } else {
     ans = 2;
 }
+print(ans);

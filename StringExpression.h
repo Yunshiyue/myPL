@@ -41,12 +41,18 @@ namespace qwq {
         // 根据op判断操作类型
         // 除+和subStr外的其他操作
         StringOperation(std::shared_ptr<StringExpression> strExpr, int op) : strExpr(std::move(strExpr)), op(op) {}
+        StringOperation(std::shared_ptr<StringIdentifier> strId, int op) : strId(std::move(strId)), op(op) {}
+
 
         // subStr操作
         StringOperation(std::shared_ptr<StringExpression> strExpr, int op, std::shared_ptr<Expression> leftRange,
                         std::shared_ptr<Expression> rightRange)
                 : strExpr(std::move(strExpr)), op(op), leftRange(std::move(leftRange)),
                   rightRange(std::move(rightRange)) {}
+        StringOperation(std::shared_ptr<StringIdentifier> strId, int op, std::shared_ptr<Expression> leftRange,
+            std::shared_ptr<Expression> rightRange)
+                : strId(std::move(strId)), op(op), leftRange(std::move(leftRange)),
+                    rightRange(std::move(rightRange)) {}
 
         // +操作
         StringOperation(std::shared_ptr<StringExpression> lhs, int op, std::shared_ptr<StringExpression> rhs)
@@ -56,7 +62,8 @@ namespace qwq {
         Element eval() override;
 
     private:
-        std::shared_ptr<StringExpression> strExpr;
+        std::shared_ptr<StringIdentifier> strId = nullptr;
+        std::shared_ptr<StringExpression> strExpr = nullptr;
         int op;
         std::shared_ptr<Expression> leftRange = nullptr;  // substr left
         std::shared_ptr<Expression> rightRange = nullptr;  // substr right

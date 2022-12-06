@@ -52,42 +52,49 @@ Element qwq::StringIdentifier::eval() {
 Element qwq::StringOperation::eval() {
     Element result;
     result.type = Element::ElementType::STRING;
+    Element lhs;
+    if (strExpr != nullptr) {
+        lhs = strExpr->eval();
+    }
+    else {
+        lhs = strId->eval();
+    }
     switch (op) {
         // +
         case 1:
         {
-            auto left = strExpr->eval();
+            
             auto right = rhs->eval();
-            result = left + right;
+            result = lhs + right;
         }
             break;
         // substr
         case 2:
         {
-            auto exp = strExpr->eval();
+            
             auto left = leftRange->eval();
             auto right = rightRange->eval();
             if (left.type != Element::ElementType::INTEGER || right.type != Element::ElementType::INTEGER) {
                 std::cerr << "substr error" << std::endl;
                 exit(1);
             }
-            std::string resultStr = exp.strVal.substr(left.intVal, right.intVal - left.intVal);
+            std::string resultStr = lhs.strVal.substr(left.intVal, right.intVal - left.intVal);
             result.strVal = resultStr;
         }
             break;
         // reverse
         case 3:
         {
-            auto exp = strExpr->eval();
-            std::reverse(exp.strVal.begin(), exp.strVal.end());
-            result.strVal = exp.strVal;
+            
+            std::reverse(lhs.strVal.begin(), lhs.strVal.end());
+            result.strVal = lhs.strVal;
         }
             break;
         // Title
         case 4:
         {
-            auto exp = strExpr->eval();
-            std::string s = exp.strVal;
+            
+            std::string s = lhs.strVal;
             for (int i = 0; i < s.size(); i++) {
                 if (i == 0) {
                     toUpperCase(s[i]);
@@ -105,8 +112,8 @@ Element qwq::StringOperation::eval() {
         // toUpper
         case 5:
         {
-            auto exp = strExpr->eval();
-            std::string s = exp.strVal;
+            
+            std::string s = lhs.strVal;
             for (auto& c : s) {
                 toUpperCase(c);
             }
@@ -116,8 +123,8 @@ Element qwq::StringOperation::eval() {
         // toLower
         case 6:
         {
-            auto exp = strExpr->eval();
-            std::string s = exp.strVal;
+            
+            std::string s = lhs.strVal;
             for (auto& c : s) {
                 toLowerCase(c);
             }
