@@ -343,12 +343,12 @@ str-expr  : TSTRING { $$ = new qwq::StringLiteral(std::string(*$1)); }
           /* | func-expr { $$ = new qwq::StringFuncExpression(std::shared_ptr<qwq::FunctionCall>($1)); } */
           ;
 
-str-operation : str-expr TADD str-expr { $$ = new qwq::StringOperation(std::shared_ptr<qwq::StringExpression>($1), $2, std::shared_ptr<qwq::StringExpression>($3)); }
-              | str-expr '.' TSUBS '(' expr ',' expr ')' { $$ = new qwq::StringOperation(std::shared_ptr<qwq::StringExpression>($1), $3, std::shared_ptr<qwq::Expression>($5), std::shared_ptr<qwq::Expression>($7)); }
-              | str-expr '.' TREVS { $$ = new qwq::StringOperation(std::shared_ptr<qwq::StringExpression>($1), $3); }
-              | str-expr '.' TTITLES { $$ = new qwq::StringOperation(std::shared_ptr<qwq::StringExpression>($1), $3); }
-              | str-expr '.' TUPS { $$ = new qwq::StringOperation(std::shared_ptr<qwq::StringExpression>($1), $3); }
-              | str-expr '.' TLOWS { $$ = new qwq::StringOperation(std::shared_ptr<qwq::StringExpression>($1), $3); }
+str-operation : str-expr TADD str-expr { $$ = new qwq::StringOperation(std::shared_ptr<qwq::StringExpression>($1), 1, std::shared_ptr<qwq::StringExpression>($3)); }
+              | str-expr '.' TSUBS '(' expr ',' expr ')' { $$ = new qwq::StringOperation(std::shared_ptr<qwq::StringExpression>($1), 2, std::shared_ptr<qwq::Expression>($5), std::shared_ptr<qwq::Expression>($7)); }
+              | str-expr '.' TREVS { $$ = new qwq::StringOperation(std::shared_ptr<qwq::StringExpression>($1), 3); }
+              | str-expr '.' TTITLES { $$ = new qwq::StringOperation(std::shared_ptr<qwq::StringExpression>($1), 4); }
+              | str-expr '.' TUPS { $$ = new qwq::StringOperation(std::shared_ptr<qwq::StringExpression>($1), 5); }
+              | str-expr '.' TLOWS { $$ = new qwq::StringOperation(std::shared_ptr<qwq::StringExpression>($1), 6); }
               ;
 
 //切片表达式
@@ -361,8 +361,8 @@ arithmetic-expr : item { $$ = new qwq::ArithmeticExpression(std::shared_ptr<qwq:
                 | arithmetic-expr addition-opt item { $$ = new qwq::ArithmeticExpression(std::shared_ptr<qwq::ArithmeticExpression>($1), std::shared_ptr<qwq::Item>($3), $2, @$); }
                 ;
 
-addition-opt  : TADD 
-              | TSUB
+addition-opt  : TADD  { $$ = 1; }
+              | TSUB { $$ = 2; }
               ;
 
 //逻辑表达式
@@ -370,8 +370,8 @@ logical-expr  : factor { $$ = new qwq::LogicalExpression(std::shared_ptr<qwq::Fa
               | logical-expr logical-opt factor { $$ = new qwq::LogicalExpression(std::shared_ptr<qwq::LogicalExpression>($1), std::shared_ptr<qwq::Factor>($3), $2, @$); }
               ;
 
-logical-opt : TAND
-            | TOR
+logical-opt : TAND { $$ = 1; }
+            | TOR { $$ = 2; }
             ;
 
 //关系表达式
@@ -379,12 +379,12 @@ relation-expr : arithmetic-expr relation-opt arithmetic-expr { $$ = new qwq::Rel
                                       std::shared_ptr<qwq::ArithmeticExpression>($3), $2, @$); }
               ;
 
-relation-opt  : TGT
-              | TGE
-              | TLT
-              | TLE
-              | TEQ
-              | TNE
+relation-opt  : TGT { $$ = 1; }
+              | TGE { $$ = 2; }
+              | TLT { $$ = 3; }
+              | TLE { $$ = 4; }
+              | TEQ { $$ = 5; }
+              | TNE { $$ = 6; }
               ;
 
 //项
@@ -393,11 +393,11 @@ item  : factor { $$ = new qwq::Item(std::shared_ptr<qwq::Factor>($1)); }
                                   std::shared_ptr<qwq::Factor>($3), $2); }
       ;
 
-multi-opt : TMUL
-          | TDIV
-          | TMOD
-          | TPOWER
-          | TEDIV
+multi-opt : TMUL { $$ = 1; }
+          | TDIV { $$ = 2; }
+          | TMOD { $$ = 3; }
+          | TPOWER { $$ = 4; }
+          | TEDIV { $$ = 5; }
           ;
 
 //因子

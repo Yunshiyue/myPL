@@ -5,6 +5,7 @@
 #include "Expression.h"
 #include "FunctionDeclaration.h"
 #include "VariableDeclaration.h"
+// #include "qwq_parser.cpp"
 
 Array::ArrayType switchToArrayType(Element::ElementType type) {
     switch (type) {
@@ -35,7 +36,6 @@ Element qwq::Factor::eval() {
     return exp->eval();
 }
 
-// TODO
 Element qwq::Item::eval() {
     if (lhs == nullptr) {
         return rhs->eval();
@@ -65,7 +65,6 @@ Element qwq::Item::eval() {
     }
 }
 
-// TODO
 Element qwq::ArithmeticExpression::eval() {
     if (lhs == nullptr) {
         return rhs->eval();
@@ -107,7 +106,6 @@ Element qwq::LogicalExpression::eval() {
     }
 }
 
-// TODO
 Element qwq::RelationalExpression::eval() {
     auto left = lhs->eval();
     auto right = rhs->eval();

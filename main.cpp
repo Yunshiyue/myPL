@@ -11,7 +11,7 @@ int main(int argc, char** argv) {
     std::string fileName;
 
     if (argc == 1) {
-        fileName = "/home/qingyue/data/cpp/myPL/examples/test_while.qwq";
+        fileName = "/home/qingyue/data/cpp/myPL/examples/test_if.qwq";
     } else {
         fileName = argv[1];
     }
@@ -28,7 +28,8 @@ int main(int argc, char** argv) {
         yylex_destroy();
         return 1;
     }
-    std::cout << "grammaAnalyze success";
+    std::cout << "grammaAnalyze success" << std::endl;
+    programBlock->eval();
     fclose(yyin);
     yylex_destroy();
     return 0;
