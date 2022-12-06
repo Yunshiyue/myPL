@@ -57,6 +57,8 @@ Element qwq::WhileStatement::eval() {
 Element qwq::PyLikeForStatement::eval() {
 
     SymbolManager::addLayer();
+    SymbolManager::addStatus(SymbolManager::WHILE);
+
     auto leftRange = left->eval();
     auto rightRange = right->eval();
     if (leftRange.type != Element::ElementType::INTEGER || rightRange.type != Element::ElementType::INTEGER) {
@@ -68,7 +70,7 @@ Element qwq::PyLikeForStatement::eval() {
     auto* a = new qwq::VarDeclByExpr(std::make_shared<qwq::IntType>(1),
             loopVariable, std::make_shared<qwq::Integer>(leftRange.intVal));
     a->eval();
-
+    loopVariable->eval();
     while (loopVariable->symbol->intVal < rightRange.intVal) {
         auto result = block->eval();
 

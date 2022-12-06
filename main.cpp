@@ -11,7 +11,7 @@ int main(int argc, char** argv) {
     std::string fileName;
 
     if (argc == 1) {
-        fileName = "/home/qingyue/data/cpp/myPL/examples/test_while2.qwq";
+        fileName = "/home/qingyue/data/cpp/myPL/examples/test_for.qwq";
     } else {
         fileName = argv[1];
 

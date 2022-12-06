@@ -11,3 +11,14 @@ d = 2 ** (a + b);
 int e;
 
 e = c // 2;
+
+print("a = ");
+print(a);
+print("b = ");
+print(b);
+print("c = ");
+print(c);
+print("d = ");
+print(d);
+print("e = ");
+print(e);
