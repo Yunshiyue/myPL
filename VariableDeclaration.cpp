@@ -34,6 +34,7 @@ Element qwq::VarDeclByExpr::eval() {
 
     // 变量声明时，符号表新建记录
     ElePtr result = std::make_shared<Element>();
+    result->type = getType()->getTypeName();
     *result = value;
     SymbolManager::add(id->name, result);
     return *result;

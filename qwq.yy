@@ -328,7 +328,7 @@ assign-expr : ident '=' expr { $$ = new qwq::AssignExpression(std::shared_ptr<qw
 
 //函数表达式
 func-expr : ident '(' ap-list ')' { $$ = new qwq::FunctionCall(std::shared_ptr<qwq::Identifier>($1), std::shared_ptr<qwq::ExpressionList>($3), @$); }
-          | ident '.' ident '(' ap-list ')' { $$ = new qwq::FunctionCall(std::shared_ptr<qwq::Identifier>($1), std::shared_ptr<qwq::Identifier>($3), std::shared_ptr<qwq::ExpressionList>($5), @$); }
+          //| ident '.' ident '(' ap-list ')' { $$ = new qwq::FunctionCall(std::shared_ptr<qwq::Identifier>($1), std::shared_ptr<qwq::Identifier>($3), std::shared_ptr<qwq::ExpressionList>($5), @$); }
           ;
 
 ap-list : %empty { $$ = new qwq::ExpressionList(); }

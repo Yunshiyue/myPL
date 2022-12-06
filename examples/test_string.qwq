@@ -1,0 +1,7 @@
+string s = "abcdefghijk";
+string ss = s.substr(1, 3);
+string c = "aaa" + "bbb";
+string d = "how are you?";
+string dt = d.title;
+string du = d.uppercase;
+string dl = d.lowercase;

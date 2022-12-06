@@ -71,7 +71,7 @@ Element qwq::StringOperation::eval() {
                 std::cerr << "substr error" << std::endl;
                 exit(1);
             }
-            std::string resultStr = exp.strVal.substr(left.intVal, right.intVal);
+            std::string resultStr = exp.strVal.substr(left.intVal, right.intVal - left.intVal);
             result.strVal = resultStr;
         }
             break;

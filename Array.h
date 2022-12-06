@@ -13,7 +13,7 @@
 
 class Array {
 public:
-    enum class ArrayType { INTEGER, DOUBLE, CHAR, BOOL, STRING };
+    enum class ArrayType { NONE, INTEGER, DOUBLE, CHAR, BOOL, STRING };
 
     Array() = default;
     explicit Array(ArrayType type, std::vector<int> sizes)
@@ -29,7 +29,7 @@ public:
 
 
 
-    ArrayType type;
+    ArrayType type = ArrayType::NONE;
     std::vector<int> sizeList;  // 记录每一维的size
     std::vector<std::shared_ptr<int>> intData;
     std::vector<std::shared_ptr<double>> doubleData;

@@ -40,7 +40,7 @@ public:
     Element& operator=(const Element& rhs);
 
     //friend std::ostream& operator<<(std::ostream& os, const Element & element);
-    ElementType type;
+    ElementType type = ElementType::NONE;
     int intVal;
     double doubleVal;
     std::string strVal;

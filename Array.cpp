@@ -58,6 +58,15 @@ bool Array::operator!=(const Array &rhs) const {
 }
 
 Array &Array::operator=(const Array &rhs) {
+    if (rhs.type == ArrayType::NONE) {
+        // 这里复制指针，不是值
+        sizeList = rhs.sizeList;
+        intData = rhs.intData;
+        doubleData = rhs.doubleData;
+        stringData = rhs.stringData;
+        return *this;
+    }
+
     if (type != rhs.type) {
         std::cerr << "two array have different type" << std::endl;
         exit(1);

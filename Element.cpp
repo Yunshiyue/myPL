@@ -419,6 +419,16 @@ Element Element::operator%(const Element &rhs) const {
 }
 
 Element &Element::operator=(const Element &rhs) {
+    if (type == ElementType::NONE) {
+        type = rhs.type;
+        array = rhs.array;
+        strVal = rhs.strVal;
+        doubleVal = rhs.doubleVal;
+        intVal = rhs.intVal;
+        return *this;
+        
+    }
+
     // array赋值
     if (type == ElementType::ARRAY && rhs.type == ElementType::ARRAY) {
         array = rhs.array;
