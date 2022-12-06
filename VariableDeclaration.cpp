@@ -3,6 +3,7 @@
 //
 
 #include "VariableDeclaration.h"
+#include "printAst.h"
 
 // TODO 模板未实现
 Element qwq::VariableDeclaration::eval() {
@@ -60,4 +61,70 @@ Element qwq::VarDeclAssignStmt::eval() {
 // TODO
 Element qwq::ObjectDeclaration::eval() {
     return AstNode::eval();
+}
+
+// 打印语法树
+
+void qwq::VariableDeclaration::printAst(int depth) {
+    io::print_ident(depth);
+    std::cout << "VariableDeclaration";
+    io::print_endl();
+    type->printAst(depth+1);
+    id->printAst(depth+1);
+    if (templateType != nullptr) {
+        templateType->printAst(depth+1);
+    }
+}
+
+void qwq::VariableDeclarationAssign::printAst(int depth) {
+    io::print_ident(depth);
+    std::cout << "VariableDeclarationAssign";
+    io::print_endl();
+    type->printAst(depth+1);
+    id->printAst(depth+1);
+    if (templateType != nullptr) {
+        templateType->printAst(depth+1);
+    }
+}
+
+void qwq::VarDeclByExpr::printAst(int depth) {
+    io::print_ident(depth);
+    std::cout << "VarDeclByExpr";
+    io::print_endl();
+    type->printAst(depth+1);
+    if (templateType != nullptr) {
+        templateType->printAst(depth+1);
+    }
+    id->printAst(depth+1);
+    io::print_ident(depth+1);
+    std::cout << "=";
+    io::print_endl();
+    assignmentExpr->printAst(depth+1);
+}
+
+void qwq::ObjectDeclaration::printAst(int depth) {
+    io::print_ident(depth);
+    std::cout << "VarDeclByExpr";
+    io::print_endl();
+    type->printAst(depth+1);
+    if (templateType != nullptr) {
+        templateType->printAst(depth+1);
+    }
+    id->printAst(depth+1);
+    io::print_ident(depth+1);
+    std::cout << "=";
+    io::print_endl();
+    io::print_ident(depth+1);
+    std::cout << "ExpressionList";
+    io::print_endl();
+    for (int i = 0; i < expressionList->size(); i++) {
+        (*expressionList)[i]->printAst(depth+2);
+    }
+}
+
+void qwq::VarDeclAssignStmt::printAst(int depth) {
+    io::print_ident(depth);
+    std::cout << "VarDeclAssignStmt";
+    io::print_endl();
+    variableDeclarationAssign->printAst(depth+1);
 }

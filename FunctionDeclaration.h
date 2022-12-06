@@ -24,6 +24,8 @@ namespace qwq {
                      std::shared_ptr<VariableList> arguments)
                 : id(std::move(id)), arguments(std::move(arguments))
                 , templateType(std::move(templateType)) {}
+        
+        void printAst(int depth) override;
 
 
     //private:
@@ -39,6 +41,7 @@ namespace qwq {
         : functionHead(std::move(functionHead))
         , block(std::move(block)) {}
         Element eval() override;
+        void printAst(int depth) override;
         std::shared_ptr<FunctionHead> getHead() { return functionHead; }
         std::shared_ptr<Block> getBlock() { return block; }
     private:

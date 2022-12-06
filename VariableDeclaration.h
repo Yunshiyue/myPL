@@ -40,6 +40,8 @@ namespace qwq {
         virtual std::shared_ptr<Type> getType() { return type; }
         virtual std::shared_ptr<Identifier> getIdentifier() { return id; }
 
+        void printAst(int depth) override;
+
     private:
         std::shared_ptr<Type> type;
         std::shared_ptr<Identifier> id;
@@ -63,6 +65,8 @@ namespace qwq {
         virtual std::shared_ptr<Type> getType() { return type; }
         virtual std::shared_ptr<Identifier> getIdentifier() { return id; }
 
+        void printAst(int depth) override;
+
     protected:
         std::shared_ptr<Type> type;
         std::shared_ptr<Identifier> id;
@@ -83,6 +87,7 @@ namespace qwq {
                 : VariableDeclarationAssign(std::move(type), std::move(id), std::move(templateType), std::move(loc))
                 , assignmentExpr(std::move(assignmentExpr)) {}
         Element eval() override;
+        void printAst(int depth) override;
 
     private:
         std::shared_ptr<Expression> assignmentExpr = nullptr;
@@ -95,6 +100,7 @@ namespace qwq {
                      : VariableDeclarationAssign(std::move(type), std::move(id), std::move(templateType), std::move(loc))
                      , expressionList(std::move(expressionList)) {}
         Element eval() override;
+        void printAst(int depth) override;
 
     private:
         std::shared_ptr<ExpressionList> expressionList;
@@ -105,6 +111,7 @@ namespace qwq {
         explicit VarDeclAssignStmt(std::shared_ptr<Expression> variableDeclarationAssign)
         : variableDeclarationAssign(std::move(variableDeclarationAssign)) {}
         Element eval() override;
+        void printAst(int depth) override;
 
         // explicit VarDeclAssignStmt(std::shared_ptr<VariableDeclarationAssign> variableDeclarationAssign)
         // : variableDeclarationAssign(std::move(variableDeclarationAssign)) {}

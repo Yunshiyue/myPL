@@ -6,6 +6,7 @@
 #include "VariableDeclaration.h"
 #include "Type.h"
 #include "Literal.h"
+#include "printAst.h"
 
 Element qwq::IfStatement::eval() {
     // 1.分析条件表达式
@@ -201,4 +202,97 @@ Element qwq::PrintStatement::eval() {
     else {
         std::cout << expEle.array << std::endl;
     }
+}
+
+// 打印语法树
+
+void qwq::CommonStatement::printAst(int depth) {
+    io::print_ident(depth);
+    std::cout << "CommonStatement";
+    io::print_endl();
+}
+
+void qwq::IfStatement::printAst(int depth) {
+    io::print_ident(depth);
+    std::cout << "IfStatement";
+    io::print_endl();
+    relationalExpr->printAst(depth+1);
+    ifBlock->printAst(depth+1);
+    if (elseBlock != nullptr) {
+        elseBlock->printAst(depth+1);
+    }
+}
+
+void qwq::WhileStatement::printAst(int depth) {
+    io::print_ident(depth);
+    std::cout << "WhileStatement";
+    io::print_endl();
+    condition->printAst(depth+1);
+    block->printAst(depth+1);
+}
+
+void qwq::ForStatement::printAst(int depth) {
+    io::print_ident(depth);
+    std::cout << "ForStatement";
+    io::print_endl();
+    block->printAst(depth+1);
+}
+
+void qwq::PyLikeForStatement::printAst(int depth) {
+    io::print_ident(depth);
+    std::cout << "PyLikeForStatement";
+    io::print_endl();
+    loopVariable->printAst(depth+1);
+    left->printAst(depth+1);
+    right->printAst(depth+1);
+}
+
+void qwq::CLikeForStatement::printAst(int depth) {
+    io::print_ident(depth);
+    std::cout << "CLikeForStatement";
+    io::print_endl();
+    if (firstExpr1 != nullptr) {
+        firstExpr1->printAst(depth+1);
+    } else {
+        firstExpr2->printAst(depth+1);
+    }
+    judgeExpr->printAst(depth+1);
+    assignExpr->printAst(depth+1);
+}
+
+void qwq::RangeForStatement::printAst(int depth) {
+    io::print_ident(depth);
+    std::cout << "RangeForStatement";
+    io::print_endl();
+    variableDeclaration->printAst(depth+1);
+    loopRangeId->printAst(depth+1);
+}
+
+void qwq::ReturnStatement::printAst(int depth) {
+    io::print_ident(depth);
+    std::cout << "ReturnStatement";
+    io::print_endl();
+    if (returnExpr != nullptr) {
+        returnExpr->printAst(depth+1);
+    }
+}
+
+void qwq::ExpressionStatement::printAst(int depth) {
+    io::print_ident(depth);
+    std::cout << "ExpressionStatement";
+    io::print_endl();
+    expr->printAst(depth+1);
+}
+
+void qwq::JumpStatement::printAst(int depth) {
+    io::print_ident(depth);
+    std::cout << "JumpStatement";
+    io::print_endl();
+}
+
+void qwq::PrintStatement::printAst(int depth) {
+    io::print_ident(depth);
+    std::cout << "PrintStatement";
+    io::print_endl();
+    expr->printAst(depth+1);
 }

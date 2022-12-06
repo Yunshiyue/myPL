@@ -28,7 +28,7 @@ namespace qwq {
     public:
         using TypeName = Element::ElementType;
         explicit Type(int type) : type(type) {}
-
+        void printAst(int depth) override;
         virtual TypeName getTypeName() { return TypeName::NONE; };
     protected:
         int type;   // 初始化时，传入词法对应的标识符，比如int、double、char对应的ID
@@ -44,6 +44,7 @@ namespace qwq {
         TypeName getElementName() { return elementType->getTypeName(); }
         std::shared_ptr<Type> getElementType() { return elementType; }
         int getCapacity() const { return capacity; }
+        void printAst(int depth) override;
 
     private:
         std::shared_ptr<Type> elementType;   // 数组存放元素的类型
@@ -56,6 +57,8 @@ namespace qwq {
 
         TypeName getTypeName() override { return TypeName::INTEGER; }
 
+        void printAst(int depth) override;
+
     private:
     };
 
@@ -64,6 +67,8 @@ namespace qwq {
         explicit DoubleType(int type) : Type(type) {}
 
         TypeName getTypeName() override { return TypeName::DOUBLE; }
+
+        void printAst(int depth) override;
 
     private:
     };
@@ -75,6 +80,8 @@ namespace qwq {
 
         TypeName getTypeName() override { return TypeName::BOOL; }
 
+        void printAst(int depth) override;
+
     private:
     };
 
@@ -84,6 +91,8 @@ namespace qwq {
 
         TypeName getTypeName() override { return TypeName::CHAR; }
 
+        void printAst(int depth) override;
+
     private:
     };
 
@@ -92,6 +101,8 @@ namespace qwq {
         explicit StringType(int type) : Type(type) {}
 
         TypeName getTypeName() override { return TypeName::STRING; }
+
+        void printAst(int depth) override;
 
     };
 
@@ -105,6 +116,8 @@ namespace qwq {
         std::shared_ptr<Identifier> getClassId() { return classId; }
 
         std::shared_ptr<Type> getTemplateType() { return templateType; }
+
+        void printAst(int depth) override;
 
     private:
         std::shared_ptr<Identifier> classId;

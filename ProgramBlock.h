@@ -14,6 +14,7 @@ namespace qwq {
         ProgramBlock() = default;
         
         Element eval() override;
+        void printAst(int depth) override;
     
         std::shared_ptr<AllStmts> stmts = std::make_shared<AllStmts>();
     

@@ -40,6 +40,7 @@ namespace qwq {
     public:
         virtual ~AstNode() = default;
         virtual Element eval()  { return EMPTY; };
+        virtual void printAst(int depth) { };
     };
 }
 

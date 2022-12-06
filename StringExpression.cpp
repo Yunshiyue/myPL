@@ -3,6 +3,7 @@
 //
 
 #include "StringExpression.h"
+#include "printAst.h"
 
 inline bool isUpper(const char c) {
     if (c >= 'A' && c <= 'Z') {
@@ -142,4 +143,105 @@ Element qwq::StringFuncExpression::eval() {
         exit(1);
     }
     return result;
+}
+
+// 打印语法树
+
+void qwq::StringExpression::printAst(int depth) {
+    io::print_ident(depth);
+    std::cout << "StringExpression";
+    io::print_endl();
+}
+
+void qwq::StringLiteral::printAst(int depth) {
+    io::print_ident(depth);
+    std::cout << "StringLiteral";
+    io::print_endl();
+    io::print_ident(depth+1);
+    std::cout << value;
+    io::print_endl();
+}
+
+void qwq::StringIdentifier::printAst(int depth) {
+    io::print_ident(depth);
+    std::cout << "StringIdentifier";
+    io::print_endl();
+    id->printAst(depth+1);
+}
+
+void qwq::StringOperation::printAst(int depth) {
+    io::print_ident(depth);
+    std::cout << "StringOperation";
+    io::print_endl();
+    if (strExpr != nullptr) {
+        strExpr->printAst(depth+1);
+    } else {
+        strId->printAst(depth+1);
+    }
+    switch (op) {
+        // +
+        case 1:
+        {
+            io::print_ident(depth+1);
+            std::cout << "+";
+            io::print_endl();
+            rhs->printAst(depth+1);
+        }
+            break;
+        // substr
+        case 2:
+        {
+            io::print_ident(depth+1);
+            std::cout << ".substr";
+            io::print_endl();
+            io::print_ident(depth+1);
+            std::cout << "leftRange:";
+            io::print_endl();
+            leftRange->printAst(depth+2);
+            io::print_ident(depth+1);
+            std::cout << "rightRange:";
+            io::print_endl();
+            rightRange->printAst(depth+2);
+        }
+            break;
+        // reverse
+        case 3:
+        {
+            io::print_ident(depth+1);
+            std::cout << ".reverse";
+            io::print_endl();
+        }
+            break;
+        // Title
+        case 4:
+        {
+            io::print_ident(depth+1);
+            std::cout << ".Title";
+            io::print_endl();
+        }
+            break;
+        // toUpper
+        case 5:
+        {
+            io::print_ident(depth+1);
+            std::cout << ".toUpper";
+            io::print_endl();
+        }
+            break;
+        // toLower
+        case 6:
+        {
+            io::print_ident(depth+1);
+            std::cout << ".toLower";
+            io::print_endl();
+        }
+            break;
+    }
+}
+
+void qwq::StringFuncExpression::printAst(int depth) {
+    io::print_ident(depth);
+    std::cout << "StringFuncExpression";
+    io::print_endl();
+    funcExpr->printAst(depth+1);
 }

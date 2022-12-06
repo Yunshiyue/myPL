@@ -11,6 +11,7 @@ namespace qwq {
 
     class Literal : public Expression {
     public:
+        void printAst(int depth) override;
     private:
     };
 
@@ -18,6 +19,7 @@ namespace qwq {
     public:
         explicit Character(int value) : value(value) {}
         Element eval() override;
+        void printAst(int depth) override;
     private:
         int value;
     };
@@ -26,6 +28,7 @@ namespace qwq {
     public:
         explicit Boolean(int v) { v >= 1 ? value = 1 : value = 0; }
         Element eval() override;
+        void printAst(int depth) override;
 
     private:
         int value;
@@ -35,6 +38,7 @@ namespace qwq {
     public:
         explicit Integer(int v) : value(v) {}
         Element eval() override;
+        void printAst(int depth) override;
 
     private:
         int value;
@@ -44,6 +48,7 @@ namespace qwq {
     public:
         explicit Real(double value) : value(value) {}
         Element eval() override;
+        void printAst(int depth) override;
 
     private:
         double value;
