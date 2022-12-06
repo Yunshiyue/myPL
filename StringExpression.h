@@ -14,7 +14,8 @@ namespace qwq {
 
 
     class StringExpression : public Expression {
-
+    public:
+        void printAst(int depth) override;
     };
 
     class StringLiteral : public StringExpression {
@@ -22,6 +23,7 @@ namespace qwq {
         // 字符串字面值
         explicit StringLiteral(std::string s) : value(std::move(s)) {}
         Element eval() override;
+        void printAst(int depth) override;
 
     private:
         std::string value;
@@ -31,6 +33,7 @@ namespace qwq {
     public:
         explicit StringIdentifier(std::shared_ptr<Identifier> id) : id(std::move(id)) {}
         Element eval() override;
+        void printAst(int depth) override;
 
     private:
         std::shared_ptr<Identifier> id;
@@ -60,6 +63,7 @@ namespace qwq {
         , op(op)
         , rhs(std::move(rhs)) {}
         Element eval() override;
+        void printAst(int depth) override;
 
     private:
         std::shared_ptr<StringIdentifier> strId = nullptr;
@@ -74,6 +78,7 @@ namespace qwq {
     public:
         explicit StringFuncExpression(std::shared_ptr<FunctionCall> funcExpr) : funcExpr(std::move(funcExpr)) {}
         Element eval() override;
+        void printAst(int depth) override;
 
     private:
         std::shared_ptr<FunctionCall> funcExpr;

@@ -5,6 +5,7 @@
 #include "Expression.h"
 #include "FunctionDeclaration.h"
 #include "VariableDeclaration.h"
+#include "printAst.h"
 // #include "qwq_parser.cpp"
 
 Array::ArrayType switchToArrayType(Element::ElementType type) {
@@ -315,5 +316,220 @@ Element qwq::ArrayAccess::eval() {
         result.type = Element::ElementType::ARRAY;
         result.array = *a;
         return result;
+    }
+}
+
+// 打印语法树
+
+void qwq::Expression::printAst(int depth) {
+    io::print_ident(depth);
+    std::cout << "Expression";
+    io::print_endl();
+}
+
+void qwq::Identifier::printAst(int depth) {
+    io::print_ident(depth);
+    std::cout << "Identifier";
+    io::print_endl();
+    io::print_ident(depth+1);
+    std::cout << name;
+    io::print_endl();
+}
+
+void qwq::ArrayAccess::printAst(int depth) {
+    io::print_ident(depth);
+    std::cout << "ArrayAccess";
+    io::print_endl();
+    if (id != nullptr) {
+        id->printAst(depth+1);
+    }
+    if (arrayExpr != nullptr) {
+        arrayExpr->printAst(depth+1);
+    }
+    index->printAst(depth+1);
+}
+
+void qwq::Factor::printAst(int depth) {
+    io::print_ident(depth);
+    std::cout << "Factor";
+    io::print_endl();
+    exp->printAst(depth+1);
+}
+
+void qwq::Item::printAst(int depth) {
+    io::print_ident(depth);
+    std::cout << "Item";
+    io::print_endl();
+    if (lhs != nullptr) {
+        lhs->printAst(depth+1);
+        switch (op) {
+            case 1:
+                io::print_ident(depth+1);
+                std::cout << "*";
+                io::print_endl();
+                break;
+            case 2:
+                io::print_ident(depth+1);
+                std::cout << "/";
+                io::print_endl();
+                break;
+            case 3:
+                io::print_ident(depth+1);
+                std::cout << "%";
+                io::print_endl();
+                break;
+            case 4:
+                io::print_ident(depth+1);
+                std::cout << "**";
+                io::print_endl();
+                break;
+            case 5:
+                io::print_ident(depth+1);
+                std::cout << "//";
+                io::print_endl();
+                break;
+        }
+    }
+    if (rhs != nullptr) {
+        rhs->printAst(depth+1);
+    }
+}
+
+void qwq::ArithmeticExpression::printAst(int depth) {
+    io::print_ident(depth);
+    std::cout << "ArithmeticExpression";
+    io::print_endl();
+    if (lhs != nullptr) {
+        lhs->printAst(depth+1);
+        switch (op) {
+            case 1:
+                io::print_ident(depth+1);
+                std::cout << "+";
+                io::print_endl();
+                break;
+            case 2:
+                io::print_ident(depth+1);
+                std::cout << "-";
+                io::print_endl();
+                break;
+        }
+    }
+    if (rhs != nullptr) {
+        rhs->printAst(depth+1);
+    }
+}
+
+void qwq::LogicalExpression::printAst(int depth) {
+    io::print_ident(depth);
+    std::cout << "LogicalExpression";
+    io::print_endl();
+    if (lhs != nullptr) {
+        lhs->printAst(depth+1);
+        switch (op) {
+            case 1:
+                io::print_ident(depth+1);
+                std::cout << "&&";
+                io::print_endl();
+                break;
+            case 2:
+                io::print_ident(depth+1);
+                std::cout << "||";
+                io::print_endl();
+                break;
+        }
+    }
+    if (rhs != nullptr) {
+        rhs->printAst(depth+1);
+    }
+}
+
+void qwq::SliceExpression::printAst(int depth) {
+    io::print_ident(depth);
+    std::cout << "SliceExpression";
+    io::print_endl();
+    id->printAst(depth+1);
+    left->printAst(depth+1);
+    right->printAst(depth+1);
+}
+
+void qwq::AssignExpression::printAst(int depth) {
+    io::print_ident(depth);
+    std::cout << "AssignExpression";
+    io::print_endl();
+    if (id != nullptr) {
+        id->printAst(depth+1);
+    } else {
+        arrayExpr->printAst(depth+1);
+    }
+    io::print_ident(depth+1);
+    std::cout << "=";
+    io::print_endl();
+    rhs->printAst(depth+1);
+}
+
+void qwq::FunctionCall::printAst(int depth) {
+    io::print_ident(depth);
+    std::cout << "FunctionCall";
+    io::print_endl();
+    if (varId != nullptr) {
+        varId->printAst(depth+1);
+    }
+    funcId->printAst(depth+1);
+    io::print_ident(depth+1);
+    std::cout << "arguments";
+    io::print_endl();
+    for (int i = 0; i < arguments->size(); i++) {
+        (*arguments)[i]->printAst(depth+2);
+    }
+}
+
+void qwq::RelationalExpression::printAst(int depth) {
+    io::print_ident(depth);
+    std::cout << "RelationalExpression";
+    io::print_endl();
+    lhs->printAst(depth+1);
+    switch (op) {
+        case 1:
+            io::print_ident(depth+1);
+            std::cout << ">";
+            io::print_endl();
+            break;
+        case 2:
+            io::print_ident(depth+1);
+            std::cout << ">=";
+            io::print_endl();
+            break;
+        case 3:
+            io::print_ident(depth+1);
+            std::cout << "<";
+            io::print_endl();
+            break;
+        case 4:
+            io::print_ident(depth+1);
+            std::cout << "<=";
+            io::print_endl();
+            break;
+        case 5:
+            io::print_ident(depth+1);
+            std::cout << "==";
+            io::print_endl();
+            break;
+        case 6:
+            io::print_ident(depth+1);
+            std::cout << "!=";
+            io::print_endl();
+            break;
+    }
+    if (rhs != nullptr) {
+        rhs->printAst(depth+1);
+    }
+}
+
+void qwq::Block::printAst(int depth) {
+    io::print_ident(depth);
+    std::cout << "Block";
+    io::print_endl();
+    for (int i = 0; i < statementList->size(); i++) {
+        (*statementList)[i]->printAst(depth+1);
     }
 }

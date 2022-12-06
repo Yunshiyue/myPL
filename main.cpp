@@ -30,7 +30,12 @@ int main(int argc, char** argv) {
         return 1;
     }
     std::cout << "grammaAnalyze success" << std::endl;
+    std::cout << "ast:" << std::endl;
+    programBlock->printAst(1);
+    std::cout << "ast-end" << std::endl;
+    std::cout << "start executing" << std::endl;
     programBlock->eval();
+    std::cout << "finished" << std::endl;
     fclose(yyin);
     yylex_destroy();
     return 0;

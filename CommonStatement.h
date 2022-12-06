@@ -17,6 +17,7 @@ namespace qwq {
     class CommonStatement : public Statement {
     public:
         Element eval() override { return EMPTY; }
+        void printAst(int depth) override;
     private:
     };
 
@@ -39,6 +40,7 @@ namespace qwq {
                     , ifBlock(std::move(ifBlock))
                     , elseBlock(std::move(elseBlock)) {}
         Element eval() override;
+        void    printAst(int depth)  override;
     private:
 //        std::shared_ptr<CBPair> ifCbs;
 //        std::shared_ptr<std::vector<CBPair>> elifCbs = nullptr;
@@ -52,6 +54,7 @@ namespace qwq {
         WhileStatement(std::shared_ptr<RelationalExpression> condition, std::shared_ptr<Block> block)
                 : condition(std::move(condition)), block(std::move(block)) {}
         Element eval() override;
+        void printAst(int depth) override;
     private:
         std::shared_ptr<RelationalExpression> condition;
         std::shared_ptr<Block> block;
@@ -60,6 +63,7 @@ namespace qwq {
     class ForStatement : public CommonStatement {
     public:
         explicit ForStatement(std::shared_ptr<Block> block) : block(std::move(block)) {}
+        void printAst(int depth) override;
     protected:
         std::shared_ptr<Block> block;
     };
@@ -72,6 +76,7 @@ namespace qwq {
                 , right(std::move(right))
                 , ForStatement(std::move(block)) {}
         Element eval() override;
+        void printAst(int depth) override;
     private:
         std::shared_ptr<Identifier> loopVariable;
         std::shared_ptr<Expression> left;
@@ -94,6 +99,7 @@ namespace qwq {
                 : firstExpr2(std::move(firstExpr2)), judgeExpr(std::move(judgeExpr)), assignExpr(std::move(assignExpr)),
                   ForStatement(std::move(block)) {}
         Element eval() override;
+        void printAst(int depth) override;
 
     private:
         std::shared_ptr<VariableDeclarationAssign> firstExpr1 = nullptr;  // 注意：expr1和expr2只能用1个
@@ -109,6 +115,7 @@ namespace qwq {
                 : variableDeclaration(std::move(variableDeclaration))
                 , loopRangeId(std::move(loopRangeId)), ForStatement(std::move(block)) {}
         Element eval() override;
+        void printAst(int depth) override;
 
     private:
         std::shared_ptr<VariableDeclaration> variableDeclaration;
@@ -128,6 +135,7 @@ namespace qwq {
 
         YYLTYPE getLocation() { return loc; }
         Element eval() override;
+        void printAst(int depth) override;
 
     private:
         std::shared_ptr<Expression> returnExpr = nullptr;
@@ -141,6 +149,7 @@ namespace qwq {
 
         YYLTYPE getLocation() { return loc; }
         Element eval() override;
+        void printAst(int depth) override;
 
     private:
         std::shared_ptr<Expression> expr;
@@ -153,6 +162,7 @@ namespace qwq {
 
         YYLTYPE getLocation() { return loc; }
         Element eval() override;
+        void printAst(int depth) override;
 
     private:
         int op;
@@ -165,6 +175,7 @@ namespace qwq {
 
         
         Element eval() override;
+        void printAst(int depth) override;
 
     private:
         std::shared_ptr<Expression> expr;

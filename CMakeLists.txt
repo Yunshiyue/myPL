@@ -38,6 +38,7 @@ ${FLEX_Lexer_OUTPUTS}
         Literal.cpp
         Type.cpp
         StringExpression.cpp 
+        printAst.cpp
         VariableDeclaration.cpp VariableDeclaration.h 
         SymbolManager.cpp SymbolManager.h 
         Element.cpp Element.h 

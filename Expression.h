@@ -19,6 +19,7 @@ namespace qwq {
 
     class Expression : public AstNode {
     public:
+        void printAst(int depth) override;
     };
 
     class Identifier : public Expression {
@@ -29,6 +30,7 @@ namespace qwq {
 
         YYLTYPE getLocation() { return loc; }
         Element eval() override;
+        void printAst(int depth) override;
 
         std::string name;
         ElePtr symbol;
@@ -49,6 +51,7 @@ namespace qwq {
 
         YYLTYPE getLocation() { return loc; }
         Element eval() override;
+        void printAst(int depth) override;
         std::shared_ptr<Identifier> getId() {
             if (id != nullptr) {
                 return id;
@@ -69,6 +72,7 @@ namespace qwq {
     public:
         explicit Factor(std::shared_ptr<Expression> exp) : exp(std::move(exp)) {}
         Element eval() override;
+        void printAst(int depth) override;
 
     private:
         std::shared_ptr<Expression> exp;
@@ -82,6 +86,7 @@ namespace qwq {
                       int op = -1)
                 : lhs(std::move(lhs)), op(op), rhs(std::move(rhs)) {}
         Element eval() override;
+        void printAst(int depth) override;
 
     private:
         std::shared_ptr<Item> lhs = nullptr;
@@ -102,6 +107,7 @@ namespace qwq {
 
         YYLTYPE getLocation() { return loc; }
         Element eval() override;
+        void printAst(int depth) override;
 
     private:
         std::shared_ptr<ArithmeticExpression> lhs = nullptr;
@@ -123,6 +129,7 @@ namespace qwq {
 
         YYLTYPE getLocation() { return loc; }
         Element eval() override;
+        void printAst(int depth) override;
 
     private:
         std::shared_ptr<LogicalExpression> lhs = nullptr;
@@ -139,6 +146,7 @@ namespace qwq {
 
         YYLTYPE getLocation() { return loc; }
         Element eval() override;
+        void printAst(int depth) override;
 
     private:
         std::shared_ptr<Identifier> id;
@@ -159,6 +167,7 @@ namespace qwq {
 
         YYLTYPE getLocation() { return loc; }
         Element eval() override;
+        void printAst(int depth) override;
     private:
         std::shared_ptr<Identifier> id = nullptr;
         std::shared_ptr<Expression> rhs = nullptr;
@@ -183,6 +192,7 @@ namespace qwq {
 
         YYLTYPE getLocation() { return loc; }
         Element eval() override;
+        void printAst(int depth) override;
 
     private:
         std::shared_ptr<Identifier> varId = nullptr;
@@ -202,6 +212,7 @@ namespace qwq {
 //        explicit RelationalExpression(std::shared_ptr<ArithmeticExpression> lhs, YYLTYPE loc)
 //                : lhs(std::move(lhs)), loc(std::move(loc)) {}
         Element eval() override;
+        void printAst(int depth) override;
 
     private:
         std::shared_ptr<ArithmeticExpression> lhs;
@@ -214,6 +225,7 @@ namespace qwq {
     public:
         explicit Block(std::shared_ptr<StatementList> statementList) : statementList(std::move(statementList)) {}
         Element eval() override;
+        void printAst(int depth) override;
 
         std::shared_ptr<StatementList> statementList;
     };
