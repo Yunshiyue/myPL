@@ -228,7 +228,7 @@ fp-list : %empty { $$ = new qwq::VariableList(); }
 
 stmt-list : %empty { $$ = new qwq::StatementList(); }
           | common-stmt { $$ = new qwq::StatementList(); $$->push_back(std::shared_ptr<qwq::CommonStatement>($1)); }
-          | stmt-list ',' common-stmt { $1->push_back(std::shared_ptr<qwq::CommonStatement>($3)); $$ = $1; }
+          | stmt-list common-stmt { $1->push_back(std::shared_ptr<qwq::CommonStatement>($2)); $$ = $1; }
           ; //这里可能有bug，书上写了
 
 block : '{' stmt-list '}' { $$ = new qwq::Block(std::shared_ptr<qwq::StatementList>($2)); } // $1 改为 $2
