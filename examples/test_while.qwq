@@ -2,6 +2,7 @@ int i = 1;
 int ans = 0;
 while (i <= 5) {
     i = i + 1;
+    print(i);
 }
 
 ans = ans + 1;
@@ -11,6 +12,7 @@ while (i <= 10) {
         break;
     }
     i = i + 1;
+    print(i);
 }
 
 if (i == 8) {
@@ -24,8 +26,17 @@ while (i <= 10) {
         continue;
     }
     break;
+    
 }
 
 if (j == 8) {
     ans = ans + 1;
 }
+
+print("i = ");
+print(i);
+print("j = ");
+print(j);
+print("ans = ");
+print(ans);
+print("end");

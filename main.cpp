@@ -11,9 +11,10 @@ int main(int argc, char** argv) {
     std::string fileName;
 
     if (argc == 1) {
-        fileName = "/home/qingyue/data/cpp/myPL/examples/test_while.qwq";
+        fileName = "/home/qingyue/data/cpp/myPL/examples/test_while2.qwq";
     } else {
         fileName = argv[1];
+
     }
 
     yyin = fopen(fileName.c_str(), "r+");

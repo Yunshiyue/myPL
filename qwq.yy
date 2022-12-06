@@ -281,8 +281,8 @@ while-stmt  : TWHILE '(' relation-expr ')' block { $$ = new qwq::WhileStatement(
             ;
 
 //jump语句
-jump-stmt : TBREAK ';' { $$ = new qwq::JumpStatement(TBREAK, @$); }
-          | TCONTINUE ';' { $$ = new qwq::JumpStatement(TCONTINUE, @$); }
+jump-stmt : TBREAK ';' { $$ = new qwq::JumpStatement(0, @$); }
+          | TCONTINUE ';' { $$ = new qwq::JumpStatement(1, @$); }
           ;
 
 // TODO:for循环
