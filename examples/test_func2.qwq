@@ -1,0 +1,17 @@
+
+
+def fun(int i, int j, int k) -> int {
+    int num = i + j;
+    return num;
+}
+
+def func2(int i) -> int {
+    return i + 3;
+}
+
+int a = 33;
+int b = 22;
+int c = 11;
+int num = fun(a, b, c);
+
+print(num);
