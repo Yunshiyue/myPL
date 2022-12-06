@@ -224,7 +224,7 @@ Element qwq::FunctionCall::eval() {
 
     SymbolManager::popStatus();
     SymbolManager::popLayer();
-    return AstNode::eval();
+    return result;
 }
 
 Element qwq::Block::eval() {
@@ -232,9 +232,13 @@ Element qwq::Block::eval() {
     for (auto& s : *statementList) {
         auto result = s->eval();
         if (SymbolManager::topStatus() == SymbolManager::CONTINUE ||
-            SymbolManager::topStatus() == SymbolManager::BREAK ||
-            SymbolManager::topStatus() == SymbolManager::RETURN)
+            SymbolManager::topStatus() == SymbolManager::BREAK) {
             break;
+            }
+        else if (SymbolManager::topStatus() == SymbolManager::RETURN) {
+            SymbolManager::popLayer();
+            return result;
+        }
             //return result;
     }
     SymbolManager::popLayer();

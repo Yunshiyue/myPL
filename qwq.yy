@@ -336,7 +336,7 @@ func-expr : ident '(' ap-list ')' { $$ = new qwq::FunctionCall(std::shared_ptr<q
 
 ap-list : %empty { $$ = new qwq::ExpressionList(); }
         | expr { $$ = new qwq::ExpressionList(); $$->push_back(std::shared_ptr<qwq::Expression>($1)); }
-        | ap-list expr { $1->push_back(std::shared_ptr<qwq::Expression>($2)); }
+        | ap-list ',' expr { $1->push_back(std::shared_ptr<qwq::Expression>($3)); }
         ;
 
 //字符串表达式

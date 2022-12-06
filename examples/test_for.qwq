@@ -1,5 +1,6 @@
 int num;
 for i in (0 , 10) {
+    print(i);
     num = i;
     print(num);
     continue;
