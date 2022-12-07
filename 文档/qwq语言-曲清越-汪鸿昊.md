@@ -892,13 +892,44 @@ class-statement-list ::= {<function-declaration> | <variable-declaration>}
 ```java
 ```
 
-# 4 词法分析设计
+# 4 词法分析器设计
+
+​		我们的词法分析采用flex完成，再github仓库中的qwq.l文件中。词法分析器的主要功能是将程序文本中的词识别分类后以token的形式传递给语法分析器，token的定义在下面进行展示。
 
 ## 4.1 yylval类型定义（qwq.yy）
 
 ```c++
 %union {
     // TODO: 根据定义的节点class完善union
+    qwq::AstNode *astNode;
+    qwq::ClassDeclaration *cDeclare;
+    qwq::ClassHead *classHead;
+    qwq::CommonStatement *cStatement;
+    qwq::ForStatement *forStatement;
+    qwq::Expression *expr;
+    qwq::ArrayAccess *arrAcc;
+    qwq::RelationalExpression *relationExpr;
+    qwq::SliceExpression *sliceExpr;
+    qwq::FunctionCall *funcExpr;
+    qwq::AssignExpression *assignExpr;
+    qwq::FunctionDeclaration *fDeclare;
+    qwq::FunctionHead *fHead;
+    qwq::Literal *literal;
+    qwq::Statement *stmt;
+    qwq::StringExpression *sExpr;
+    qwq::Block *block;
+    qwq::Type *type;
+    qwq::Identifier *ident;
+    qwq::Item *item;
+    qwq::Factor *factor;
+    qwq::VariableDeclaration* varDecl;
+    qwq::VariableDeclarationAssign *varDeclAssign;
+    qwq::ArithmeticExpression *arithExpr;
+    qwq::LogicalExpression *logicalExpr;
+    qwq::VariableList *varList;
+    qwq::StatementList *stmtList;
+    qwq::ExpressionList *exprList;
+    qwq::ProgramBlock *allStmts;
     long long integer;
     double real;
     int boolean;
@@ -964,15 +995,16 @@ class-statement-list ::= {<function-declaration> | <variable-declaration>}
 | 'uppercase'                        | TUPS                 |
 | 'lowercase'                        | TLOWS                |
 
-+ 赋值符号=、各种括号、.、,、;没有对应的token
++ 注意：赋值符号=、各种括号、.、,、;没有对应的token
 
-# 5 语法分析设计
+# 5 语法分析器设计
 
-
+​		我们的语法分析器由bison生成，语法分析器的作用是使用词法分析器识别出来的token序列建立抽象语法树（ast），为下一步抽象语法树的解释运行奠定基础。下面介绍语法分析器中主要的部分。
 
 ## 5.1 终结符定义
 
 ```C++
+// 定义终结符
 %token <integer>    TINTEGER
 %token <real>       TREAL
 %token <boolean>    TBOOL
@@ -984,11 +1016,13 @@ class-statement-list ::= {<function-declaration> | <variable-declaration>}
 %token <token>      TAND TOR TNOT
 // 比较运算符
 %token <token>      TEQ TNE TGE TLE TGT TLT
+// 其它运算符
+%token <token>      TARROW
 // 关键字
 // 条件语句
 %token <token>      TIF TELSE TELIF
 // 循环语句
-%token <token>      TFOR TWHILE
+%token <token>      TFOR TWHILE TIN
 // 类
 %token <token>      TTHIS TPUBLIC TPRIVATE TPROTECTED TEXTEND TCLASS
 // 函数
@@ -1001,13 +1035,58 @@ class-statement-list ::= {<function-declaration> | <variable-declaration>}
 %token <token>      TTEMP TTYNAME
 // 字符串操作
 %token <token>      TSUBS TREVS TTITLES TUPS TLOWS
+
+%token <token>      PRINT
 ```
 
 ## 5.2 非终结符定义
 
+```c++
+// 定义非终结符
+// TODO: 定义非终结符的类型
+%type <astNode> program
+%type <cDeclare> class-decl
+%type <classHead> class-head
+%type <cStatement> common-stmt if-stmt while-stmt jump-stmt for-stmt return-stmt expr-stmt var-decl-stmt print-stmt
+%type <forStatement> c-like-for py-like-for range-for
+%type <expr> expr
 
+%type <arrAcc> arr-access
+%type <relationExpr> relation-expr 
+%type <sliceExpr> slice-expr
+%type <funcExpr> func-expr
+%type <assignExpr> assign-expr
+
+%type <fDeclare> func-decl
+%type <fHead> func-head
+%type <literal> literal
+%type <stmt> stmt 
+%type <sExpr> str-expr str-operation
+%type <block> block
+%type <type> type val-type
+%type <ident> ident
+%type <item> item
+%type <factor> factor
+%type <varDecl> var-decl
+%type <varDeclAssign> var-decl-assign
+
+%type <arithExpr> arithmetic-expr
+%type <logicalExpr> logical-expr
+// 列表
+%type <varList> fp-list
+%type <stmtList> stmt-list
+%type <exprList> ap-list
+%type <allStmts> all-stmt-list
+// 操作符
+%type <token> addition-opt
+%type <token> multi-opt
+%type <token> relation-opt
+%type <token> logical-opt
+```
 
 ## 5.3 优先级以及结合性
+
+​		为了解决文法中存在的二义性问题，我们需要对各个token的优先级以及结合性进行定义。
 
 ```C++
 %right '='
@@ -1019,17 +1098,1529 @@ class-statement-list ::= {<function-declaration> | <variable-declaration>}
 %nonassoc TSADD TSSUB
 ```
 
+# 6 抽象语法树节点设计
 
 
 
+# 7 解释器设计
 
 
 
+# 8 运行方法
 
+## 8.1 获取与安装
 
++ 首先从github仓库中将代码clone下来
+  `git clone git@github.com:Yunshiyue/myPL.git`
++ 接着在根目录下执行
+  `cmake -B build`
++ 最后进入build文件夹执行make
+  `cd build`
+  `make`
 
+## 8.2 对.qwq文件进行解释执行
 
+```bash
+# 在build文件夹中执行，fileName表示需要执行的.qwq文件
+./myPL fileName -h -t
+#where
+#-h  help: shows the usage.
+#-t  tree: tell qwq to print ast.
+```
 
+# 9 结果与测试
+
+## 9.1 变量声明
+
++ 测试文件
+  ```c++
+  int i1;
+  double i2;
+  char i3;
+  string i4;
+  bool i5;
+  array<int, 10> i6;
+  
+  print("变量声明测试通过");
+  
+  int j1 = 1;
+  double j2 = 1;
+  char j3 = '1';
+  string j4 = "123";
+  bool j5 = false;
+  
+  int jn = j1;
+  
+  print(jn);
+  print("变量声明赋值测试通过");
+  ```
+
++ 结果展示
+  ```
+  $ ./myPL ../examples/test_declaration.qwq 
+  grammaAnalyze success
+  start executing
+  变量声明测试通过
+  变量声明赋值测试通过
+  Segmentation fault
+  (base) whh@whh:~/workSpace/myPL/build$ ./myPL ../examples/test_declaration.qwq 
+  grammaAnalyze success
+  start executing
+  变量声明测试通过
+  1
+  变量声明赋值测试通过
+  finished
+  (base) whh@whh:~/workSpace/myPL/build$ ./myPL ../examples/test_declaration.qwq -t
+  grammaAnalyze success
+  ast:
+  Program
+  |----VarDeclAssignStmt
+  |      |----VariableDeclaration
+  |      |      |----IntType
+  |      |      |      |----299
+  |      |      |----Identifier
+  |      |      |      |----i1
+  |----VarDeclAssignStmt
+  |      |----VariableDeclaration
+  |      |      |----DoubleType
+  |      |      |      |----301
+  |      |      |----Identifier
+  |      |      |      |----i2
+  |----VarDeclAssignStmt
+  |      |----VariableDeclaration
+  |      |      |----CharType
+  |      |      |      |----302
+  |      |      |----Identifier
+  |      |      |      |----i3
+  |----VarDeclAssignStmt
+  |      |----VariableDeclaration
+  |      |      |----StringType
+  |      |      |      |----303
+  |      |      |----Identifier
+  |      |      |      |----i4
+  |----VarDeclAssignStmt
+  |      |----VariableDeclaration
+  |      |      |----BooleanType
+  |      |      |      |----300
+  |      |      |----Identifier
+  |      |      |      |----i5
+  |----VarDeclAssignStmt
+  |      |----VariableDeclaration
+  |      |      |----ArrayType
+  |      |      |      |----elementType
+  |      |      |      |      |----IntType
+  |      |      |      |      |      |----299
+  |      |      |      |----capacity
+  |      |      |      |      |----10
+  |      |      |----Identifier
+  |      |      |      |----i6
+  |----PrintStatement
+  |      |----StringLiteral
+  |      |      |----变量声明测试通过
+  |----VarDeclAssignStmt
+  |      |----VarDeclByExpr
+  |      |      |----IntType
+  |      |      |      |----299
+  |      |      |----Identifier
+  |      |      |      |----j1
+  |      |      |----=
+  |      |      |----LogicalExpression
+  |      |      |      |----Factor
+  |      |      |      |      |----Integer
+  |      |      |      |      |----1
+  |----VarDeclAssignStmt
+  |      |----VarDeclByExpr
+  |      |      |----DoubleType
+  |      |      |      |----301
+  |      |      |----Identifier
+  |      |      |      |----j2
+  |      |      |----=
+  |      |      |----LogicalExpression
+  |      |      |      |----Factor
+  |      |      |      |      |----Integer
+  |      |      |      |      |----1
+  |----VarDeclAssignStmt
+  |      |----VarDeclByExpr
+  |      |      |----CharType
+  |      |      |      |----302
+  |      |      |----Identifier
+  |      |      |      |----j3
+  |      |      |----=
+  |      |      |----LogicalExpression
+  |      |      |      |----Factor
+  |      |      |      |      |----Character
+  |      |      |      |      |      |----49
+  |----VarDeclAssignStmt
+  |      |----VarDeclByExpr
+  |      |      |----StringType
+  |      |      |      |----303
+  |      |      |----Identifier
+  |      |      |      |----j4
+  |      |      |----=
+  |      |      |----StringLiteral
+  |      |      |      |----123
+  |----VarDeclAssignStmt
+  |      |----VarDeclByExpr
+  |      |      |----BooleanType
+  |      |      |      |----300
+  |      |      |----Identifier
+  |      |      |      |----j5
+  |      |      |----=
+  |      |      |----LogicalExpression
+  |      |      |      |----Factor
+  |      |      |      |      |----Boolean
+  |      |      |      |      |----0
+  |----VarDeclAssignStmt
+  |      |----VarDeclByExpr
+  |      |      |----IntType
+  |      |      |      |----299
+  |      |      |----Identifier
+  |      |      |      |----jn
+  |      |      |----=
+  |      |      |----LogicalExpression
+  |      |      |      |----Factor
+  |      |      |      |      |----Identifier
+  |      |      |      |      |      |----j1
+  |----PrintStatement
+  |      |----LogicalExpression
+  |      |      |----Factor
+  |      |      |      |----Identifier
+  |      |      |      |      |----jn
+  |----PrintStatement
+  |      |----StringLiteral
+  |      |      |----变量声明赋值测试通过
+  ast-end
+  start executing
+  变量声明测试通过
+  1
+  变量声明赋值测试通过
+  finished
+  ```
+
+  
+
+## 9.2 表达式
+
++ 测试文件
+
+  ```c++
+  int a = 1;
+  int b = 2;
+  int c;
+  
+  c = 3 * (a + b);
+  
+  int d;
+  
+  d = 2 ** (a + b);
+  
+  int e;
+  
+  e = c // 2;
+  
+  print("a = ");
+  print(a);
+  print("b = ");
+  print(b);
+  print("c = ");
+  print(c);
+  print("d = ");
+  print(d);
+  print("e = ");
+  print(e);
+  
+  ```
+
++ 结果展示
+  ```
+  $ ./myPL ../examples/test_expression.qwq -t
+  grammaAnalyze success
+  ast:
+  Program
+  |----VarDeclAssignStmt
+  |      |----VarDeclByExpr
+  |      |      |----IntType
+  |      |      |      |----299
+  |      |      |----Identifier
+  |      |      |      |----a
+  |      |      |----=
+  |      |      |----LogicalExpression
+  |      |      |      |----Factor
+  |      |      |      |      |----Integer
+  |      |      |      |      |----1
+  |----VarDeclAssignStmt
+  |      |----VarDeclByExpr
+  |      |      |----IntType
+  |      |      |      |----299
+  |      |      |----Identifier
+  |      |      |      |----b
+  |      |      |----=
+  |      |      |----LogicalExpression
+  |      |      |      |----Factor
+  |      |      |      |      |----Integer
+  |      |      |      |      |----2
+  |----VarDeclAssignStmt
+  |      |----VariableDeclaration
+  |      |      |----IntType
+  |      |      |      |----299
+  |      |      |----Identifier
+  |      |      |      |----c
+  |----ExpressionStatement
+  |      |----AssignExpression
+  |      |      |----Identifier
+  |      |      |      |----c
+  |      |      |----=
+  |      |      |----ArithmeticExpression
+  |      |      |      |----Item
+  |      |      |      |      |----Item
+  |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |----Integer
+  |      |      |      |      |      |      |----3
+  |      |      |      |      |----*
+  |      |      |      |      |----Factor
+  |      |      |      |      |      |----ArithmeticExpression
+  |      |      |      |      |      |      |----ArithmeticExpression
+  |      |      |      |      |      |      |      |----Item
+  |      |      |      |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |      |      |      |      |----a
+  |      |      |      |      |      |      |----+
+  |      |      |      |      |      |      |----Item
+  |      |      |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |      |      |      |----b
+  |----VarDeclAssignStmt
+  |      |----VariableDeclaration
+  |      |      |----IntType
+  |      |      |      |----299
+  |      |      |----Identifier
+  |      |      |      |----d
+  |----ExpressionStatement
+  |      |----AssignExpression
+  |      |      |----Identifier
+  |      |      |      |----d
+  |      |      |----=
+  |      |      |----ArithmeticExpression
+  |      |      |      |----Item
+  |      |      |      |      |----Item
+  |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |----Integer
+  |      |      |      |      |      |      |----2
+  |      |      |      |      |----**
+  |      |      |      |      |----Factor
+  |      |      |      |      |      |----ArithmeticExpression
+  |      |      |      |      |      |      |----ArithmeticExpression
+  |      |      |      |      |      |      |      |----Item
+  |      |      |      |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |      |      |      |      |----a
+  |      |      |      |      |      |      |----+
+  |      |      |      |      |      |      |----Item
+  |      |      |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |      |      |      |----b
+  |----VarDeclAssignStmt
+  |      |----VariableDeclaration
+  |      |      |----IntType
+  |      |      |      |----299
+  |      |      |----Identifier
+  |      |      |      |----e
+  |----ExpressionStatement
+  |      |----AssignExpression
+  |      |      |----Identifier
+  |      |      |      |----e
+  |      |      |----=
+  |      |      |----ArithmeticExpression
+  |      |      |      |----Item
+  |      |      |      |      |----Item
+  |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |      |----c
+  |      |      |      |      |----//
+  |      |      |      |      |----Factor
+  |      |      |      |      |      |----Integer
+  |      |      |      |      |      |----2
+  |----PrintStatement
+  |      |----StringLiteral
+  |      |      |----a = 
+  |----PrintStatement
+  |      |----LogicalExpression
+  |      |      |----Factor
+  |      |      |      |----Identifier
+  |      |      |      |      |----a
+  |----PrintStatement
+  |      |----StringLiteral
+  |      |      |----b = 
+  |----PrintStatement
+  |      |----LogicalExpression
+  |      |      |----Factor
+  |      |      |      |----Identifier
+  |      |      |      |      |----b
+  |----PrintStatement
+  |      |----StringLiteral
+  |      |      |----c = 
+  |----PrintStatement
+  |      |----LogicalExpression
+  |      |      |----Factor
+  |      |      |      |----Identifier
+  |      |      |      |      |----c
+  |----PrintStatement
+  |      |----StringLiteral
+  |      |      |----d = 
+  |----PrintStatement
+  |      |----LogicalExpression
+  |      |      |----Factor
+  |      |      |      |----Identifier
+  |      |      |      |      |----d
+  |----PrintStatement
+  |      |----StringLiteral
+  |      |      |----e = 
+  |----PrintStatement
+  |      |----LogicalExpression
+  |      |      |----Factor
+  |      |      |      |----Identifier
+  |      |      |      |      |----e
+  ast-end
+  start executing
+  a = 
+  1
+  b = 
+  2
+  c = 
+  9
+  d = 
+  8
+  e = 
+  4
+  finished
+  ```
+
+## 9.3 for循环
+
++ 测试文件
+
+  ```c++
+  int num;
+  for i in (0 , 10) {
+      num = i;
+      print(num);
+  }
+  print("pyLike成功");
+  
+  int num2;
+  for (int j = 1; j <= 2; j = j + 1) {
+      num2 = j;
+      print(j);
+  }
+  print("cLike成功");
+  
+  ```
+
++ 结果展示
+  ```
+  $ ./myPL ../examples/test_for.qwq -t
+  grammaAnalyze success
+  ast:
+  Program
+  |----VarDeclAssignStmt
+  |      |----VariableDeclaration
+  |      |      |----IntType
+  |      |      |      |----299
+  |      |      |----Identifier
+  |      |      |      |----num
+  |----PyLikeForStatement
+  |      |----Identifier
+  |      |      |----i
+  |      |----LogicalExpression
+  |      |      |----Factor
+  |      |      |      |----Integer
+  |      |      |      |----0
+  |      |----LogicalExpression
+  |      |      |----Factor
+  |      |      |      |----Integer
+  |      |      |      |----10
+  |----PrintStatement
+  |      |----StringLiteral
+  |      |      |----pyLike成功
+  |----VarDeclAssignStmt
+  |      |----VariableDeclaration
+  |      |      |----IntType
+  |      |      |      |----299
+  |      |      |----Identifier
+  |      |      |      |----num2
+  |----CLikeForStatement
+  |      |----VarDeclByExpr
+  |      |      |----IntType
+  |      |      |      |----299
+  |      |      |----Identifier
+  |      |      |      |----j
+  |      |      |----=
+  |      |      |----LogicalExpression
+  |      |      |      |----Factor
+  |      |      |      |      |----Integer
+  |      |      |      |      |----1
+  |      |----RelationalExpression
+  |      |      |----ArithmeticExpression
+  |      |      |      |----Item
+  |      |      |      |      |----Factor
+  |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |----j
+  |      |      |----<=
+  |      |      |----ArithmeticExpression
+  |      |      |      |----Item
+  |      |      |      |      |----Factor
+  |      |      |      |      |      |----Integer
+  |      |      |      |      |      |----2
+  |      |----AssignExpression
+  |      |      |----Identifier
+  |      |      |      |----j
+  |      |      |----=
+  |      |      |----ArithmeticExpression
+  |      |      |      |----ArithmeticExpression
+  |      |      |      |      |----Item
+  |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |      |----j
+  |      |      |      |----+
+  |      |      |      |----Item
+  |      |      |      |      |----Factor
+  |      |      |      |      |      |----Integer
+  |      |      |      |      |      |----1
+  |----PrintStatement
+  |      |----StringLiteral
+  |      |      |----cLike成功
+  ast-end
+  start executing
+  0
+  1
+  2
+  3
+  4
+  5
+  6
+  7
+  8
+  9
+  pyLike成功
+  1
+  2
+  cLike成功
+  finished
+  ```
+
+## 9.4 if语句
+
++ 测试文件
+
+  ```c++
+  int i = 1;
+  int j = 2;
+  int ans;
+  if (i <= j) {
+      ans = 1;
+  } else {
+      ans = 2;
+  }
+  if (ans == 1) {
+      i = 1;
+      print("if语句测试通过");
+  }
+  ```
+
++ 结果展示
+  ```
+  $ ./myPL ../examples/test_if.qwq -t
+  grammaAnalyze success
+  ast:
+  Program
+  |----VarDeclAssignStmt
+  |      |----VarDeclByExpr
+  |      |      |----IntType
+  |      |      |      |----299
+  |      |      |----Identifier
+  |      |      |      |----i
+  |      |      |----=
+  |      |      |----LogicalExpression
+  |      |      |      |----Factor
+  |      |      |      |      |----Integer
+  |      |      |      |      |----1
+  |----VarDeclAssignStmt
+  |      |----VarDeclByExpr
+  |      |      |----IntType
+  |      |      |      |----299
+  |      |      |----Identifier
+  |      |      |      |----j
+  |      |      |----=
+  |      |      |----LogicalExpression
+  |      |      |      |----Factor
+  |      |      |      |      |----Integer
+  |      |      |      |      |----2
+  |----VarDeclAssignStmt
+  |      |----VariableDeclaration
+  |      |      |----IntType
+  |      |      |      |----299
+  |      |      |----Identifier
+  |      |      |      |----ans
+  |----IfStatement
+  |      |----RelationalExpression
+  |      |      |----ArithmeticExpression
+  |      |      |      |----Item
+  |      |      |      |      |----Factor
+  |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |----i
+  |      |      |----<=
+  |      |      |----ArithmeticExpression
+  |      |      |      |----Item
+  |      |      |      |      |----Factor
+  |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |----j
+  |      |----Block
+  |      |      |----ExpressionStatement
+  |      |      |      |----AssignExpression
+  |      |      |      |      |----Identifier
+  |      |      |      |      |      |----ans
+  |      |      |      |      |----=
+  |      |      |      |      |----LogicalExpression
+  |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |----Integer
+  |      |      |      |      |      |      |----1
+  |      |----Block
+  |      |      |----ExpressionStatement
+  |      |      |      |----AssignExpression
+  |      |      |      |      |----Identifier
+  |      |      |      |      |      |----ans
+  |      |      |      |      |----=
+  |      |      |      |      |----LogicalExpression
+  |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |----Integer
+  |      |      |      |      |      |      |----2
+  |----IfStatement
+  |      |----RelationalExpression
+  |      |      |----ArithmeticExpression
+  |      |      |      |----Item
+  |      |      |      |      |----Factor
+  |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |----ans
+  |      |      |----==
+  |      |      |----ArithmeticExpression
+  |      |      |      |----Item
+  |      |      |      |      |----Factor
+  |      |      |      |      |      |----Integer
+  |      |      |      |      |      |----1
+  |      |----Block
+  |      |      |----ExpressionStatement
+  |      |      |      |----AssignExpression
+  |      |      |      |      |----Identifier
+  |      |      |      |      |      |----i
+  |      |      |      |      |----=
+  |      |      |      |      |----LogicalExpression
+  |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |----Integer
+  |      |      |      |      |      |      |----1
+  |      |      |----PrintStatement
+  |      |      |      |----StringLiteral
+  |      |      |      |      |----if语句测试通过
+  ast-end
+  start executing
+  if语句测试通过
+  finished
+  ```
+
+## 9.5 字符串
+
++ 测试文件
+
+  ```c++
+  string s = "abcdefghijk";
+  string ss = s.substr(1, 3);
+  string c = "aaa" + "bbb";
+  string d = "how are you?";
+  string dt = d.title;
+  string du = d.uppercase;
+  string dl = d.lowercase;
+  string dr = d.reverse;
+  
+  print(s);
+  print(ss);
+  print(c);
+  print(d);
+  print(dt);
+  print(du);
+  print(dl);
+  print(dr);
+  ```
+
++ 结果展示
+  ```
+  $ ./myPL ../examples/test_string.qwq -t
+  grammaAnalyze success
+  ast:
+  Program
+  |----VarDeclAssignStmt
+  |      |----VarDeclByExpr
+  |      |      |----StringType
+  |      |      |      |----303
+  |      |      |----Identifier
+  |      |      |      |----s
+  |      |      |----=
+  |      |      |----StringLiteral
+  |      |      |      |----abcdefghijk
+  |----VarDeclAssignStmt
+  |      |----VarDeclByExpr
+  |      |      |----StringType
+  |      |      |      |----303
+  |      |      |----Identifier
+  |      |      |      |----ss
+  |      |      |----=
+  |      |      |----StringOperation
+  |      |      |      |----StringIdentifier
+  |      |      |      |      |----Identifier
+  |      |      |      |      |      |----s
+  |      |      |      |----.substr
+  |      |      |      |----leftRange:
+  |      |      |      |      |----LogicalExpression
+  |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |----Integer
+  |      |      |      |      |      |      |----1
+  |      |      |      |----rightRange:
+  |      |      |      |      |----LogicalExpression
+  |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |----Integer
+  |      |      |      |      |      |      |----3
+  |----VarDeclAssignStmt
+  |      |----VarDeclByExpr
+  |      |      |----StringType
+  |      |      |      |----303
+  |      |      |----Identifier
+  |      |      |      |----c
+  |      |      |----=
+  |      |      |----StringOperation
+  |      |      |      |----StringLiteral
+  |      |      |      |      |----aaa
+  |      |      |      |----+
+  |      |      |      |----StringLiteral
+  |      |      |      |      |----bbb
+  |----VarDeclAssignStmt
+  |      |----VarDeclByExpr
+  |      |      |----StringType
+  |      |      |      |----303
+  |      |      |----Identifier
+  |      |      |      |----d
+  |      |      |----=
+  |      |      |----StringLiteral
+  |      |      |      |----how are you?
+  |----VarDeclAssignStmt
+  |      |----VarDeclByExpr
+  |      |      |----StringType
+  |      |      |      |----303
+  |      |      |----Identifier
+  |      |      |      |----dt
+  |      |      |----=
+  |      |      |----StringOperation
+  |      |      |      |----StringIdentifier
+  |      |      |      |      |----Identifier
+  |      |      |      |      |      |----d
+  |      |      |      |----.Title
+  |----VarDeclAssignStmt
+  |      |----VarDeclByExpr
+  |      |      |----StringType
+  |      |      |      |----303
+  |      |      |----Identifier
+  |      |      |      |----du
+  |      |      |----=
+  |      |      |----StringOperation
+  |      |      |      |----StringIdentifier
+  |      |      |      |      |----Identifier
+  |      |      |      |      |      |----d
+  |      |      |      |----.toUpper
+  |----VarDeclAssignStmt
+  |      |----VarDeclByExpr
+  |      |      |----StringType
+  |      |      |      |----303
+  |      |      |----Identifier
+  |      |      |      |----dl
+  |      |      |----=
+  |      |      |----StringOperation
+  |      |      |      |----StringIdentifier
+  |      |      |      |      |----Identifier
+  |      |      |      |      |      |----d
+  |      |      |      |----.toLower
+  |----VarDeclAssignStmt
+  |      |----VarDeclByExpr
+  |      |      |----StringType
+  |      |      |      |----303
+  |      |      |----Identifier
+  |      |      |      |----dr
+  |      |      |----=
+  |      |      |----StringOperation
+  |      |      |      |----StringIdentifier
+  |      |      |      |      |----Identifier
+  |      |      |      |      |      |----d
+  |      |      |      |----.reverse
+  |----PrintStatement
+  |      |----LogicalExpression
+  |      |      |----Factor
+  |      |      |      |----Identifier
+  |      |      |      |      |----s
+  |----PrintStatement
+  |      |----LogicalExpression
+  |      |      |----Factor
+  |      |      |      |----Identifier
+  |      |      |      |      |----ss
+  |----PrintStatement
+  |      |----LogicalExpression
+  |      |      |----Factor
+  |      |      |      |----Identifier
+  |      |      |      |      |----c
+  |----PrintStatement
+  |      |----LogicalExpression
+  |      |      |----Factor
+  |      |      |      |----Identifier
+  |      |      |      |      |----d
+  |----PrintStatement
+  |      |----LogicalExpression
+  |      |      |----Factor
+  |      |      |      |----Identifier
+  |      |      |      |      |----dt
+  |----PrintStatement
+  |      |----LogicalExpression
+  |      |      |----Factor
+  |      |      |      |----Identifier
+  |      |      |      |      |----du
+  |----PrintStatement
+  |      |----LogicalExpression
+  |      |      |----Factor
+  |      |      |      |----Identifier
+  |      |      |      |      |----dl
+  |----PrintStatement
+  |      |----LogicalExpression
+  |      |      |----Factor
+  |      |      |      |----Identifier
+  |      |      |      |      |----dr
+  ast-end
+  start executing
+  abcdefghijk
+  bc
+  aaabbb
+  how are you?
+  How Are You?
+  HOW ARE YOU?
+  how are you?
+  ?uoy era woh
+  finished
+  ```
+
+## 9.6 While语句
+
++ 测试文件
+
+  ```c++
+  int i = 1;
+  int ans = 0;
+  while (i <= 5) {
+      i = i + 1;
+      print(i);
+  }
+  
+  ans = ans + 1;
+  
+  while (i <= 10) {
+      if (i == 8) {
+          break;
+      }
+      i = i + 1;
+      print(i);
+  }
+  
+  if (i == 8) {
+      ans = ans + 1;
+  }
+  
+  int j = 1;
+  while (i <= 10) {
+      if (j < i) {
+          j = j + 1;
+          continue;
+      }
+      break;
+      
+  }
+  
+  if (j == 8) {
+      ans = ans + 1;
+  }
+  
+  print("i = ");
+  print(i);
+  print("j = ");
+  print(j);
+  print("ans = ");
+  print(ans);
+  print("end");
+  ```
+
++ 结果展示
+  ```
+  $ ./myPL ../examples/test_while.qwq -t
+  grammaAnalyze success
+  ast:
+  Program
+  |----VarDeclAssignStmt
+  |      |----VarDeclByExpr
+  |      |      |----IntType
+  |      |      |      |----299
+  |      |      |----Identifier
+  |      |      |      |----i
+  |      |      |----=
+  |      |      |----LogicalExpression
+  |      |      |      |----Factor
+  |      |      |      |      |----Integer
+  |      |      |      |      |----1
+  |----VarDeclAssignStmt
+  |      |----VarDeclByExpr
+  |      |      |----IntType
+  |      |      |      |----299
+  |      |      |----Identifier
+  |      |      |      |----ans
+  |      |      |----=
+  |      |      |----LogicalExpression
+  |      |      |      |----Factor
+  |      |      |      |      |----Integer
+  |      |      |      |      |----0
+  |----WhileStatement
+  |      |----RelationalExpression
+  |      |      |----ArithmeticExpression
+  |      |      |      |----Item
+  |      |      |      |      |----Factor
+  |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |----i
+  |      |      |----<=
+  |      |      |----ArithmeticExpression
+  |      |      |      |----Item
+  |      |      |      |      |----Factor
+  |      |      |      |      |      |----Integer
+  |      |      |      |      |      |----5
+  |      |----Block
+  |      |      |----ExpressionStatement
+  |      |      |      |----AssignExpression
+  |      |      |      |      |----Identifier
+  |      |      |      |      |      |----i
+  |      |      |      |      |----=
+  |      |      |      |      |----ArithmeticExpression
+  |      |      |      |      |      |----ArithmeticExpression
+  |      |      |      |      |      |      |----Item
+  |      |      |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |      |      |      |----i
+  |      |      |      |      |      |----+
+  |      |      |      |      |      |----Item
+  |      |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |      |----Integer
+  |      |      |      |      |      |      |      |----1
+  |      |      |----PrintStatement
+  |      |      |      |----LogicalExpression
+  |      |      |      |      |----Factor
+  |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |----i
+  |----ExpressionStatement
+  |      |----AssignExpression
+  |      |      |----Identifier
+  |      |      |      |----ans
+  |      |      |----=
+  |      |      |----ArithmeticExpression
+  |      |      |      |----ArithmeticExpression
+  |      |      |      |      |----Item
+  |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |      |----ans
+  |      |      |      |----+
+  |      |      |      |----Item
+  |      |      |      |      |----Factor
+  |      |      |      |      |      |----Integer
+  |      |      |      |      |      |----1
+  |----WhileStatement
+  |      |----RelationalExpression
+  |      |      |----ArithmeticExpression
+  |      |      |      |----Item
+  |      |      |      |      |----Factor
+  |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |----i
+  |      |      |----<=
+  |      |      |----ArithmeticExpression
+  |      |      |      |----Item
+  |      |      |      |      |----Factor
+  |      |      |      |      |      |----Integer
+  |      |      |      |      |      |----10
+  |      |----Block
+  |      |      |----IfStatement
+  |      |      |      |----RelationalExpression
+  |      |      |      |      |----ArithmeticExpression
+  |      |      |      |      |      |----Item
+  |      |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |      |      |----i
+  |      |      |      |      |----==
+  |      |      |      |      |----ArithmeticExpression
+  |      |      |      |      |      |----Item
+  |      |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |      |----Integer
+  |      |      |      |      |      |      |      |----8
+  |      |      |      |----Block
+  |      |      |      |      |----JumpStatement
+  |      |      |----ExpressionStatement
+  |      |      |      |----AssignExpression
+  |      |      |      |      |----Identifier
+  |      |      |      |      |      |----i
+  |      |      |      |      |----=
+  |      |      |      |      |----ArithmeticExpression
+  |      |      |      |      |      |----ArithmeticExpression
+  |      |      |      |      |      |      |----Item
+  |      |      |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |      |      |      |----i
+  |      |      |      |      |      |----+
+  |      |      |      |      |      |----Item
+  |      |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |      |----Integer
+  |      |      |      |      |      |      |      |----1
+  |      |      |----PrintStatement
+  |      |      |      |----LogicalExpression
+  |      |      |      |      |----Factor
+  |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |----i
+  |----IfStatement
+  |      |----RelationalExpression
+  |      |      |----ArithmeticExpression
+  |      |      |      |----Item
+  |      |      |      |      |----Factor
+  |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |----i
+  |      |      |----==
+  |      |      |----ArithmeticExpression
+  |      |      |      |----Item
+  |      |      |      |      |----Factor
+  |      |      |      |      |      |----Integer
+  |      |      |      |      |      |----8
+  |      |----Block
+  |      |      |----ExpressionStatement
+  |      |      |      |----AssignExpression
+  |      |      |      |      |----Identifier
+  |      |      |      |      |      |----ans
+  |      |      |      |      |----=
+  |      |      |      |      |----ArithmeticExpression
+  |      |      |      |      |      |----ArithmeticExpression
+  |      |      |      |      |      |      |----Item
+  |      |      |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |      |      |      |----ans
+  |      |      |      |      |      |----+
+  |      |      |      |      |      |----Item
+  |      |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |      |----Integer
+  |      |      |      |      |      |      |      |----1
+  |----VarDeclAssignStmt
+  |      |----VarDeclByExpr
+  |      |      |----IntType
+  |      |      |      |----299
+  |      |      |----Identifier
+  |      |      |      |----j
+  |      |      |----=
+  |      |      |----LogicalExpression
+  |      |      |      |----Factor
+  |      |      |      |      |----Integer
+  |      |      |      |      |----1
+  |----WhileStatement
+  |      |----RelationalExpression
+  |      |      |----ArithmeticExpression
+  |      |      |      |----Item
+  |      |      |      |      |----Factor
+  |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |----i
+  |      |      |----<=
+  |      |      |----ArithmeticExpression
+  |      |      |      |----Item
+  |      |      |      |      |----Factor
+  |      |      |      |      |      |----Integer
+  |      |      |      |      |      |----10
+  |      |----Block
+  |      |      |----IfStatement
+  |      |      |      |----RelationalExpression
+  |      |      |      |      |----ArithmeticExpression
+  |      |      |      |      |      |----Item
+  |      |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |      |      |----j
+  |      |      |      |      |----<
+  |      |      |      |      |----ArithmeticExpression
+  |      |      |      |      |      |----Item
+  |      |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |      |      |----i
+  |      |      |      |----Block
+  |      |      |      |      |----ExpressionStatement
+  |      |      |      |      |      |----AssignExpression
+  |      |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |      |----j
+  |      |      |      |      |      |      |----=
+  |      |      |      |      |      |      |----ArithmeticExpression
+  |      |      |      |      |      |      |      |----ArithmeticExpression
+  |      |      |      |      |      |      |      |      |----Item
+  |      |      |      |      |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |      |      |      |      |      |----j
+  |      |      |      |      |      |      |      |----+
+  |      |      |      |      |      |      |      |----Item
+  |      |      |      |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |      |      |      |----Integer
+  |      |      |      |      |      |      |      |      |      |----1
+  |      |      |      |      |----JumpStatement
+  |      |      |----JumpStatement
+  |----IfStatement
+  |      |----RelationalExpression
+  |      |      |----ArithmeticExpression
+  |      |      |      |----Item
+  |      |      |      |      |----Factor
+  |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |----j
+  |      |      |----==
+  |      |      |----ArithmeticExpression
+  |      |      |      |----Item
+  |      |      |      |      |----Factor
+  |      |      |      |      |      |----Integer
+  |      |      |      |      |      |----8
+  |      |----Block
+  |      |      |----ExpressionStatement
+  |      |      |      |----AssignExpression
+  |      |      |      |      |----Identifier
+  |      |      |      |      |      |----ans
+  |      |      |      |      |----=
+  |      |      |      |      |----ArithmeticExpression
+  |      |      |      |      |      |----ArithmeticExpression
+  |      |      |      |      |      |      |----Item
+  |      |      |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |      |      |      |----ans
+  |      |      |      |      |      |----+
+  |      |      |      |      |      |----Item
+  |      |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |      |----Integer
+  |      |      |      |      |      |      |      |----1
+  |----PrintStatement
+  |      |----StringLiteral
+  |      |      |----i = 
+  |----PrintStatement
+  |      |----LogicalExpression
+  |      |      |----Factor
+  |      |      |      |----Identifier
+  |      |      |      |      |----i
+  |----PrintStatement
+  |      |----StringLiteral
+  |      |      |----j = 
+  |----PrintStatement
+  |      |----LogicalExpression
+  |      |      |----Factor
+  |      |      |      |----Identifier
+  |      |      |      |      |----j
+  |----PrintStatement
+  |      |----StringLiteral
+  |      |      |----ans = 
+  |----PrintStatement
+  |      |----LogicalExpression
+  |      |      |----Factor
+  |      |      |      |----Identifier
+  |      |      |      |      |----ans
+  |----PrintStatement
+  |      |----StringLiteral
+  |      |      |----end
+  ast-end
+  start executing
+  2
+  3
+  4
+  5
+  6
+  7
+  8
+  i = 
+  8
+  j = 
+  8
+  ans = 
+  3
+  end
+  finished
+  ```
+
+## 9.7 数组的声明调用
+
+仅展示二维数组。
+
++ 测试文件
+
+  ```c++
+  array<array<int, 4>, 4> a;
+  int num = 0;
+  for (int i = 0; i < 4; i = i + 1) {
+      for (int j = 0; j < 4; j = j + 1) {
+          a[i][j] = num;
+          num = num + 1;
+      }
+  }
+  
+  print(a);
+  array<int, 4> b = a[1];
+  print(b);
+  b = a[2];
+  print(b);
+  a[1] = b;
+  a[2] = a[0];
+  print(a);
+  print(a[3]);
+  ```
+
++ 结果展示
+  ```
+  $ ./myPL ../examples/test_array_2d.qwq -t
+  grammaAnalyze success
+  ast:
+  Program
+  |----VarDeclAssignStmt
+  |      |----VariableDeclaration
+  |      |      |----ArrayType
+  |      |      |      |----elementType
+  |      |      |      |      |----ArrayType
+  |      |      |      |      |      |----elementType
+  |      |      |      |      |      |      |----IntType
+  |      |      |      |      |      |      |      |----299
+  |      |      |      |      |      |----capacity
+  |      |      |      |      |      |      |----4
+  |      |      |      |----capacity
+  |      |      |      |      |----4
+  |      |      |----Identifier
+  |      |      |      |----a
+  |----VarDeclAssignStmt
+  |      |----VarDeclByExpr
+  |      |      |----IntType
+  |      |      |      |----299
+  |      |      |----Identifier
+  |      |      |      |----num
+  |      |      |----=
+  |      |      |----LogicalExpression
+  |      |      |      |----Factor
+  |      |      |      |      |----Integer
+  |      |      |      |      |----0
+  |----CLikeForStatement
+  |      |----VarDeclByExpr
+  |      |      |----IntType
+  |      |      |      |----299
+  |      |      |----Identifier
+  |      |      |      |----i
+  |      |      |----=
+  |      |      |----LogicalExpression
+  |      |      |      |----Factor
+  |      |      |      |      |----Integer
+  |      |      |      |      |----0
+  |      |----RelationalExpression
+  |      |      |----ArithmeticExpression
+  |      |      |      |----Item
+  |      |      |      |      |----Factor
+  |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |----i
+  |      |      |----<
+  |      |      |----ArithmeticExpression
+  |      |      |      |----Item
+  |      |      |      |      |----Factor
+  |      |      |      |      |      |----Integer
+  |      |      |      |      |      |----4
+  |      |----AssignExpression
+  |      |      |----Identifier
+  |      |      |      |----i
+  |      |      |----=
+  |      |      |----ArithmeticExpression
+  |      |      |      |----ArithmeticExpression
+  |      |      |      |      |----Item
+  |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |      |----i
+  |      |      |      |----+
+  |      |      |      |----Item
+  |      |      |      |      |----Factor
+  |      |      |      |      |      |----Integer
+  |      |      |      |      |      |----1
+  |----PrintStatement
+  |      |----LogicalExpression
+  |      |      |----Factor
+  |      |      |      |----Identifier
+  |      |      |      |      |----a
+  |----VarDeclAssignStmt
+  |      |----VarDeclByExpr
+  |      |      |----ArrayType
+  |      |      |      |----elementType
+  |      |      |      |      |----IntType
+  |      |      |      |      |      |----299
+  |      |      |      |----capacity
+  |      |      |      |      |----4
+  |      |      |----Identifier
+  |      |      |      |----b
+  |      |      |----=
+  |      |      |----LogicalExpression
+  |      |      |      |----Factor
+  |      |      |      |      |----ArrayAccess
+  |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |----a
+  |      |      |      |      |      |----LogicalExpression
+  |      |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |      |----Integer
+  |      |      |      |      |      |      |      |----1
+  |----PrintStatement
+  |      |----LogicalExpression
+  |      |      |----Factor
+  |      |      |      |----Identifier
+  |      |      |      |      |----b
+  |----ExpressionStatement
+  |      |----AssignExpression
+  |      |      |----Identifier
+  |      |      |      |----b
+  |      |      |----=
+  |      |      |----LogicalExpression
+  |      |      |      |----Factor
+  |      |      |      |      |----ArrayAccess
+  |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |----a
+  |      |      |      |      |      |----LogicalExpression
+  |      |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |      |----Integer
+  |      |      |      |      |      |      |      |----2
+  |----PrintStatement
+  |      |----LogicalExpression
+  |      |      |----Factor
+  |      |      |      |----Identifier
+  |      |      |      |      |----b
+  |----ExpressionStatement
+  |      |----AssignExpression
+  |      |      |----ArrayAccess
+  |      |      |      |----Identifier
+  |      |      |      |      |----a
+  |      |      |      |----LogicalExpression
+  |      |      |      |      |----Factor
+  |      |      |      |      |      |----Integer
+  |      |      |      |      |      |----1
+  |      |      |----=
+  |      |      |----LogicalExpression
+  |      |      |      |----Factor
+  |      |      |      |      |----Identifier
+  |      |      |      |      |      |----b
+  |----ExpressionStatement
+  |      |----AssignExpression
+  |      |      |----ArrayAccess
+  |      |      |      |----Identifier
+  |      |      |      |      |----a
+  |      |      |      |----LogicalExpression
+  |      |      |      |      |----Factor
+  |      |      |      |      |      |----Integer
+  |      |      |      |      |      |----2
+  |      |      |----=
+  |      |      |----LogicalExpression
+  |      |      |      |----Factor
+  |      |      |      |      |----ArrayAccess
+  |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |----a
+  |      |      |      |      |      |----LogicalExpression
+  |      |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |      |----Integer
+  |      |      |      |      |      |      |      |----0
+  |----PrintStatement
+  |      |----LogicalExpression
+  |      |      |----Factor
+  |      |      |      |----Identifier
+  |      |      |      |      |----a
+  |----PrintStatement
+  |      |----LogicalExpression
+  |      |      |----Factor
+  |      |      |      |----ArrayAccess
+  |      |      |      |      |----Identifier
+  |      |      |      |      |      |----a
+  |      |      |      |      |----LogicalExpression
+  |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |----Integer
+  |      |      |      |      |      |      |----3
+  ast-end
+  start executing
+  0  1  2  3  4  5  6  7  8  9  10  11  12  13  14  15  
+  4  5  6  7  
+  8  9  10  11  
+  0  1  2  3  8  9  10  11  0  1  2  3  12  13  14  15  
+  12  13  14  15  
+  finished
+  ```
+
+## 9.8 函数声明及调用
+
++ 测试文件
+
+  ```c++
+  def fun(int i, int j, int k) -> int {
+      int num = i + j;
+      return num;
+  }
+  
+  def func2(int i) -> int {
+      return i + 3;
+  }
+  
+  int a = 33;
+  int b = 22;
+  int c = 11;
+  int num = fun(a, b, c);
+  
+  print(num);
+  ```
+
++ 结果展示
+  ```
+  $ ./myPL ../examples/test_func2.qwq -t
+  grammaAnalyze success
+  ast:
+  Program
+  |----FunctionDeclaration
+  |      |----FunctionHead
+  |      |      |----Identifier
+  |      |      |      |----fun
+  |      |      |----VariableDeclaration
+  |      |      |      |----IntType
+  |      |      |      |      |----299
+  |      |      |      |----Identifier
+  |      |      |      |      |----i
+  |      |      |----VariableDeclaration
+  |      |      |      |----IntType
+  |      |      |      |      |----299
+  |      |      |      |----Identifier
+  |      |      |      |      |----j
+  |      |      |----VariableDeclaration
+  |      |      |      |----IntType
+  |      |      |      |      |----299
+  |      |      |      |----Identifier
+  |      |      |      |      |----k
+  |      |      |----IntType
+  |      |      |      |----299
+  |      |----Block
+  |      |      |----VarDeclAssignStmt
+  |      |      |      |----VarDeclByExpr
+  |      |      |      |      |----IntType
+  |      |      |      |      |      |----299
+  |      |      |      |      |----Identifier
+  |      |      |      |      |      |----num
+  |      |      |      |      |----=
+  |      |      |      |      |----ArithmeticExpression
+  |      |      |      |      |      |----ArithmeticExpression
+  |      |      |      |      |      |      |----Item
+  |      |      |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |      |      |      |----i
+  |      |      |      |      |      |----+
+  |      |      |      |      |      |----Item
+  |      |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |      |      |----j
+  |      |      |----ReturnStatement
+  |      |      |      |----LogicalExpression
+  |      |      |      |      |----Factor
+  |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |----num
+  |----FunctionDeclaration
+  |      |----FunctionHead
+  |      |      |----Identifier
+  |      |      |      |----func2
+  |      |      |----VariableDeclaration
+  |      |      |      |----IntType
+  |      |      |      |      |----299
+  |      |      |      |----Identifier
+  |      |      |      |      |----i
+  |      |      |----IntType
+  |      |      |      |----299
+  |      |----Block
+  |      |      |----ReturnStatement
+  |      |      |      |----ArithmeticExpression
+  |      |      |      |      |----ArithmeticExpression
+  |      |      |      |      |      |----Item
+  |      |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |      |      |----i
+  |      |      |      |      |----+
+  |      |      |      |      |----Item
+  |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |----Integer
+  |      |      |      |      |      |      |----3
+  |----VarDeclAssignStmt
+  |      |----VarDeclByExpr
+  |      |      |----IntType
+  |      |      |      |----299
+  |      |      |----Identifier
+  |      |      |      |----a
+  |      |      |----=
+  |      |      |----LogicalExpression
+  |      |      |      |----Factor
+  |      |      |      |      |----Integer
+  |      |      |      |      |----33
+  |----VarDeclAssignStmt
+  |      |----VarDeclByExpr
+  |      |      |----IntType
+  |      |      |      |----299
+  |      |      |----Identifier
+  |      |      |      |----b
+  |      |      |----=
+  |      |      |----LogicalExpression
+  |      |      |      |----Factor
+  |      |      |      |      |----Integer
+  |      |      |      |      |----22
+  |----VarDeclAssignStmt
+  |      |----VarDeclByExpr
+  |      |      |----IntType
+  |      |      |      |----299
+  |      |      |----Identifier
+  |      |      |      |----c
+  |      |      |----=
+  |      |      |----LogicalExpression
+  |      |      |      |----Factor
+  |      |      |      |      |----Integer
+  |      |      |      |      |----11
+  |----VarDeclAssignStmt
+  |      |----VarDeclByExpr
+  |      |      |----IntType
+  |      |      |      |----299
+  |      |      |----Identifier
+  |      |      |      |----num
+  |      |      |----=
+  |      |      |----LogicalExpression
+  |      |      |      |----Factor
+  |      |      |      |      |----FunctionCall
+  |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |----fun
+  |      |      |      |      |      |----arguments
+  |      |      |      |      |      |      |----LogicalExpression
+  |      |      |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |      |      |      |----a
+  |      |      |      |      |      |      |----LogicalExpression
+  |      |      |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |      |      |      |----b
+  |      |      |      |      |      |      |----LogicalExpression
+  |      |      |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |      |      |      |----c
+  |----PrintStatement
+  |      |----LogicalExpression
+  |      |      |----Factor
+  |      |      |      |----Identifier
+  |      |      |      |      |----num
+  ast-end
+  start executing
+  55
+  finished
+  ```
+
+  
 
 
 
