@@ -51,7 +51,7 @@ int main(int argc, char** argv) {
     // 如果输入了-t参数，需要输出语法树
     if (printTree) {
         std::cout << "ast:" << std::endl;
-        programBlock->printAst(1);
+        programBlock->printAst(0);
         std::cout << "ast-end" << std::endl;
     }
     std::cout << "start executing" << std::endl;
