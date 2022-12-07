@@ -867,31 +867,6 @@ evaluate [template<typename T>I(AP)] env =
 	func arg
 ```
 
-### 3.4.7 类
-
-#### 3.4.7.1 语法定义
-
-```java
-# 类声明（注意模板）
-class-declaration ::= <class-head> <class-body>
-class-head ::= ['template' '<' 'typename' <identifier> '>'] 'class' <identifier> ['extends' <identifier>]
-class-body ::= '{' {public-block} {protected-block} {private-block} '}' ';'
-public-block ::= 'public:' <class-statement-list>
-protected-block ::= 'protected:' <class-statement-list>
-private-block ::= 'private:' <class-statement-list>
-class-statement-list ::= {<function-declaration> | <variable-declaration>}
-```
-#### 3.4.7.2 辅助函数
-
-#### 3.4.7.3 辅助函数的形式化定义
-
-```java
-```
-#### 3.4.7.4 指称语义
-
-```java
-```
-
 # 4 词法分析器设计
 
 ​		我们的词法分析采用flex完成，在github仓库中的qwq.l文件中。词法分析器的主要功能是将程序文本中的词识别分类后以token的形式传递给语法分析器，token的定义在下面进行展示。
