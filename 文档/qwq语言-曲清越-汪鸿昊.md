@@ -252,7 +252,7 @@ assign-expression ::= <identifier> {'[' <expression> ']'} '=' <expression>;
 ### 2.2.6.2 字符串表达式
 
 &emsp;&emsp;本语言将字符串作为一种基本类型，并为string类型内置了一些基本操作：  
-（1）使用substr返回子字符串；
+（1）使用substr返回子字符串；  
 （2）使用reverse倒置字符串；  
 （3）使用title将字符串中每个单词的首字母大写；  
 （4）使用uppercase将字符串中的所有字母大写；  
@@ -894,7 +894,7 @@ class-statement-list ::= {<function-declaration> | <variable-declaration>}
 
 # 4 词法分析器设计
 
-​		我们的词法分析采用flex完成，再github仓库中的qwq.l文件中。词法分析器的主要功能是将程序文本中的词识别分类后以token的形式传递给语法分析器，token的定义在下面进行展示。
+​		我们的词法分析采用flex完成，在github仓库中的qwq.l文件中。词法分析器的主要功能是将程序文本中的词识别分类后以token的形式传递给语法分析器，token的定义在下面进行展示。
 
 ## 4.1 yylval类型定义（qwq.yy）
 
@@ -1099,10 +1099,84 @@ class-statement-list ::= {<function-declaration> | <variable-declaration>}
 ```
 
 # 6 抽象语法树节点设计
+## 6.1 语法树节点示意图
+
+![avatar](节点示意图.png)
+
+## 6.2 语法树节点说明
+
+如图所示，AstNode为所有节点的根节点，所有节点都继承于AstNode。
+
+剩余的节点可分为4大类：
++ ProgramBlock
+
+ 抽象语法树的开始节点，用于保存程序中的所有语句。
+
++ Type
+
+ 表示语言中的的基本类型，包括boolean、char、int、double、array、class、string。
+
++ Statement
+
+ 包括语言中所有的合法语句，分为类声明、函数声明、普通语句。普通语句包括循环语句、返回语句、表达式语句、跳转语句、打印语句。
+
++ Expression
+
+ 包括语言中支持的所有表达式，分为标识符、数组访问、因子、项、算术表达式、逻辑表达式、切片表达式、赋值表达式、函数调用、关系表达式、语句块、字符串表达式、变量声明、变量声明并定义。
 
 
 
 # 7 解释器设计
+## 7.1 解释器架构
+qwq语言的解释器架构参考eDraw语言。关于解释器的详细代码，见每个类中的eval函数。
+
++ 符号表
+
+ 符号表分为变量符号表和函数符号表。函数符号表存放函数名和函数声明对象（即FunctionDeclaration节点对象）的映射关系，变量符号表存放变量名和变量对应值的映射关系。qwq语言存在函数调用、类、循环、判断语句，所以程序中允许存在多个作用域，每个作用域对应一个本作用域的变量符号表。
+
++ 程序分析
+
+ 每个节点类都有一个用来解释分析当前节点的成员函数（eval函数）。ProgramBlock为语言的开始节点，该节点存放了程序中的所有语句，执行programBlock->eval()后，开始执行成语，通过eval递归地分析执行每一条语句。
+
+## 7.2 部分重要功能实现
+因篇幅有限，在这里我们展示qwq语言的创新点。
+
+### 7.2.1 数组实现
+qwq语言将数组作为一种基本类型。在解释器的实现中，将一维数组和多维数组都视为一维数组，即数据存放于一个容器中，有一个list存放每一维的大小。数组类含有一个类型枚举变量，指明该数组存放的元素类型，在新建数组时，会根据数组的类型为对应的容器分配存储空间。
+```C++
+ArrayType type = ArrayType::NONE;
+std::vector<int> sizeList;  // 记录每一维的size
+std::vector<std::shared_ptr<int>> intData;
+std::vector<std::shared_ptr<double>> doubleData;
+std::vector<std::shared_ptr<std::string>> stringData;
+```
+
+#### 7.2.1.1 数组访问
+qwq语言支持多维数组，在访问数组时，若没有任何下标，则返回整个数组。若通过下标访问，则根据下标递归地取出每个子数组，最后得到想要的那个数组或者元素。例如，arr是一个array<array<int, 4>, 5>的二维数组，通过标识符arr访问，会得到整个数组；通过下标[1]访问，会得到一个类型为array<int, 4>的子数组；通过下标[1][3]访问，会先得到一个array<int, 4>的子数组，再从这个子数组中取出第3个元素。
+
+#### 7.2.1.2 数组赋值
++ 单个元素赋值
+
+ 通过上述数组访问的方法，可以得到对应单个元素的指针，修改指针存放的值即可。
+
++ 整体赋值
+
+ qwq语言支持数组整体赋值。2个数组之间可以整体赋值的条件是，它们存放元素的类型相同，元素个数相同。多维数组可以视为数组的数组，所以也可对多维数组中的子数组进行整体赋值。通过上述数组访问的方法，可以得到赋值运算符两端存有2个数组元素的对象，修改被赋值数组的值即可。
+
+#### 7.2.1.3 切片表达式
+qwq支持类似Python中的切片表达式。例如，我们通过a是一个int类型数组，通过a[2: 5]访问一个数组，首先解释器得到存放a数组元素的对象，然后取出第2-5个元素，返回一个存有这3个元素的数组对象。简单来说，它会返回一个array<int, 3>的新数组，该数组与其他声明的数组类型无异。
+
+### 7.2.2 字符串相关操作
+qwq语言将字符串视为基本类型，并提供了内置操作。解释器在实现时，根据操作类型的不同，分别对字符串的值进行处理。要注意的是，解释器进行操作后，会返回一个新的操作后的字符串，而不会改变原来的字符串。
+
+### 7.2.3 PyLikeFor循环
+qwq语言支持类似Python中的for循环，在其之上加以微小的改变，例如：
+```python
+for i in (1, 10) {
+    # 代码块
+}
+```
+这里无需指定i为int类型，也不需要前置声明，解释器会把循环控制变量定义为一个int型的变量，并赋予初值。每次循环结束之时，解释器自动为循环控制变量加1。
 
 
 
@@ -1157,12 +1231,7 @@ class-statement-list ::= {<function-declaration> | <variable-declaration>}
 
 + 结果展示
   ```
-  $ ./myPL ../examples/test_declaration.qwq 
-  grammaAnalyze success
-  start executing
-  变量声明测试通过
-  变量声明赋值测试通过
-  Segmentation fault
+  
   (base) whh@whh:~/workSpace/myPL/build$ ./myPL ../examples/test_declaration.qwq 
   grammaAnalyze success
   start executing
