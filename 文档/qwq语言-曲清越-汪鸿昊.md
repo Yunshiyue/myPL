@@ -368,7 +368,7 @@ factor ::= <identifier> | <identifier> { '[' <expression> ']' } | '(' <expressio
 ### 3.3.1 语义域定义
 
 + 先定义语言所有操作数的值构成的域，定义为Value，：
-	$Value = truth\_value\ Truth\_Value + integer\ Interger + float\ Float + double\ Real + char\ Char + string\_value\ String\_Value + array\_value\ Array\_Value$
+	$Value = truth\_value\ Truth\_Value + integer\ Interger + float\ Float + double\ Real + char\ Char + \\string\_value\ String\_Value + array\_value\ Array\_Value$
 	其中String_Value以及Array_Value都属于序列域，其定义如下，String的元素的值的类型只能为char，而Array的元素的值的类型为除了数组之外的所有元素的类型：
 	+ $String\_Value = Char\_Value^{*}$
 	+ $Array\_Value = (Value - Array\_Value)^{*}$（Value域中除了Array_Value的其它域构成的联合域）
