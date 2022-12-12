@@ -29,7 +29,7 @@ int main(int argc, char** argv) {
         yylex_destroy();
         return 1;
     }
-    std::cout << "grammaAnalyze success" << std::endl;
+    std::cout << "gramma analyze success" << std::endl;
     std::cout << "ast:" << std::endl;
     programBlock->printAst(1);
     std::cout << "ast-end" << std::endl;
