@@ -1,12 +1,13 @@
+[toc]
 # 1 设计背景和思路
 
 ## 1.1 背景
 
-​		随着信息技术的发展，计算机已成为人们学习和生活中不可缺少的一部分。在高等教育中，即使是非计算机专业，学校也往往会在前2学期为学生开设计算机相关的课程。课程内容一般为计算机的通识知识，后来为增加实用性，又出现了越来越多的课程开始教授编程语言，甚至部分非理工科专业也会在大学阶段修读关于编程语言的课程。
+&emsp;&emsp;随着信息技术的发展，计算机已成为人们学习和生活中不可缺少的一部分。在高等教育中，即使是非计算机专业，学校也往往会在前2学期为学生开设计算机相关的课程。课程内容一般为计算机的通识知识，后来为增加实用性，又出现了越来越多的课程开始教授编程语言，甚至部分非理工科专业也会在大学阶段修读关于编程语言的课程。
 
-​		现阶段，大学课堂上教授的最广泛的语言是C/C++、Java和Python，然而，这些语言都是应用广泛的商业型语言，语法规则、特性往往十分复杂、繁多。受限于课时数、语言的复杂程度等原因，学生并不可能在短短一学期的课程中掌握一门语言的全部内容，尤其对于非计算机专业的大部分学生，可能只能掌握语言的基本用法，无法理解更高级的特性。甚至面对规则、特性十分繁杂的语言，产生“被劝退”的副作用。
+&emsp;&emsp;现阶段，大学课堂上教授的最广泛的语言是C/C++、Java和Python，然而，这些语言都是应用广泛的商业型语言，语法规则、特性往往十分复杂、繁多。受限于课时数、语言的复杂程度等原因，学生并不可能在短短一学期的课程中掌握一门语言的全部内容，尤其对于非计算机专业的大部分学生，可能只能掌握语言的基本用法，无法理解更高级的特性。甚至面对规则、特性十分繁杂的语言，产生“被劝退”的副作用。
 
-​		所以，我们选择设计一门专门用于教学的编程语言，它集成了C++、Java和Python的最核心部分，去除了其中对于普通学生而言不常用的功能特性，让它作为一门教学语言，能达到“麻雀虽小五脏俱全”的效果。
+&emsp;&emsp;所以，我们选择设计一门专门用于教学的编程语言，它集成了C++、Java和Python的最核心部分，去除了其中对于普通学生而言不常用的功能特性，让它作为一门教学语言，能达到“麻雀虽小五脏俱全”的效果。
 
 ​		在详细阐述我们的语言的设计前，我们先从教学的角度分析C++、Java和Python的特点：
 
@@ -16,6 +17,8 @@
   Java抛弃了C++中一些使人容易犯错的用法，比如指针，从入手难度上看，比C++更加友好。但Java是一门纯面向对象语言，意味着任何事情都是对象，任何方法、变量均需在类里声明和定义。对于新手而言，理解面向对象的编程思想可能并不简单，容易在学习编程的初期产生很多困惑。
 + Python
   与C++和Java相比，Python的语法精简了很多，在很多操作上，也比C++和Java容易，比如列表可以进行切片操作、有乘方运算符“**”等。但Python作为一门解释型的动态类型语言，也存在一些缺点。比如，性能相对较差，语法混乱（不同版本之间的语法可能不兼容）等。
+
+整个项目开源于：[https://github.com/Yunshiyue/myPL](https://github.com/Yunshiyue/myPL)
 
 ## 1.2 设计思路
 
@@ -252,7 +255,7 @@ assign-expression ::= <identifier> {'[' <expression> ']'} '=' <expression>;
 ### 2.2.6.2 字符串表达式
 
 &emsp;&emsp;本语言将字符串作为一种基本类型，并为string类型内置了一些基本操作：  
-（1）使用substr返回子字符串；
+（1）使用substr返回子字符串；  
 （2）使用reverse倒置字符串；  
 （3）使用title将字符串中每个单词的首字母大写；  
 （4）使用uppercase将字符串中的所有字母大写；  
@@ -365,7 +368,7 @@ factor ::= <identifier> | <identifier> { '[' <expression> ']' } | '(' <expressio
 ### 3.3.1 语义域定义
 
 + 先定义语言所有操作数的值构成的域，定义为Value，：
-	$Value = truth\_value\ Truth\_Value + integer\ Interger + float\ Float + double\ Real + char\ Char + string\_value\ String\_Value + array\_value\ Array\_Value$
+	$Value = truth\_value\ Truth\_Value + integer\ Interger + float\ Float + double\ Real + char\ Char + \\string\_value\ String\_Value + array\_value\ Array\_Value$
 	其中String_Value以及Array_Value都属于序列域，其定义如下，String的元素的值的类型只能为char，而Array的元素的值的类型为除了数组之外的所有元素的类型：
 	+ $String\_Value = Char\_Value^{*}$
 	+ $Array\_Value = (Value - Array\_Value)^{*}$（Value域中除了Array_Value的其它域构成的联合域）
@@ -867,38 +870,44 @@ evaluate [template<typename T>I(AP)] env =
 	func arg
 ```
 
-### 3.4.7 类
+# 4 词法分析器设计
 
-#### 3.4.7.1 语法定义
-
-```java
-# 类声明（注意模板）
-class-declaration ::= <class-head> <class-body>
-class-head ::= ['template' '<' 'typename' <identifier> '>'] 'class' <identifier> ['extends' <identifier>]
-class-body ::= '{' {public-block} {protected-block} {private-block} '}' ';'
-public-block ::= 'public:' <class-statement-list>
-protected-block ::= 'protected:' <class-statement-list>
-private-block ::= 'private:' <class-statement-list>
-class-statement-list ::= {<function-declaration> | <variable-declaration>}
-```
-#### 3.4.7.2 辅助函数
-
-#### 3.4.7.3 辅助函数的形式化定义
-
-```java
-```
-#### 3.4.7.4 指称语义
-
-```java
-```
-
-# 4 词法分析设计
+​		我们的词法分析采用flex完成，在github仓库中的qwq.l文件中。词法分析器的主要功能是将程序文本中的词识别分类后以token的形式传递给语法分析器，token的定义在下面进行展示。
 
 ## 4.1 yylval类型定义（qwq.yy）
 
 ```c++
 %union {
     // TODO: 根据定义的节点class完善union
+    qwq::AstNode *astNode;
+    qwq::ClassDeclaration *cDeclare;
+    qwq::ClassHead *classHead;
+    qwq::CommonStatement *cStatement;
+    qwq::ForStatement *forStatement;
+    qwq::Expression *expr;
+    qwq::ArrayAccess *arrAcc;
+    qwq::RelationalExpression *relationExpr;
+    qwq::SliceExpression *sliceExpr;
+    qwq::FunctionCall *funcExpr;
+    qwq::AssignExpression *assignExpr;
+    qwq::FunctionDeclaration *fDeclare;
+    qwq::FunctionHead *fHead;
+    qwq::Literal *literal;
+    qwq::Statement *stmt;
+    qwq::StringExpression *sExpr;
+    qwq::Block *block;
+    qwq::Type *type;
+    qwq::Identifier *ident;
+    qwq::Item *item;
+    qwq::Factor *factor;
+    qwq::VariableDeclaration* varDecl;
+    qwq::VariableDeclarationAssign *varDeclAssign;
+    qwq::ArithmeticExpression *arithExpr;
+    qwq::LogicalExpression *logicalExpr;
+    qwq::VariableList *varList;
+    qwq::StatementList *stmtList;
+    qwq::ExpressionList *exprList;
+    qwq::ProgramBlock *allStmts;
     long long integer;
     double real;
     int boolean;
@@ -964,15 +973,16 @@ class-statement-list ::= {<function-declaration> | <variable-declaration>}
 | 'uppercase'                        | TUPS                 |
 | 'lowercase'                        | TLOWS                |
 
-+ 赋值符号=、各种括号、.、,、;没有对应的token
++ 注意：赋值符号=、各种括号、.、,、;没有对应的token
 
-# 5 语法分析设计
+# 5 语法分析器设计
 
-
+​		我们的语法分析器由bison生成，语法分析器的作用是使用词法分析器识别出来的token序列建立抽象语法树（ast），为下一步抽象语法树的解释运行奠定基础。下面介绍语法分析器中主要的部分。
 
 ## 5.1 终结符定义
 
 ```C++
+// 定义终结符
 %token <integer>    TINTEGER
 %token <real>       TREAL
 %token <boolean>    TBOOL
@@ -984,11 +994,13 @@ class-statement-list ::= {<function-declaration> | <variable-declaration>}
 %token <token>      TAND TOR TNOT
 // 比较运算符
 %token <token>      TEQ TNE TGE TLE TGT TLT
+// 其它运算符
+%token <token>      TARROW
 // 关键字
 // 条件语句
 %token <token>      TIF TELSE TELIF
 // 循环语句
-%token <token>      TFOR TWHILE
+%token <token>      TFOR TWHILE TIN
 // 类
 %token <token>      TTHIS TPUBLIC TPRIVATE TPROTECTED TEXTEND TCLASS
 // 函数
@@ -1001,13 +1013,58 @@ class-statement-list ::= {<function-declaration> | <variable-declaration>}
 %token <token>      TTEMP TTYNAME
 // 字符串操作
 %token <token>      TSUBS TREVS TTITLES TUPS TLOWS
+
+%token <token>      PRINT
 ```
 
 ## 5.2 非终结符定义
 
+```c++
+// 定义非终结符
+// TODO: 定义非终结符的类型
+%type <astNode> program
+%type <cDeclare> class-decl
+%type <classHead> class-head
+%type <cStatement> common-stmt if-stmt while-stmt jump-stmt for-stmt return-stmt expr-stmt var-decl-stmt print-stmt
+%type <forStatement> c-like-for py-like-for range-for
+%type <expr> expr
 
+%type <arrAcc> arr-access
+%type <relationExpr> relation-expr 
+%type <sliceExpr> slice-expr
+%type <funcExpr> func-expr
+%type <assignExpr> assign-expr
+
+%type <fDeclare> func-decl
+%type <fHead> func-head
+%type <literal> literal
+%type <stmt> stmt 
+%type <sExpr> str-expr str-operation
+%type <block> block
+%type <type> type val-type
+%type <ident> ident
+%type <item> item
+%type <factor> factor
+%type <varDecl> var-decl
+%type <varDeclAssign> var-decl-assign
+
+%type <arithExpr> arithmetic-expr
+%type <logicalExpr> logical-expr
+// 列表
+%type <varList> fp-list
+%type <stmtList> stmt-list
+%type <exprList> ap-list
+%type <allStmts> all-stmt-list
+// 操作符
+%type <token> addition-opt
+%type <token> multi-opt
+%type <token> relation-opt
+%type <token> logical-opt
+```
 
 ## 5.3 优先级以及结合性
+
+​		为了解决文法中存在的二义性问题，我们需要对各个token的优先级以及结合性进行定义。
 
 ```C++
 %right '='
@@ -1019,21 +1076,785 @@ class-statement-list ::= {<function-declaration> | <variable-declaration>}
 %nonassoc TSADD TSSUB
 ```
 
+# 6 抽象语法树节点设计
+## 6.1 语法树节点示意图
+
+![avatar](节点示意图.png)
+
+## 6.2 语法树节点说明
+
+如图所示，AstNode为所有节点的根节点，所有节点都继承于AstNode。
+
+剩余的节点可分为4大类：
++ ProgramBlock
+
+ 抽象语法树的开始节点，用于保存程序中的所有语句。
+
++ Type
+
+ 表示语言中的的基本类型，包括boolean、char、int、double、array、class、string。
+
++ Statement
+
+ 包括语言中所有的合法语句，分为类声明、函数声明、普通语句。普通语句包括循环语句、返回语句、表达式语句、跳转语句、打印语句。
+
++ Expression
+
+ 包括语言中支持的所有表达式，分为标识符、数组访问、因子、项、算术表达式、逻辑表达式、切片表达式、赋值表达式、函数调用、关系表达式、语句块、字符串表达式、变量声明、变量声明并定义。
 
 
 
+# 7 解释器设计
+## 7.1 解释器架构
+qwq语言的解释器架构参考eDraw语言。关于解释器的详细代码，见每个类中的eval函数。
+
++ 符号表
+
+ 符号表分为变量符号表和函数符号表。函数符号表存放函数名和函数声明对象（即FunctionDeclaration节点对象）的映射关系，变量符号表存放变量名和变量对应值的映射关系。qwq语言存在函数调用、类、循环、判断语句，所以程序中允许存在多个作用域，每个作用域对应一个本作用域的变量符号表。
+
++ 程序分析
+
+ 每个节点类都有一个用来解释分析当前节点的成员函数（eval函数）。ProgramBlock为语言的开始节点，该节点存放了程序中的所有语句，执行programBlock->eval()后，开始执行成语，通过eval递归地分析执行每一条语句。
+
+## 7.2 部分重要功能实现
+因篇幅有限，在这里我们展示qwq语言的创新点。
+
+### 7.2.1 数组实现
+qwq语言将数组作为一种基本类型。在解释器的实现中，将一维数组和多维数组都视为一维数组，即数据存放于一个容器中，有一个list存放每一维的大小。数组类含有一个类型枚举变量，指明该数组存放的元素类型，在新建数组时，会根据数组的类型为对应的容器分配存储空间。
+```C++
+ArrayType type = ArrayType::NONE;
+std::vector<int> sizeList;  // 记录每一维的size
+std::vector<std::shared_ptr<int>> intData;
+std::vector<std::shared_ptr<double>> doubleData;
+std::vector<std::shared_ptr<std::string>> stringData;
+```
+
+#### 7.2.1.1 数组访问
+qwq语言支持多维数组，在访问数组时，若没有任何下标，则返回整个数组。若通过下标访问，则根据下标递归地取出每个子数组，最后得到想要的那个数组或者元素。例如，arr是一个array<array<int, 4>, 5>的二维数组，通过标识符arr访问，会得到整个数组；通过下标[1]访问，会得到一个类型为array<int, 4>的子数组；通过下标[1][3]访问，会先得到一个array<int, 4>的子数组，再从这个子数组中取出第3个元素。
+
+#### 7.2.1.2 数组赋值
++ 单个元素赋值
+
+ 通过上述数组访问的方法，可以得到对应单个元素的指针，修改指针存放的值即可。
+
++ 整体赋值
+
+ qwq语言支持数组整体赋值。2个数组之间可以整体赋值的条件是，它们存放元素的类型相同，元素个数相同。多维数组可以视为数组的数组，所以也可对多维数组中的子数组进行整体赋值。通过上述数组访问的方法，可以得到赋值运算符两端存有2个数组元素的对象，修改被赋值数组的值即可。
+
+#### 7.2.1.3 切片表达式
+qwq支持类似Python中的切片表达式。例如，我们通过a是一个int类型数组，通过a[2: 5]访问一个数组，首先解释器得到存放a数组元素的对象，然后取出第2-5个元素，返回一个存有这3个元素的数组对象。简单来说，它会返回一个array<int, 3>的新数组，该数组与其他声明的数组类型无异。
+
+### 7.2.2 字符串相关操作
+qwq语言将字符串视为基本类型，并提供了内置操作。解释器在实现时，根据操作类型的不同，分别对字符串的值进行处理。要注意的是，解释器进行操作后，会返回一个新的操作后的字符串，而不会改变原来的字符串。
+
+### 7.2.3 PyLikeFor循环
+qwq语言支持类似Python中的for循环，在其之上加以微小的改变，例如：
+```python
+for i in (1, 10) {
+    # 代码块
+}
+```
+这里无需指定i为int类型，也不需要前置声明，解释器会把循环控制变量定义为一个int型的变量，并赋予初值。每次循环结束之时，解释器自动为循环控制变量加1。
 
 
 
+# 8 运行方法
 
+## 8.1 获取与安装
 
++ 首先从github仓库中将代码clone下来
+  `git clone git@github.com:Yunshiyue/myPL.git`
++ 接着在根目录下执行
+  `cmake -B build`
++ 最后进入build文件夹执行make
+  `cd build`
+  `make`
 
+## 8.2 对.qwq文件进行解释执行
 
+```bash
+# 在build文件夹中执行，fileName表示需要执行的.qwq文件
+./myPL fileName -h -t
+#where
+#-h  help: shows the usage.
+#-t  tree: tell qwq to print ast.
+```
 
+# 9 结果与测试
 
+## 9.1 变量声明
 
++ 测试文件
+  ```c++
+  int i1;
+  double i2;
+  char i3;
+  string i4;
+  bool i5;
+  array<int, 10> i6;
+  
+  print("变量声明测试通过");
+  
+  int j1 = 1;
+  double j2 = 1;
+  char j3 = '1';
+  string j4 = "123";
+  bool j5 = false;
+  
+  int jn = j1;
+  
+  print(jn);
+  print("变量声明赋值测试通过");
+  ```
 
++ 结果展示
+  ```
+  
+  (base) whh@whh:~/workSpace/myPL/build$ ./myPL ../examples/test_declaration.qwq -t
+  grammaAnalyze success
+  ast:
+  Program
+  |----VarDeclAssignStmt
+  |      |----VariableDeclaration
+  |      |      |----IntType
+  |      |      |      |----299
+  |      |      |----Identifier
+  |      |      |      |----i1
+  |----VarDeclAssignStmt
+  |      |----VariableDeclaration
+  |      |      |----DoubleType
+  |      |      |      |----301
+  |      |      |----Identifier
+  |      |      |      |----i2
+  |----VarDeclAssignStmt
+  |      |----VariableDeclaration
+  |      |      |----CharType
+  |      |      |      |----302
+  |      |      |----Identifier
+  |      |      |      |----i3
+  |----VarDeclAssignStmt
+  |      |----VariableDeclaration
+  |      |      |----StringType
+  |      |      |      |----303
+  |      |      |----Identifier
+  |      |      |      |----i4
+  |----VarDeclAssignStmt
+  |      |----VariableDeclaration
+  |      |      |----BooleanType
+  |      |      |      |----300
+  |      |      |----Identifier
+  |      |      |      |----i5
+  |----VarDeclAssignStmt
+  |      |----VariableDeclaration
+  |      |      |----ArrayType
+  |      |      |      |----elementType
+  |      |      |      |      |----IntType
+  |      |      |      |      |      |----299
+  |      |      |      |----capacity
+  |      |      |      |      |----10
+  |      |      |----Identifier
+  |      |      |      |----i6
+  |----PrintStatement
+  |      |----StringLiteral
+  |      |      |----变量声明测试通过
+  |----VarDeclAssignStmt
+  |      |----VarDeclByExpr
+  |      |      |----IntType
+  |      |      |      |----299
+  |      |      |----Identifier
+  |      |      |      |----j1
+  |      |      |----=
+  |      |      |----LogicalExpression
+  |      |      |      |----Factor
+  |      |      |      |      |----Integer
+  |      |      |      |      |----1
+  |----VarDeclAssignStmt
+  |      |----VarDeclByExpr
+  |      |      |----DoubleType
+  |      |      |      |----301
+  |      |      |----Identifier
+  |      |      |      |----j2
+  |      |      |----=
+  |      |      |----LogicalExpression
+  |      |      |      |----Factor
+  |      |      |      |      |----Integer
+  |      |      |      |      |----1
+  |----VarDeclAssignStmt
+  |      |----VarDeclByExpr
+  |      |      |----CharType
+  |      |      |      |----302
+  |      |      |----Identifier
+  |      |      |      |----j3
+  |      |      |----=
+  |      |      |----LogicalExpression
+  |      |      |      |----Factor
+  |      |      |      |      |----Character
+  |      |      |      |      |      |----49
+  |----VarDeclAssignStmt
+  |      |----VarDeclByExpr
+  |      |      |----StringType
+  |      |      |      |----303
+  |      |      |----Identifier
+  |      |      |      |----j4
+  |      |      |----=
+  |      |      |----StringLiteral
+  |      |      |      |----123
+  |----VarDeclAssignStmt
+  |      |----VarDeclByExpr
+  |      |      |----BooleanType
+  |      |      |      |----300
+  |      |      |----Identifier
+  |      |      |      |----j5
+  |      |      |----=
+  |      |      |----LogicalExpression
+  |      |      |      |----Factor
+  |      |      |      |      |----Boolean
+  |      |      |      |      |----0
+  |----VarDeclAssignStmt
+  |      |----VarDeclByExpr
+  |      |      |----IntType
+  |      |      |      |----299
+  |      |      |----Identifier
+  |      |      |      |----jn
+  |      |      |----=
+  |      |      |----LogicalExpression
+  |      |      |      |----Factor
+  |      |      |      |      |----Identifier
+  |      |      |      |      |      |----j1
+  |----PrintStatement
+  |      |----LogicalExpression
+  |      |      |----Factor
+  |      |      |      |----Identifier
+  |      |      |      |      |----jn
+  |----PrintStatement
+  |      |----StringLiteral
+  |      |      |----变量声明赋值测试通过
+  ast-end
+  start executing
+  变量声明测试通过
+  1
+  变量声明赋值测试通过
+  finished
+  ```
 
+  
 
+## 9.2 表达式
 
++ 测试文件
+
+  ```c++
+  int a = 1;
+  int b = 2;
+  int c;
+  
+  c = 3 * (a + b);
+  
+  int d;
+  
+  d = 2 ** (a + b);
+  
+  int e;
+  
+  e = c // 2;
+  
+  print("a = ");
+  print(a);
+  print("b = ");
+  print(b);
+  print("c = ");
+  print(c);
+  print("d = ");
+  print(d);
+  print("e = ");
+  print(e);
+  
+  ```
+
++ 结果展示
+  ```
+  $ ./myPL ../examples/test_expression.qwq -t
+  grammaAnalyze success
+  ast:
+  Program
+  |----VarDeclAssignStmt
+  |      |----VarDeclByExpr
+  |      |      |----IntType
+  |      |      |      |----299
+  |      |      |----Identifier
+  |      |      |      |----a
+  |      |      |----=
+  |      |      |----LogicalExpression
+  |      |      |      |----Factor
+  |      |      |      |      |----Integer
+  |      |      |      |      |----1
+  |----VarDeclAssignStmt
+  |      |----VarDeclByExpr
+  |      |      |----IntType
+  |      |      |      |----299
+  |      |      |----Identifier
+  |      |      |      |----b
+  |      |      |----=
+  |      |      |----LogicalExpression
+  |      |      |      |----Factor
+  |      |      |      |      |----Integer
+  |      |      |      |      |----2
+  |----VarDeclAssignStmt
+  |      |----VariableDeclaration
+  |      |      |----IntType
+  |      |      |      |----299
+  |      |      |----Identifier
+  |      |      |      |----c
+  |----ExpressionStatement
+  |      |----AssignExpression
+  |      |      |----Identifier
+  |      |      |      |----c
+  |      |      |----=
+  |      |      |----ArithmeticExpression
+  |      |      |      |----Item
+  |      |      |      |      |----Item
+  |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |----Integer
+  |      |      |      |      |      |      |----3
+  |      |      |      |      |----*
+  |      |      |      |      |----Factor
+  |      |      |      |      |      |----ArithmeticExpression
+  |      |      |      |      |      |      |----ArithmeticExpression
+  |      |      |      |      |      |      |      |----Item
+  |      |      |      |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |      |      |      |      |----a
+  |      |      |      |      |      |      |----+
+  |      |      |      |      |      |      |----Item
+  |      |      |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |      |      |      |----b
+  |----VarDeclAssignStmt
+  |      |----VariableDeclaration
+  |      |      |----IntType
+  |      |      |      |----299
+  |      |      |----Identifier
+  |      |      |      |----d
+  |----ExpressionStatement
+  |      |----AssignExpression
+  |      |      |----Identifier
+  |      |      |      |----d
+  |      |      |----=
+  |      |      |----ArithmeticExpression
+  |      |      |      |----Item
+  |      |      |      |      |----Item
+  |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |----Integer
+  |      |      |      |      |      |      |----2
+  |      |      |      |      |----**
+  |      |      |      |      |----Factor
+  |      |      |      |      |      |----ArithmeticExpression
+  |      |      |      |      |      |      |----ArithmeticExpression
+  |      |      |      |      |      |      |      |----Item
+  |      |      |      |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |      |      |      |      |----a
+  |      |      |      |      |      |      |----+
+  |      |      |      |      |      |      |----Item
+  |      |      |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |      |      |      |----b
+  |----VarDeclAssignStmt
+  |      |----VariableDeclaration
+  |      |      |----IntType
+  |      |      |      |----299
+  |      |      |----Identifier
+  |      |      |      |----e
+  |----ExpressionStatement
+  |      |----AssignExpression
+  |      |      |----Identifier
+  |      |      |      |----e
+  |      |      |----=
+  |      |      |----ArithmeticExpression
+  |      |      |      |----Item
+  |      |      |      |      |----Item
+  |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |      |----c
+  |      |      |      |      |----//
+  |      |      |      |      |----Factor
+  |      |      |      |      |      |----Integer
+  |      |      |      |      |      |----2
+  |----PrintStatement
+  |      |----StringLiteral
+  |      |      |----a = 
+  |----PrintStatement
+  |      |----LogicalExpression
+  |      |      |----Factor
+  |      |      |      |----Identifier
+  |      |      |      |      |----a
+  |----PrintStatement
+  |      |----StringLiteral
+  |      |      |----b = 
+  |----PrintStatement
+  |      |----LogicalExpression
+  |      |      |----Factor
+  |      |      |      |----Identifier
+  |      |      |      |      |----b
+  |----PrintStatement
+  |      |----StringLiteral
+  |      |      |----c = 
+  |----PrintStatement
+  |      |----LogicalExpression
+  |      |      |----Factor
+  |      |      |      |----Identifier
+  |      |      |      |      |----c
+  |----PrintStatement
+  |      |----StringLiteral
+  |      |      |----d = 
+  |----PrintStatement
+  |      |----LogicalExpression
+  |      |      |----Factor
+  |      |      |      |----Identifier
+  |      |      |      |      |----d
+  |----PrintStatement
+  |      |----StringLiteral
+  |      |      |----e = 
+  |----PrintStatement
+  |      |----LogicalExpression
+  |      |      |----Factor
+  |      |      |      |----Identifier
+  |      |      |      |      |----e
+  ast-end
+  start executing
+  a = 
+  1
+  b = 
+  2
+  c = 
+  9
+  d = 
+  8
+  e = 
+  4
+  finished
+  ```
+
+## 9.3 for循环
+
++ 测试文件
+
+  ```c++
+  int num;
+  for i in (0 , 10) {
+      num = i;
+      print(num);
+  }
+  print("pyLike成功");
+  
+  int num2;
+  for (int j = 1; j <= 2; j = j + 1) {
+      num2 = j;
+      print(j);
+  }
+  print("cLike成功");
+  
+  ```
+
++ 结果展示
+  ```
+  $ ./myPL ../examples/test_for.qwq -t
+  grammaAnalyze success
+  ast:
+  Program
+  |----VarDeclAssignStmt
+  |      |----VariableDeclaration
+  |      |      |----IntType
+  |      |      |      |----299
+  |      |      |----Identifier
+  |      |      |      |----num
+  |----PyLikeForStatement
+  |      |----Identifier
+  |      |      |----i
+  |      |----LogicalExpression
+  |      |      |----Factor
+  |      |      |      |----Integer
+  |      |      |      |----0
+  |      |----LogicalExpression
+  |      |      |----Factor
+  |      |      |      |----Integer
+  |      |      |      |----10
+  |----PrintStatement
+  |      |----StringLiteral
+  |      |      |----pyLike成功
+  |----VarDeclAssignStmt
+  |      |----VariableDeclaration
+  |      |      |----IntType
+  |      |      |      |----299
+  |      |      |----Identifier
+  |      |      |      |----num2
+  |----CLikeForStatement
+  |      |----VarDeclByExpr
+  |      |      |----IntType
+  |      |      |      |----299
+  |      |      |----Identifier
+  |      |      |      |----j
+  |      |      |----=
+  |      |      |----LogicalExpression
+  |      |      |      |----Factor
+  |      |      |      |      |----Integer
+  |      |      |      |      |----1
+  |      |----RelationalExpression
+  |      |      |----ArithmeticExpression
+  |      |      |      |----Item
+  |      |      |      |      |----Factor
+  |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |----j
+  |      |      |----<=
+  |      |      |----ArithmeticExpression
+  |      |      |      |----Item
+  |      |      |      |      |----Factor
+  |      |      |      |      |      |----Integer
+  |      |      |      |      |      |----2
+  |      |----AssignExpression
+  |      |      |----Identifier
+  |      |      |      |----j
+  |      |      |----=
+  |      |      |----ArithmeticExpression
+  |      |      |      |----ArithmeticExpression
+  |      |      |      |      |----Item
+  |      |      |      |      |      |----Factor
+  |      |      |      |      |      |      |----Identifier
+  |      |      |      |      |      |      |      |----j
+  |      |      |      |----+
+  |      |      |      |----Item
+  |      |      |      |      |----Factor
+  |      |      |      |      |      |----Integer
+  |      |      |      |      |      |----1
+  |----PrintStatement
+  |      |----StringLiteral
+  |      |      |----cLike成功
+  ast-end
+  start executing
+  0
+  1
+  2
+  3
+  4
+  5
+  6
+  7
+  8
+  9
+  pyLike成功
+  1
+  2
+  cLike成功
+  finished
+  ```
+
+## 9.4 if语句
+
++ 测试文件
+
+  ```c++
+  int i = 1;
+  int j = 2;
+  int ans;
+  if (i <= j) {
+      ans = 1;
+  } else {
+      ans = 2;
+  }
+  if (ans == 1) {
+      i = 1;
+      print("if语句测试通过");
+  }
+  ```
+
++ 结果展示
+  ```
+  $ ./myPL ../examples/test_if.qwq
+  grammaAnalyze success
+  start executing
+  if语句测试通过
+  finished
+  ```
+
+## 9.5 字符串
+
++ 测试文件
+
+  ```c++
+  string s = "abcdefghijk";
+  string ss = s.substr(1, 3);
+  string c = "aaa" + "bbb";
+  string d = "how are you?";
+  string dt = d.title;
+  string du = d.uppercase;
+  string dl = d.lowercase;
+  string dr = d.reverse;
+  
+  print(s);
+  print(ss);
+  print(c);
+  print(d);
+  print(dt);
+  print(du);
+  print(dl);
+  print(dr);
+  ```
+
++ 结果展示
+  ```
+  $ ./myPL ../examples/test_string.qwq
+  grammaAnalyze success
+  start executing
+  abcdefghijk
+  bc
+  aaabbb
+  how are you?
+  How Are You?
+  HOW ARE YOU?
+  how are you?
+  ?uoy era woh
+  finished
+  ```
+
+## 9.6 While语句
+
++ 测试文件
+
+  ```c++
+  int i = 1;
+  int ans = 0;
+  while (i <= 5) {
+      i = i + 1;
+      print(i);
+  }
+  
+  ans = ans + 1;
+  
+  while (i <= 10) {
+      if (i == 8) {
+          break;
+      }
+      i = i + 1;
+      print(i);
+  }
+  
+  if (i == 8) {
+      ans = ans + 1;
+  }
+  
+  int j = 1;
+  while (i <= 10) {
+      if (j < i) {
+          j = j + 1;
+          continue;
+      }
+      break;
+      
+  }
+  
+  if (j == 8) {
+      ans = ans + 1;
+  }
+  
+  print("i = ");
+  print(i);
+  print("j = ");
+  print(j);
+  print("ans = ");
+  print(ans);
+  print("end");
+  ```
+
++ 结果展示
+  ```
+  $ ./myPL ../examples/test_while.qwq
+  grammaAnalyze success
+  start executing
+  2
+  3
+  4
+  5
+  6
+  7
+  8
+  i = 
+  8
+  j = 
+  8
+  ans = 
+  3
+  end
+  finished
+  ```
+
+## 9.7 数组的声明调用
+
+仅展示二维数组。
+
++ 测试文件
+
+  ```c++
+  array<array<int, 4>, 4> a;
+  int num = 0;
+  for (int i = 0; i < 4; i = i + 1) {
+      for (int j = 0; j < 4; j = j + 1) {
+          a[i][j] = num;
+          num = num + 1;
+      }
+  }
+  
+  print(a);
+  array<int, 4> b = a[1];
+  print(b);
+  b = a[2];
+  print(b);
+  a[1] = b;
+  a[2] = a[0];
+  print(a);
+  print(a[3]);
+  ```
+
++ 结果展示
+  ```
+  $ ./myPL ../examples/test_array_2d.qwq
+  grammaAnalyze success
+  start executing
+  0  1  2  3  4  5  6  7  8  9  10  11  12  13  14  15  
+  4  5  6  7  
+  8  9  10  11  
+  0  1  2  3  8  9  10  11  0  1  2  3  12  13  14  15  
+  12  13  14  15  
+  finished
+  ```
+
+## 9.8 函数声明及调用
+
++ 测试文件
+
+  ```c++
+  def fun(int i, int j, int k) -> int {
+      int num = i + j;
+      return num;
+  }
+  
+  def func2(int i) -> int {
+      return i + 3;
+  }
+  
+  int a = 33;
+  int b = 22;
+  int c = 11;
+  int num = fun(a, b, c);
+  
+  print(num);
+  ```
+
++ 结果展示
+  ```
+  $ ./myPL ../examples/test_func2.qwq
+  grammaAnalyze success
+  start executing
+  55
+  finished
+  ```
 

@@ -216,9 +216,9 @@ func-decl : func-head block { $$ = new qwq::FunctionDeclaration(std::shared_ptr<
           ;
 
 func-head : TDEF ident '(' fp-list ')' { $$ = new qwq::FunctionHead(nullptr, std::shared_ptr<qwq::Identifier>($2), std::shared_ptr<qwq::VariableList>($4), nullptr); }
-          | TTEMP '<' TTYNAME type '>' TDEF ident '(' fp-list ')' { $$ = new qwq::FunctionHead(std::shared_ptr<qwq::Type>($4), std::shared_ptr<qwq::Identifier>($7), std::shared_ptr<qwq::VariableList>($9), nullptr); }
+          | TTEMP TLT TTYNAME type TGT TDEF ident '(' fp-list ')' { $$ = new qwq::FunctionHead(std::shared_ptr<qwq::Type>($4), std::shared_ptr<qwq::Identifier>($7), std::shared_ptr<qwq::VariableList>($9), nullptr); }
           | TDEF ident '(' fp-list ')' TARROW type { $$ = new qwq::FunctionHead(nullptr, std::shared_ptr<qwq::Identifier>($2), std::shared_ptr<qwq::VariableList>($4), std::shared_ptr<qwq::Type>($7)); }
-          | TTEMP '<' TTYNAME type '>' TDEF ident '(' fp-list ')' TARROW type { $$ = new qwq::FunctionHead(std::shared_ptr<qwq::Type>($4), std::shared_ptr<qwq::Identifier>($7), std::shared_ptr<qwq::VariableList>($9), std::shared_ptr<qwq::Type>($12)); }
+          | TTEMP TLT TTYNAME type TGT TDEF ident '(' fp-list ')' TARROW type { $$ = new qwq::FunctionHead(std::shared_ptr<qwq::Type>($4), std::shared_ptr<qwq::Identifier>($7), std::shared_ptr<qwq::VariableList>($9), std::shared_ptr<qwq::Type>($12)); }
           ; //bug?
 
 fp-list : %empty { $$ = new qwq::VariableList(); }
@@ -239,20 +239,20 @@ class-decl  : class-head block { $$ = new qwq::ClassDeclaration(std::shared_ptr<
             ; //应该只有var和func的声明
 
 class-head  : TCLASS ident { $$ = new qwq::ClassHead(std::shared_ptr<qwq::Identifier>($2), nullptr, nullptr); }
-            | TTEMP '<' TTYNAME ident '>' TCLASS ident { $$ = new qwq::ClassHead(std::shared_ptr<qwq::Identifier>($7), std::shared_ptr<qwq::Identifier>($4), nullptr); }
+            | TTEMP TLT TTYNAME ident TGT TCLASS ident { $$ = new qwq::ClassHead(std::shared_ptr<qwq::Identifier>($7), std::shared_ptr<qwq::Identifier>($4), nullptr); }
             | TCLASS ident TEXTEND ident { $$ = new qwq::ClassHead(std::shared_ptr<qwq::Identifier>($2), nullptr, std::shared_ptr<qwq::Identifier>($4)); }
-            | TTEMP '<' TTYNAME ident '>' TCLASS ident TEXTEND ident { $$ = new qwq::ClassHead(std::shared_ptr<qwq::Identifier>($7), std::shared_ptr<qwq::Identifier>($4), std::shared_ptr<qwq::Identifier>($9)); }
+            | TTEMP TLT TTYNAME ident TGT TCLASS ident TEXTEND ident { $$ = new qwq::ClassHead(std::shared_ptr<qwq::Identifier>($7), std::shared_ptr<qwq::Identifier>($4), std::shared_ptr<qwq::Identifier>($9)); }
             ; //有点复杂，bug?
 
 //变量声明
-var-decl  : type '<' type '>' ident { $$ = new qwq::VariableDeclaration(std::shared_ptr<qwq::Type>($1), std::shared_ptr<qwq::Type>($3), std::shared_ptr<qwq::Identifier>($5), @$); }
+var-decl  : type TLT type TGT ident { $$ = new qwq::VariableDeclaration(std::shared_ptr<qwq::Type>($1), std::shared_ptr<qwq::Type>($3), std::shared_ptr<qwq::Identifier>($5), @$); }
           | type ident { $$ = new qwq::VariableDeclaration(std::shared_ptr<qwq::Type>($1), std::shared_ptr<qwq::Identifier>($2), @$); }
           ;
 
 var-decl-assign : type ident '=' expr { $$ = new qwq::VarDeclByExpr(std::shared_ptr<qwq::Type>($1), std::shared_ptr<qwq::Identifier>($2), std::shared_ptr<qwq::Expression>($4), @$); }
-                | type '<' type '>' ident '=' expr { $$ = new qwq::VarDeclByExpr(std::shared_ptr<qwq::Type>($1), std::shared_ptr<qwq::Type>($3), std::shared_ptr<qwq::Identifier>($5), std::shared_ptr<qwq::Expression>($7), @$); }
+                | type TLT type TGT ident '=' expr { $$ = new qwq::VarDeclByExpr(std::shared_ptr<qwq::Type>($1), std::shared_ptr<qwq::Type>($3), std::shared_ptr<qwq::Identifier>($5), std::shared_ptr<qwq::Expression>($7), @$); }
                 | type ident '(' ap-list ')' { $$ = new qwq::ObjectDeclaration(std::shared_ptr<qwq::Type>($1), nullptr, std::shared_ptr<qwq::Identifier>($2), std::shared_ptr<qwq::ExpressionList>($4), @$); }
-                | type '<' type '>' ident '(' ap-list ')' { $$ = new qwq::ObjectDeclaration(std::shared_ptr<qwq::Type>($1), std::shared_ptr<qwq::Type>($3), std::shared_ptr<qwq::Identifier>($5), std::shared_ptr<qwq::ExpressionList>($7), @$); }
+                | type TLT type TGT ident '(' ap-list ')' { $$ = new qwq::ObjectDeclaration(std::shared_ptr<qwq::Type>($1), std::shared_ptr<qwq::Type>($3), std::shared_ptr<qwq::Identifier>($5), std::shared_ptr<qwq::ExpressionList>($7), @$); }
                 ;
 
 var-decl-stmt : var-decl ';' { $$ = new qwq::VarDeclAssignStmt(std::shared_ptr<qwq::VariableDeclaration>($1)); }

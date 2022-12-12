@@ -5,8 +5,13 @@ void io::print_empty_bay() {
 }
 
 void io::print_ident(int depth) {
-    for (int i = 0; i < depth; i++) {
-        std::cout << "  ";
+    for (int i = 0; i < depth - 1; i++) {
+        std::cout << "|";
+        std::cout << "      ";
+    }
+    if (depth > 0) {
+        std::cout << "|";
+        std::cout << "----";
     }
 }
 

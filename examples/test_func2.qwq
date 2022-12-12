@@ -1,17 +1,35 @@
+def func1() {
+    int a = 1;
+    int b = 2;
+    int c = 3;
+    print("this is func1");
+}
 
-
-def fun(int i, int j, int k) -> int {
+def func2(int i, int j) -> int {
     int num = i + j;
     return num;
 }
 
-def func2(int i) -> int {
-    return i + 3;
+def func3() -> string {
+    return "no argument function";
 }
+
+def fi(int i) -> int {
+    if (i == 1) {
+        return 1;
+    }
+    if (i == 2) {
+        return 1;
+    }
+    return fi(i - 1) + fi(i - 2);
+}
+
 
 int a = 33;
 int b = 22;
-int c = 11;
-int num = fun(a, b, c);
+int num = func2(a, b);
 
+func1();
 print(num);
+print(func3());
+print(fi(9));

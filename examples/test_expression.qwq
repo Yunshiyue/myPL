@@ -1,16 +1,13 @@
 int a = 1;
 int b = 2;
-int c;
 
+int c;
 c = 3 * (a + b);
 
-int d;
+int d = 2 ** (a + b);
 
-d = 2 ** (a + b);
-
-int e;
-
-e = c // 2;
+int e = c // 2;
+double f = 9.3 // 2.2;
 
 print("a = ");
 print(a);
@@ -22,3 +19,5 @@ print("d = ");
 print(d);
 print("e = ");
 print(e);
+print("f = ");
+print(f);
